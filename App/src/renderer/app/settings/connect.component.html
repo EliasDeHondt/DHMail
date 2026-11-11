@@ -1,0 +1,54 @@
+@if (mode() === 'choose') {
+<div class="choices">
+  <button type="button" class="choice" [disabled]="!!busy()" (click)="oauth('microsoft')">
+    <span class="choice-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#f25022" d="M2 2h9.5v9.5H2z"/><path fill="#7fba00" d="M12.5 2H22v9.5h-9.5z"/><path fill="#00a4ef" d="M2 12.5h9.5V22H2z"/><path fill="#ffb900" d="M12.5 12.5H22V22h-9.5z"/></svg></span>
+    <span class="choice-text"><span class="choice-name">{{ 'APP.CONNECT.OUTLOOK' | translate }}</span><span class="choice-sub">{{ 'APP.CONNECT.OUTLOOK_SUB' | translate }}</span></span>
+    @if (busy() === 'microsoft') {<span class="spinner"></span>} @else {<app-icon class="choice-chevron" name="chevron-right"></app-icon>}
+  </button>
+  <button type="button" class="choice" [disabled]="!!busy()" (click)="oauth('google')">
+    <span class="choice-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285f4" d="M22.6 12.2c0-.8-.1-1.4-.2-2H12v4h6c-.1.9-.8 2.4-2.2 3.3l3.4 2.6c2.1-1.9 3.4-4.7 3.4-7.9z"/><path fill="#34a853" d="M12 23c2.9 0 5.4-1 7.2-2.6l-3.4-2.6c-.9.6-2.2 1.1-3.8 1.1-2.9 0-5.3-1.9-6.2-4.5l-3.5 2.7C4.1 20.6 7.8 23 12 23z"/><path fill="#fbbc05" d="M5.8 14.4c-.2-.7-.4-1.5-.4-2.4s.1-1.6.4-2.4L2.3 6.9C1.5 8.4 1 10.2 1 12s.5 3.6 1.3 5.1l3.5-2.7z"/><path fill="#ea4335" d="M12 5.1c2 0 3.4.9 4.2 1.6l3.1-3C17.4 2 14.9 1 12 1 7.8 1 4.1 3.4 2.3 6.9l3.5 2.7C6.7 7 9.1 5.1 12 5.1z"/></svg></span>
+    <span class="choice-text"><span class="choice-name">{{ 'APP.CONNECT.GMAIL' | translate }}</span><span class="choice-sub">{{ 'APP.CONNECT.GMAIL_SUB' | translate }}</span></span>
+    @if (busy() === 'google') {<span class="spinner"></span>} @else {<app-icon class="choice-chevron" name="chevron-right"></app-icon>}
+  </button>
+  <button type="button" class="choice" [disabled]="!!busy()" (click)="go('imap')">
+    <span class="choice-logo choice-logo--imap"><app-icon name="at"></app-icon></span>
+    <span class="choice-text"><span class="choice-name">{{ 'APP.CONNECT.OTHER' | translate }}</span><span class="choice-sub">{{ 'APP.CONNECT.OTHER_SUB' | translate }}</span></span>
+    <app-icon class="choice-chevron" name="chevron-right"></app-icon>
+  </button>
+</div>
+@if (status()) {<p class="status"><span class="spinner"></span>{{ status() }}</p>}
+@if (error()) {<p class="error">{{ error() }}</p>}
+}
+@if (mode() === 'imap' || mode() === 'gmail-app') {
+<form class="form" (ngSubmit)="connectImap()">
+  <button type="button" class="back" (click)="go('choose')"><app-icon name="back"></app-icon>{{ 'APP.CONNECT.BACK' | translate }}</button>
+  @if (mode() === 'gmail-app') {<div class="callout"><app-icon name="key"></app-icon><div><p class="callout-title">{{ 'APP.CONNECT.GMAIL_APP_TITLE' | translate }}</p><p class="hint">{{ 'APP.CONNECT.GMAIL_APP_HINT' | translate }}</p><button type="button" class="link" (click)="open('https://myaccount.google.com/apppasswords')">{{ 'APP.CONNECT.GMAIL_APP_LINK' | translate }}<app-icon name="external"></app-icon></button></div></div>}
+  <div class="field"><span class="field-label">{{ 'APP.CONNECT.EMAIL' | translate }}</span><input class="input" type="email" [(ngModel)]="email" name="email" [placeholder]="mode() === 'gmail-app' ? 'naam@gmail.com' : 'naam@domein.be'" autocomplete="email" autofocus/></div>
+  <div class="field"><span class="field-label">{{ (mode() === 'gmail-app' ? 'APP.CONNECT.APP_PASSWORD' : 'APP.CONNECT.PASSWORD') | translate }}</span><input class="input" type="password" [(ngModel)]="password" name="password" autocomplete="current-password"/></div>
+  @if (suggest(); as s) {<div class="callout callout--hint"><app-icon name="info"></app-icon><div><p class="hint">{{ (s === 'google' ? 'APP.CONNECT.SUGGEST_GOOGLE' : 'APP.CONNECT.SUGGEST_MICROSOFT') | translate }}</p><button type="button" class="link" (click)="go('choose'); oauth(s)">{{ (s === 'google' ? 'APP.CONNECT.GMAIL' : 'APP.CONNECT.OUTLOOK') | translate }}<app-icon name="chevron-right"></app-icon></button></div></div>}
+  @if (status()) {<p class="status"><span class="spinner"></span>{{ status() }}</p>}
+  @if (error()) {<p class="error">{{ error() }}</p>}
+  <div class="actions"><button type="button" class="btn btn--ghost btn--sm" (click)="mode.set('manual'); servers.username = servers.username || email">{{ 'APP.CONNECT.MANUAL' | translate }}</button><span class="spacer"></span><button type="submit" class="btn btn--primary" [disabled]="busy() === 'imap'">{{ 'APP.CONNECT.CONNECT' | translate }}</button></div>
+</form>}
+@if (mode() === 'manual') {
+<form class="form" (ngSubmit)="connectManual()">
+  <button type="button" class="back" (click)="go('imap')"><app-icon name="back"></app-icon>{{ 'APP.CONNECT.BACK' | translate }}</button>
+  <p class="hint">{{ 'APP.CONNECT.MANUAL_HINT' | translate }}</p>
+  <div class="field-row"><div class="field"><span class="field-label">{{ 'APP.CONNECT.EMAIL' | translate }}</span><input class="input" type="email" [(ngModel)]="email" name="email"/></div><div class="field"><span class="field-label">{{ 'APP.CONNECT.PASSWORD' | translate }}</span><input class="input" type="password" [(ngModel)]="password" name="password"/></div></div>
+  <div class="field"><span class="field-label">{{ 'APP.CONNECT.USERNAME' | translate }}</span><input class="input" type="text" [(ngModel)]="servers.username" name="username" [placeholder]="email"/></div>
+  <div class="server"><span class="section-title">{{ 'APP.CONNECT.INCOMING' | translate }} (IMAP)</span><div class="field-row"><div class="field grow"><span class="field-label">{{ 'APP.CONNECT.SERVER' | translate }}</span><input class="input" type="text" [(ngModel)]="servers.imapHost" name="imapHost" placeholder="imap.domein.be" required/></div><div class="field port"><span class="field-label">{{ 'APP.CONNECT.PORT' | translate }}</span><input class="input" type="number" [(ngModel)]="servers.imapPort" name="imapPort" required/></div></div><label class="check"><input type="checkbox" [(ngModel)]="servers.imapSecure" name="imapSecure"/>SSL/TLS</label></div>
+  <div class="server"><span class="section-title">{{ 'APP.CONNECT.OUTGOING' | translate }} (SMTP)</span><div class="field-row"><div class="field grow"><span class="field-label">{{ 'APP.CONNECT.SERVER' | translate }}</span><input class="input" type="text" [(ngModel)]="servers.smtpHost" name="smtpHost" placeholder="smtp.domein.be" required/></div><div class="field port"><span class="field-label">{{ 'APP.CONNECT.PORT' | translate }}</span><input class="input" type="number" [(ngModel)]="servers.smtpPort" name="smtpPort" required/></div></div><label class="check"><input type="checkbox" [(ngModel)]="servers.smtpSecure" name="smtpSecure"/>SSL/TLS <small class="muted">{{ 'APP.CONNECT.STARTTLS_HINT' | translate }}</small></label></div>
+  @if (status()) {<p class="status"><span class="spinner"></span>{{ status() }}</p>}
+  @if (error()) {<p class="error">{{ error() }}</p>}
+  <div class="actions"><span class="spacer"></span><button type="submit" class="btn btn--primary" [disabled]="busy() === 'imap'">{{ 'APP.CONNECT.CONNECT' | translate }}</button></div>
+</form>}
+@if (mode() === 'outlook-setup') {
+<form class="form" (ngSubmit)="saveMicrosoftClient()">
+  <button type="button" class="back" (click)="go('choose')"><app-icon name="back"></app-icon>{{ 'APP.CONNECT.BACK' | translate }}</button>
+  <div class="callout"><app-icon name="key"></app-icon><div><p class="callout-title">{{ 'APP.CONNECT.OUTLOOK_SETUP_TITLE' | translate }}</p><p class="hint">{{ 'APP.CONNECT.OUTLOOK_SETUP_HINT' | translate }}</p></div></div>
+  <ol class="steps"><li>{{ 'APP.CONNECT.MS_STEP_1' | translate }}</li><li>{{ 'APP.CONNECT.MS_STEP_2' | translate }}</li><li>{{ 'APP.CONNECT.MS_STEP_3' | translate }}</li></ol>
+  <button type="button" class="link" (click)="open('https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade')">{{ 'APP.CONNECT.OPEN_ENTRA' | translate }}<app-icon name="external"></app-icon></button>
+  <div class="field"><span class="field-label">{{ 'APP.CONNECT.CLIENT_ID' | translate }}</span><input class="input" type="text" [(ngModel)]="microsoftClientId" name="clientId" placeholder="00000000-0000-0000-0000-000000000000"/></div>
+  @if (error()) {<p class="error">{{ error() }}</p>}
+  <div class="actions"><span class="spacer"></span><button type="submit" class="btn btn--primary">{{ 'APP.CONNECT.SAVE_AND_CONNECT' | translate }}</button></div>
+</form>}

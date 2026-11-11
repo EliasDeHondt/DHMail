@@ -1,0 +1,17 @@
+<div class="wrap" (click)="focus()">
+  @for (chip of chips; track $index; let i = $index) {
+  <span class="rchip" [class.rchip--invalid]="!isValid(chip)" [title]="chip">
+    <app-avatar class="rchip-avatar" [name]="chip" [address]="chip"></app-avatar>
+    <span class="rchip-text">{{ chip }}</span>
+    <button type="button" class="rchip-remove" (click)="remove(i); $event.stopPropagation()" aria-label="remove"><app-icon name="close"></app-icon></button>
+  </span>}
+  <input #draftInput class="draft" type="text" [(ngModel)]="draft" [placeholder]="chips.length ? '' : placeholder" (input)="onInput()" (keydown)="onKeydown($event)" (blur)="onBlur()" (paste)="onPaste($event)" (click)="$event.stopPropagation()" autocomplete="off" spellcheck="false"/>
+</div>
+@if (suggestions().length) {
+<div class="suggest">
+  @for (s of suggestions(); track s.address; let i = $index) {
+  <button type="button" class="suggest-item" [class.suggest-item--active]="i === active()" (mousedown)="$event.preventDefault()" (click)="choose(s)" (mouseenter)="active.set(i)">
+    <app-avatar [name]="s.name" [address]="s.address"></app-avatar>
+    <span class="suggest-text"><span class="suggest-name">{{ s.name || s.address }}</span>@if (s.name) {<span class="suggest-address">{{ s.address }}</span>}</span>
+  </button>}
+</div>}

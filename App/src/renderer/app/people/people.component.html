@@ -1,0 +1,55 @@
+<div class="people">
+  <aside class="side">
+    <button type="button" class="new-contact" (click)="newContact()"><app-icon name="plus"></app-icon>{{ 'APP.PEOPLE.NEW_CONTACT' | translate }}</button>
+    <div class="side-head"><span class="section-title">{{ 'APP.PEOPLE.SOURCES' | translate }}</span><button type="button" class="icon-btn icon-btn--sm" (click)="sync()" [title]="'APP.PEOPLE.SYNC' | translate"><app-icon name="refresh" [class.spinning]="syncing()"></app-icon></button></div>
+    <button type="button" class="src" [class.src--active]="sourceFilter() === null" (click)="sourceFilter.set(null)"><app-icon name="people"></app-icon><span class="src-name">{{ 'APP.PEOPLE.ALL_CONTACTS' | translate }}</span><span class="src-count">{{ contacts().length }}</span></button>
+    @for (s of sources(); track s.id) {<button type="button" class="src" [class.src--active]="sourceFilter() === s.id" (click)="sourceFilter.set(s.id)" [title]="s.error || s.name"><app-icon [name]="sourceIcon(s)"></app-icon><span class="src-name">{{ s.name }}</span>@if (s.error) {<app-icon class="src-err" name="alert"></app-icon>}@if (s.kind === 'carddav') {<span class="icon-btn icon-btn--sm src-x" (click)="removeSource(s); $event.stopPropagation()"><app-icon name="close"></app-icon></span>}</button>}
+    <div class="side-actions"><button type="button" class="btn btn--sm btn--ghost" (click)="addingSource.set(true); error.set(null)"><app-icon name="plus"></app-icon>CardDAV</button><button type="button" class="btn btn--sm btn--ghost" (click)="importVcf()"><app-icon name="upload"></app-icon>{{ 'APP.PEOPLE.IMPORT_VCF' | translate }}</button></div>
+  </aside>
+  <section class="list">
+    <div class="search"><app-icon name="search"></app-icon><input type="search" [ngModel]="query()" (ngModelChange)="query.set($event)" [placeholder]="'APP.PEOPLE.SEARCH' | translate"/></div>
+    <div class="list-scroll">
+      @if (loading() && !contacts().length) {<div class="empty"><span class="spinner"></span></div>}
+      @else if (!filtered().length) {<div class="empty"><app-icon name="people"></app-icon><strong>{{ 'APP.PEOPLE.EMPTY' | translate }}</strong><span>{{ 'APP.PEOPLE.EMPTY_HINT' | translate }}</span></div>}
+      @else {@for (g of grouped(); track g.letter) {<div class="letter">{{ g.letter }}</div>@for (c of g.items; track c.id) {<button type="button" class="crow" [class.crow--active]="selected()?.id === c.id" (click)="select(c)"><app-avatar [name]="c.displayName" [address]="c.emails[0]?.value || ''" [photo]="c.photo"></app-avatar><span class="crow-text"><span class="crow-name">{{ c.displayName }}</span><span class="crow-sub">{{ c.emails[0]?.value || c.phones[0]?.value || c.company }}</span></span></button>}}}
+    </div>
+  </section>
+  <section class="detail">
+    @if (editing(); as f) {
+    <form class="edit" (ngSubmit)="save()">
+      <h2 class="detail-title">{{ (f.id ? 'APP.PEOPLE.EDIT_CONTACT' : 'APP.PEOPLE.NEW_CONTACT') | translate }}</h2>
+      <div class="field-row"><div class="field"><span class="field-label">{{ 'APP.PEOPLE.FIRST_NAME' | translate }}</span><input class="input" type="text" [(ngModel)]="f.firstName" name="firstName" autofocus/></div><div class="field"><span class="field-label">{{ 'APP.PEOPLE.LAST_NAME' | translate }}</span><input class="input" type="text" [(ngModel)]="f.lastName" name="lastName"/></div></div>
+      <div class="field"><span class="field-label">{{ 'APP.PEOPLE.DISPLAY_NAME' | translate }}</span><input class="input" type="text" [(ngModel)]="f.displayName" name="displayName" [placeholder]="(f.firstName + ' ' + f.lastName).trim()"/></div>
+      <div class="field"><span class="field-label">{{ 'APP.PEOPLE.EMAILS' | translate }}</span>@for (e of f.emails; track $index; let i = $index) {<div class="multi"><input class="input" type="email" [(ngModel)]="e.value" [name]="'email' + i" placeholder="naam@voorbeeld.be"/><select class="select multi-label" [(ngModel)]="e.label" [name]="'emailLabel' + i"><option value="">{{ 'APP.PEOPLE.LABEL_NONE' | translate }}</option><option value="home">{{ 'APP.PEOPLE.LABEL_HOME' | translate }}</option><option value="work">{{ 'APP.PEOPLE.LABEL_WORK' | translate }}</option><option value="other">{{ 'APP.PEOPLE.LABEL_OTHER' | translate }}</option></select><button type="button" class="icon-btn" (click)="removeField(f.emails, i)"><app-icon name="minus"></app-icon></button></div>}<button type="button" class="btn btn--sm btn--ghost self-start" (click)="addField(f.emails)"><app-icon name="plus"></app-icon>{{ 'APP.PEOPLE.ADD_EMAIL' | translate }}</button></div>
+      <div class="field"><span class="field-label">{{ 'APP.PEOPLE.PHONES' | translate }}</span>@for (p of f.phones; track $index; let i = $index) {<div class="multi"><input class="input" type="tel" [(ngModel)]="p.value" [name]="'phone' + i"/><select class="select multi-label" [(ngModel)]="p.label" [name]="'phoneLabel' + i"><option value="">{{ 'APP.PEOPLE.LABEL_NONE' | translate }}</option><option value="mobile">{{ 'APP.PEOPLE.LABEL_MOBILE' | translate }}</option><option value="home">{{ 'APP.PEOPLE.LABEL_HOME' | translate }}</option><option value="work">{{ 'APP.PEOPLE.LABEL_WORK' | translate }}</option></select><button type="button" class="icon-btn" (click)="removeField(f.phones, i)"><app-icon name="minus"></app-icon></button></div>}<button type="button" class="btn btn--sm btn--ghost self-start" (click)="addField(f.phones)"><app-icon name="plus"></app-icon>{{ 'APP.PEOPLE.ADD_PHONE' | translate }}</button></div>
+      <div class="field-row"><div class="field"><span class="field-label">{{ 'APP.PEOPLE.COMPANY' | translate }}</span><input class="input" type="text" [(ngModel)]="f.company" name="company"/></div><div class="field"><span class="field-label">{{ 'APP.PEOPLE.JOB_TITLE' | translate }}</span><input class="input" type="text" [(ngModel)]="f.title" name="title"/></div></div>
+      <div class="field"><span class="field-label">{{ 'APP.PEOPLE.BIRTHDAY' | translate }}</span><input class="input" type="date" [(ngModel)]="f.birthday" name="birthday"/></div>
+      <div class="field"><span class="field-label">{{ 'APP.PEOPLE.NOTES' | translate }}</span><textarea class="textarea" [(ngModel)]="f.notes" name="notes"></textarea></div>
+      @if (error()) {<p class="error">{{ error() }}</p>}
+      <div class="edit-actions"><button type="button" class="btn btn--ghost" (click)="editing.set(null)">{{ 'APP.COMMON.CANCEL' | translate }}</button><button type="submit" class="btn btn--primary" [disabled]="saving()">{{ 'APP.COMMON.SAVE' | translate }}</button></div>
+    </form>}
+    @else if (addingSource()) {
+    <form class="edit" (ngSubmit)="addSource()">
+      <h2 class="detail-title">{{ 'APP.PEOPLE.ADD_CARDDAV' | translate }}</h2>
+      <p class="hint">{{ 'APP.PEOPLE.CARDDAV_HINT' | translate }}</p>
+      <div class="field"><span class="field-label">{{ 'APP.COMMON.NAME' | translate }}</span><input class="input" type="text" [(ngModel)]="sourceForm.name" name="srcName"/></div>
+      <div class="field"><span class="field-label">URL</span><input class="input" type="url" [(ngModel)]="sourceForm.url" name="srcUrl" placeholder="https://carddav.example.com/" required/></div>
+      <div class="field-row"><div class="field"><span class="field-label">{{ 'APP.CONNECT.USERNAME' | translate }}</span><input class="input" type="text" [(ngModel)]="sourceForm.username" name="srcUser"/></div><div class="field"><span class="field-label">{{ 'APP.CONNECT.PASSWORD' | translate }}</span><input class="input" type="password" [(ngModel)]="sourceForm.password" name="srcPass"/></div></div>
+      @if (error()) {<p class="error">{{ error() }}</p>}
+      <div class="edit-actions"><button type="button" class="btn btn--ghost" (click)="addingSource.set(false)">{{ 'APP.COMMON.CANCEL' | translate }}</button><button type="submit" class="btn btn--primary" [disabled]="saving()">{{ 'APP.COMMON.ADD' | translate }}</button></div>
+    </form>}
+    @else if (selected(); as c) {
+    <div class="card">
+      <div class="card-head"><app-avatar class="card-avatar" [name]="c.displayName" [address]="c.emails[0]?.value || ''" [photo]="c.photo"></app-avatar><div class="card-id"><h2 class="card-name">{{ c.displayName }}</h2>@if (c.title || c.company) {<p class="card-sub">{{ [c.title, c.company].join(' · ') }}</p>}<span class="chip card-source">{{ sourceName(c.sourceId) }}</span></div><div class="card-actions">@if (c.emails.length) {<button type="button" class="btn btn--primary btn--sm" (click)="mailTo(c.emails[0].value)"><app-icon name="mail"></app-icon>{{ 'APP.PEOPLE.SEND_MAIL' | translate }}</button>}@if (!c.readOnly) {<button type="button" class="icon-btn" (click)="edit(c)" [title]="'APP.COMMON.EDIT' | translate"><app-icon name="edit"></app-icon></button><button type="button" class="icon-btn icon-btn--danger" (click)="remove(c)" [title]="'APP.COMMON.DELETE' | translate"><app-icon name="trash"></app-icon></button>}</div></div>
+      <div class="card-body">
+        @for (e of c.emails; track $index) {<div class="kv"><app-icon name="mail"></app-icon><span class="kv-text"><a href="#" (click)="mailTo(e.value); $event.preventDefault()">{{ e.value }}</a>@if (e.label) {<small>{{ e.label }}</small>}</span></div>}
+        @for (p of c.phones; track $index) {<div class="kv"><app-icon name="phone"></app-icon><span class="kv-text"><a href="#" (click)="openExternal('tel:' + p.value); $event.preventDefault()">{{ p.value }}</a>@if (p.label) {<small>{{ p.label }}</small>}</span></div>}
+        @if (c.company) {<div class="kv"><app-icon name="building"></app-icon><span class="kv-text">{{ c.company }}</span></div>}
+        @if (c.birthday) {<div class="kv"><app-icon name="cake"></app-icon><span class="kv-text">{{ birthdayLabel(c.birthday) }}</span></div>}
+        @if (c.notes) {<div class="kv"><app-icon name="file"></app-icon><span class="kv-text kv-notes">{{ c.notes }}</span></div>}
+        @if (c.readOnly) {<p class="hint">{{ 'APP.PEOPLE.READ_ONLY_HINT' | translate }}</p>}
+      </div>
+    </div>}
+    @else {<div class="empty"><app-icon name="user"></app-icon><strong>{{ 'APP.PEOPLE.SELECT' | translate }}</strong><span>{{ 'APP.PEOPLE.SELECT_HINT' | translate }}</span></div>}
+  </section>
+</div>

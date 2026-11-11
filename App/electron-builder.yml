@@ -1,0 +1,32 @@
+appId: com.eliasdehondt.dhmail
+productName: DHMail
+copyright: Copyright © Elias De Hondt
+directories:
+  output: release
+  buildResources: build
+files:
+  - dist/main/**/*
+  - dist/renderer/browser/**/*
+  - package.json
+extraResources:
+  - from: oauth.json
+    to: oauth.json
+asar: true
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+  icon: build/icon.png
+  artifactName: ${productName}-${version}-${arch}.${ext}
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: DHMail
+portable:
+  artifactName: ${productName}-${version}-portable.${ext}

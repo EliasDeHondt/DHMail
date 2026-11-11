@@ -1,0 +1,84 @@
+<div class="cal" (click)="popover.set(null)">
+  <aside class="side">
+    <button type="button" class="new-event" (click)="newEvent()"><app-icon name="plus"></app-icon>{{ 'APP.CALENDAR.NEW_EVENT' | translate }}</button>
+    <div class="mini">
+      <div class="mini-head"><button type="button" class="icon-btn icon-btn--sm" (click)="miniGo(-1)"><app-icon name="chevron-left"></app-icon></button><span class="mini-title">{{ miniMonth().toLocaleDateString(store.locale(), { month: 'long', year: 'numeric' }) }}</span><button type="button" class="icon-btn icon-btn--sm" (click)="miniGo(1)"><app-icon name="chevron-right"></app-icon></button></div>
+      <div class="mini-grid"><span class="mini-wk"></span>@for (n of weekdayNames(); track $index) {<span class="mini-dow">{{ n.slice(0, 2) }}</span>}
+        @for (d of miniDays(); track $index; let i = $index) {@if (i % 7 === 0) {<span class="mini-wk">{{ d.week }}</span>}<button type="button" class="mini-day" [class.mini-day--out]="!d.inMonth" [class.mini-day--today]="d.today" [class.mini-day--sel]="d.selected" (click)="pickDay(d.date)">{{ d.date.getDate() }}</button>}
+      </div>
+    </div>
+    <div class="cal-list">
+      <div class="cal-list-head"><span class="section-title">{{ 'APP.CALENDAR.CALENDARS' | translate }}</span><button type="button" class="icon-btn icon-btn--sm" (click)="syncAll()" [title]="'APP.COMMON.REFRESH' | translate"><app-icon name="refresh" [class.spinning]="loading()"></app-icon></button><button type="button" class="icon-btn icon-btn--sm" (click)="addingCalendar.set(true)" [title]="'APP.CALENDAR.ADD_CALENDAR' | translate"><app-icon name="plus"></app-icon></button></div>
+      @for (g of groups(); track g.key) {
+      <div class="cal-group"><div class="cal-group-name">{{ g.label }}</div>
+        @for (c of g.list; track c.id) {<label class="cal-item" (contextmenu)="calendarMenu($event, c)"><input type="checkbox" [checked]="c.visible" (change)="toggleCalendar(c)" [style.accent-color]="c.color"/><span class="cal-swatch" [style.background]="c.color"></span><span class="cal-name" [title]="c.error || c.name">{{ c.name }}</span>@if (c.error) {<app-icon class="cal-err" name="alert"></app-icon>}@if (c.readOnly || c.source === 'ics' || c.source === 'birthdays') {<app-icon class="cal-lock" name="eye"></app-icon>}<button type="button" class="icon-btn icon-btn--sm cal-more" (click)="calendarMenu($event, c); $event.preventDefault()"><app-icon name="more"></app-icon></button></label>}
+      </div>}
+    </div>
+  </aside>
+  <section class="main">
+    <div class="toolbar">
+      <button type="button" class="btn btn--sm" (click)="today()">{{ 'APP.CALENDAR.TODAY' | translate }}</button>
+      <button type="button" class="icon-btn" (click)="go(-1)"><app-icon name="chevron-left"></app-icon></button>
+      <button type="button" class="icon-btn" (click)="go(1)"><app-icon name="chevron-right"></app-icon></button>
+      <h2 class="cal-title">{{ title() }}</h2>
+      <span class="toolbar-spacer"></span>
+      <div class="views"><button type="button" class="view" [class.view--on]="view() === 'day'" (click)="setView('day')">{{ 'APP.CALENDAR.VIEW_DAY' | translate }}</button><button type="button" class="view" [class.view--on]="view() === 'workweek'" (click)="setView('workweek')">{{ 'APP.CALENDAR.VIEW_WORKWEEK' | translate }}</button><button type="button" class="view" [class.view--on]="view() === 'week'" (click)="setView('week')">{{ 'APP.CALENDAR.VIEW_WEEK' | translate }}</button><button type="button" class="view" [class.view--on]="view() === 'month'" (click)="setView('month')">{{ 'APP.CALENDAR.VIEW_MONTH' | translate }}</button></div>
+    </div>
+    @if (view() === 'month') {
+    <div class="month">
+      <div class="month-dows">@for (n of weekdayNames(); track $index) {<span>{{ n }}</span>}</div>
+      <div class="month-grid">
+        @for (cell of monthCells(); track $index) {
+        <div class="mcell" [class.mcell--out]="!cell.inMonth" [class.mcell--today]="cell.today" (dblclick)="newEvent(cell.day, true)">
+          <button type="button" class="mcell-day" (click)="openDay(cell.day)">{{ cell.day.getDate() === 1 ? cell.day.toLocaleDateString(store.locale(), { day: 'numeric', month: 'short' }) : cell.day.getDate() }}</button>
+          <div class="mcell-items">
+            @for (ev of cell.items.slice(0, 4); track ev.id) {<button type="button" class="mev" [class.mev--timed]="!isAllDayLike(ev)" [style.background]="isAllDayLike(ev) ? ev.color : null" [style.color]="isAllDayLike(ev) ? textColor(ev.color) : null" [style.--dot]="ev.color" (click)="showEvent(ev, $event)">@if (!isAllDayLike(ev)) {<span class="mev-time">{{ time(eventStart(ev)) }}</span>}<span class="mev-title">{{ ev.title || ('APP.CALENDAR.NO_TITLE' | translate) }}</span></button>}
+            @if (cell.items.length > 4) {<button type="button" class="mev-more" (click)="openDay(cell.day)">+{{ cell.items.length - 4 }}</button>}
+          </div>
+        </div>}
+      </div>
+    </div>}
+    @else {
+    <div class="grid">
+      <div class="grid-head">
+        <div class="gutter-head"></div>
+        @for (d of days(); track $index) {<div class="day-head" [class.day-head--today]="isToday(d)"><span class="day-num">{{ d.getDate() }}</span><span class="day-name">{{ dayLabel(d) }}</span></div>}
+      </div>
+      @if (allDayByDay().rows) {
+      <div class="allday" [style.grid-template-columns]="'56px repeat(' + days().length + ', minmax(0, 1fr))'" [style.height.px]="allDayByDay().rows * 24 + 6">
+        @for (p of allDayByDay().items; track p.event.id) {<button type="button" class="ev ev--allday" [style.grid-column]="(p.col + 2) + ' / span ' + p.span" [style.top.px]="p.row * 24 + 3" [style.background]="p.event.color" [style.color]="textColor(p.event.color)" (click)="showEvent(p.event, $event)" [title]="p.event.title">{{ p.event.title || ('APP.CALENDAR.NO_TITLE' | translate) }}</button>}
+      </div>}
+      <div class="grid-scroll" #gridScroll>
+        <div class="grid-body" [style.height.px]="24 * hourPx">
+          <div class="gutter">@for (h of hours; track h) {<div class="hour-label" [style.top.px]="h * hourPx">{{ h ? hourLabel(h) : '' }}</div>}</div>
+          @for (day of days(); track $index; let di = $index) {
+          <div class="day-col" [class.day-col--today]="isToday(day)" (click)="slotClick(day, $event)">
+            @for (h of hours; track h) {<div class="hour-line" [style.top.px]="h * hourPx" [class.hour-line--work]="h >= store.settings().workDayStart && h < store.settings().workDayEnd"></div>}
+            @if (isToday(day)) {<div class="now-line" [style.top.px]="nowTop()"></div>}
+            @for (p of timedByDay()[di]; track p.event.id) {<button type="button" class="ev" [style.top.px]="p.top" [style.height.px]="p.height" [style.left.%]="p.left" [style.width]="'calc(' + p.width + '% - 3px)'" [style.background]="p.event.color" [style.color]="textColor(p.event.color)" [class.ev--tentative]="p.event.status === 'TENTATIVE'" (click)="showEvent(p.event, $event)" [title]="p.event.title"><span class="ev-title">{{ p.event.title || ('APP.CALENDAR.NO_TITLE' | translate) }}</span>@if (p.height > 34) {<span class="ev-time">{{ time(p.start) }} – {{ time(p.end) }}</span>}@if (p.height > 50 && p.event.location) {<span class="ev-loc">{{ p.event.location }}</span>}</button>}
+          </div>}
+        </div>
+      </div>
+    </div>}
+  </section>
+  @if (popover(); as p) {
+  <div class="pop" [style.left.px]="p.x" [style.top.px]="p.y" (click)="$event.stopPropagation()">
+    <div class="pop-bar" [style.background]="p.event.color"></div>
+    <div class="pop-body">
+      <div class="pop-title">{{ p.event.title || ('APP.CALENDAR.NO_TITLE' | translate) }}</div>
+      <div class="pop-line"><app-icon name="clock"></app-icon><span>{{ eventTime(p.event) }}</span></div>
+      @if (p.event.location) {<div class="pop-line"><app-icon name="map-pin"></app-icon><span>{{ p.event.location }}</span></div>}
+      <div class="pop-line"><app-icon name="calendar"></app-icon><span>{{ calendarOf(p.event.calendarId)?.name }}</span></div>
+      @if (p.event.organizer) {<div class="pop-line"><app-icon name="user"></app-icon><span>{{ p.event.organizer }}</span></div>}
+      @if (p.event.attendees.length) {<div class="pop-line"><app-icon name="people"></app-icon><span>{{ p.event.attendees.length }} {{ 'APP.CALENDAR.ATTENDEES' | translate }}</span></div>}
+      @if (p.event.description) {<div class="pop-desc">{{ p.event.description }}</div>}
+      <div class="pop-actions">
+        <button type="button" class="btn btn--sm" (click)="editEvent(p.event)"><app-icon [name]="p.event.readOnly ? 'eye' : 'edit'"></app-icon>{{ (p.event.readOnly ? 'APP.COMMON.DETAILS' : 'APP.COMMON.EDIT') | translate }}</button>
+        @if (!p.event.readOnly) {<button type="button" class="btn btn--sm btn--ghost" (click)="deleteEvent(p.event)"><app-icon name="trash"></app-icon>{{ 'APP.COMMON.DELETE' | translate }}</button>}
+        <button type="button" class="icon-btn icon-btn--sm pop-close" (click)="popover.set(null)"><app-icon name="close"></app-icon></button>
+      </div>
+    </div>
+  </div>}
+  @if (editing(); as ed) {<app-event-dialog [init]="ed" [calendars]="writable()" (closed)="editing.set(null)" (saved)="onSaved()" (deleted)="ed.event && deleteEvent(ed.event)"></app-event-dialog>}
+  @if (addingCalendar()) {<app-calendar-dialog (closed)="addingCalendar.set(false)" (saved)="addingCalendar.set(false); load()"></app-calendar-dialog>}
+</div>

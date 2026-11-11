@@ -1,0 +1,41 @@
+<div class="compose" (dragover)="$event.preventDefault()" (drop)="onDrop($event)">
+  <header class="compose-head">
+    <h2 class="compose-title">{{ ('APP.MAIL.COMPOSE_' + init.mode.toUpperCase()) | translate }}</h2>
+    @if (status()) {<span class="compose-status">{{ status() }}</span>}
+    <button type="button" class="icon-btn" (click)="discard()" [title]="'APP.MAIL.DISCARD' | translate"><app-icon name="close"></app-icon></button>
+  </header>
+  <div class="compose-fields">
+    @if (store.mailAccounts().length > 1) {
+    <div class="cfield"><span class="cfield-label">{{ 'APP.MAIL.FROM' | translate }}</span><select class="cfield-select" [(ngModel)]="accountId" (ngModelChange)="markDirty()">@for (a of store.mailAccounts(); track a.id) {<option [ngValue]="a.id">{{ a.name }} &lt;{{ a.email }}&gt;</option>}</select></div>}
+    <div class="cfield"><span class="cfield-label">{{ 'APP.MAIL.TO' | translate }}</span><app-recipients-input #toInput [chips]="to" (chipsChange)="to = $event; markDirty()" [placeholder]="'APP.MAIL.TO_PLACEHOLDER' | translate"></app-recipients-input><span class="cfield-links">@if (!showCc()) {<button type="button" class="link-btn" (click)="showCc.set(true)">{{ 'APP.MAIL.CC' | translate }}</button>}@if (!showBcc()) {<button type="button" class="link-btn" (click)="showBcc.set(true)">{{ 'APP.MAIL.BCC' | translate }}</button>}</span></div>
+    @if (showCc()) {<div class="cfield"><span class="cfield-label">{{ 'APP.MAIL.CC' | translate }}</span><app-recipients-input [chips]="cc" (chipsChange)="cc = $event; markDirty()"></app-recipients-input></div>}
+    @if (showBcc()) {<div class="cfield"><span class="cfield-label">{{ 'APP.MAIL.BCC' | translate }}</span><app-recipients-input [chips]="bcc" (chipsChange)="bcc = $event; markDirty()"></app-recipients-input></div>}
+    <div class="cfield"><span class="cfield-label">{{ 'APP.MAIL.SUBJECT' | translate }}</span><input #subjectInput class="cfield-input" type="text" [(ngModel)]="subject" (ngModelChange)="markDirty()" [placeholder]="'APP.MAIL.SUBJECT_PLACEHOLDER' | translate"/></div>
+  </div>
+  <div class="compose-toolbar">
+    <button type="button" class="tool" (mousedown)="$event.preventDefault()" (click)="exec('bold')" [title]="'APP.MAIL.BOLD' | translate"><app-icon name="bold"></app-icon></button>
+    <button type="button" class="tool" (mousedown)="$event.preventDefault()" (click)="exec('italic')" [title]="'APP.MAIL.ITALIC' | translate"><app-icon name="italic"></app-icon></button>
+    <button type="button" class="tool" (mousedown)="$event.preventDefault()" (click)="exec('underline')" [title]="'APP.MAIL.UNDERLINE' | translate"><app-icon name="underline"></app-icon></button>
+    <span class="tool-sep"></span>
+    <button type="button" class="tool" (mousedown)="$event.preventDefault()" (click)="exec('insertUnorderedList')" [title]="'APP.MAIL.BULLETS' | translate"><app-icon name="list"></app-icon></button>
+    <button type="button" class="tool" (mousedown)="$event.preventDefault()" (click)="exec('insertOrderedList')" [title]="'APP.MAIL.NUMBERING' | translate"><app-icon name="list-ordered"></app-icon></button>
+    <button type="button" class="tool" (mousedown)="$event.preventDefault()" (click)="link()" [title]="'APP.MAIL.LINK' | translate"><app-icon name="link"></app-icon></button>
+    <button type="button" class="tool" (mousedown)="$event.preventDefault()" (click)="exec('removeFormat')" [title]="'APP.MAIL.CLEAR_FORMAT' | translate"><app-icon name="clear-format"></app-icon></button>
+    <span class="tool-sep"></span>
+    <select class="tool-select" (mousedown)="$event.stopPropagation()" (change)="exec('fontSize', $any($event.target).value)"><option value="2">{{ 'APP.MAIL.SIZE_SMALL' | translate }}</option><option value="3" selected>{{ 'APP.MAIL.SIZE_NORMAL' | translate }}</option><option value="5">{{ 'APP.MAIL.SIZE_LARGE' | translate }}</option></select>
+    <button type="button" class="tool" (click)="addFiles()" [title]="'APP.MAIL.ATTACH' | translate"><app-icon name="paperclip"></app-icon></button>
+  </div>
+  <div #editor class="compose-body" contenteditable="true" (input)="markDirty()" (paste)="onPaste($event)" [attr.data-placeholder]="'APP.MAIL.BODY_PLACEHOLDER' | translate" spellcheck="true"></div>
+  @if (attachments.length) {
+  <div class="compose-attachments">
+    @for (a of attachments; track $index; let i = $index) {<span class="achip"><app-icon name="file"></app-icon><span class="achip-name">{{ a.filename }}</span><small>{{ formatBytes(a.size) }}</small><button type="button" class="achip-remove" (click)="removeAttachment(i)"><app-icon name="close"></app-icon></button></span>}
+    <span class="compose-total" [class.compose-total--warn]="totalSize() > 25 * 1024 * 1024">{{ formatBytes(totalSize()) }} / 35 MB</span>
+  </div>}
+  @if (error()) {<p class="error compose-error">{{ error() }}</p>}
+  <footer class="compose-foot">
+    <button type="button" class="btn btn--primary" [disabled]="sending()" (click)="send()"><app-icon name="send"></app-icon>{{ 'APP.MAIL.SEND' | translate }}</button>
+    <button type="button" class="btn" [disabled]="saving() || sending()" (click)="saveDraft(false)">{{ 'APP.MAIL.SAVE_DRAFT' | translate }}</button>
+    <button type="button" class="btn btn--ghost" (click)="discard()">{{ 'APP.MAIL.DISCARD' | translate }}</button>
+    <span class="compose-hint">{{ 'APP.MAIL.SEND_SHORTCUT' | translate }}</span>
+  </footer>
+</div>

@@ -1,0 +1,38 @@
+:host { display: flex; flex: 1; min-height: 0; }
+.compose { display: flex; flex-direction: column; flex: 1; min-height: 0; animation: fade 0.15s ease-out; }
+.compose-head { display: flex; align-items: center; gap: 8px; flex: none; padding: 8px 12px 8px 20px; border-bottom: 1px solid var(--line-soft); }
+.compose-title { flex: 1; margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: var(--primary); }
+.compose-status { font-size: 12px; color: var(--secondary); }
+.compose-fields { display: flex; flex-direction: column; flex: none; padding: 0 20px; }
+.cfield { display: flex; align-items: center; gap: 10px; min-height: 42px; border-bottom: 1px solid var(--line-soft); }
+.cfield-label { flex: none; width: 70px; font-size: 13px; color: var(--secondary); }
+.cfield-input { flex: 1; min-width: 0; height: 38px; border: none; outline: none; background: none; color: var(--text); font-size: 14px; }
+.cfield-select { flex: 1; min-width: 0; height: 38px; border: none; outline: none; background: none; color: var(--text); font-size: 14px; }
+.cfield-select option { background: var(--surface); }
+.cfield-links { display: flex; gap: 4px; flex: none; }
+.link-btn { padding: 4px 6px; border: none; background: none; color: var(--ink); font-size: 13px; font-weight: 500; }
+.link-btn:hover { text-decoration: underline; }
+.compose-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; flex: none; padding: 6px 16px 6px 20px; border-bottom: 1px solid var(--line-soft); }
+.tool { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: none; border-radius: 8px; background: none; color: var(--secondary); transition: background 0.15s, color 0.15s; }
+.tool app-icon { --icon-size: 17px; }
+.tool:hover { background: var(--hover); color: var(--text); }
+.tool-sep { width: 1px; height: 18px; margin: 0 6px; background: var(--line); }
+.tool-select { height: 32px; padding: 0 8px; border: none; border-radius: 8px; background: none; color: var(--secondary); font-size: 13px; }
+.tool-select option { background: var(--surface); color: var(--text); }
+.compose-body { flex: 1; min-height: 160px; padding: 16px 20px; overflow-y: auto; outline: none; font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+.compose-body:empty::before { content: attr(data-placeholder); color: var(--secondary); pointer-events: none; }
+.compose-body img { max-width: 100%; height: auto; }
+.compose-body blockquote { border-left: 2px solid #c9d2df; margin: 8px 0; padding-left: 12px; }
+.compose-attachments { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex: none; padding: 8px 20px; border-top: 1px solid var(--line-soft); }
+.achip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 3px 6px 3px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; }
+.achip app-icon { --icon-size: 15px; color: var(--ink); }
+.achip-name { min-width: 0; max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.achip small { color: var(--secondary); white-space: nowrap; }
+.achip-remove { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; padding: 0; border: none; border-radius: 50%; background: none; color: var(--secondary); }
+.achip-remove app-icon { --icon-size: 12px; color: inherit; }
+.achip-remove:hover { background: var(--hover); color: var(--danger); }
+.compose-total { margin-left: auto; font-size: 12px; color: var(--secondary); }
+.compose-total--warn { color: var(--warn-ink); }
+.compose-error { padding: 8px 20px 0; }
+.compose-foot { display: flex; align-items: center; gap: 8px; flex: none; padding: 10px 20px; border-top: 1px solid var(--line-soft); background: var(--background); }
+.compose-hint { margin-left: auto; font-size: 12px; color: var(--secondary); }

@@ -1,0 +1,11 @@
+.callout { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-left: 3px solid var(--primary); border-radius: 4px 10px 10px 4px; background: var(--tint); }
+.callout app-icon { --icon-size: 20px; color: var(--ink); flex: none; }
+.callout > div { flex: 1; min-width: 0; }
+.callout-title { margin: 0 0 2px; font-size: 14px; font-weight: 600; }
+.self-start { align-self: flex-start; }
+.features { display: flex; flex-wrap: wrap; gap: 14px; }
+.servers { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border: 1px solid var(--line-soft); border-radius: 10px; }
+.grow { flex: 3 !important; }
+.port { flex: 1 !important; }
+.muted { color: var(--secondary); font-size: 12px; }
+.foot { display: flex; justify-content: flex-end; gap: 8px; padding-top: 6px; }

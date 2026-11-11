@@ -1,0 +1,30 @@
+<div class="overlay" (click)="closed.emit()">
+  <div class="dialog" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    <header class="dialog-head">
+      <div class="dialog-heading"><h3 class="dialog-title">{{ (account ? 'APP.ACCOUNT.TITLE_EDIT' : 'APP.ACCOUNT.TITLE_ADD') | translate }}</h3>@if (account) {<p class="dialog-sub">{{ account.email }}</p>}</div>
+      <button type="button" class="icon-btn" (click)="closed.emit()"><app-icon name="close"></app-icon></button>
+    </header>
+    @if (!account) {<div class="dialog-body"><app-connect (connected)="saved.emit($event)"></app-connect></div>}
+    @else {
+    <form class="dialog-body" (ngSubmit)="save()">
+      @if (form.authType === 'oauth') {<div class="callout"><app-icon name="check"></app-icon><div><p class="callout-title">{{ (form.provider === 'google' ? 'APP.CONNECT.GMAIL' : 'APP.CONNECT.OUTLOOK') | translate }}</p><p class="hint">{{ 'APP.ACCOUNT.OAUTH_CONNECTED' | translate }}</p></div><button type="button" class="btn btn--sm" (click)="reconnect()" [disabled]="busy()">{{ 'APP.SETTINGS.SIGN_IN_AGAIN' | translate }}</button></div>}
+      <div class="field"><span class="field-label">{{ 'APP.ACCOUNT.NAME' | translate }}</span><input class="input" type="text" [(ngModel)]="form.name" name="name"/></div>
+      <div class="field"><span class="field-label">{{ 'APP.ACCOUNT.COLOR' | translate }}</span><app-color-picker [value]="form.color" (valueChange)="form.color = $event"></app-color-picker></div>
+      @if (form.authType === 'oauth') {<div class="field"><span class="field-label">{{ 'APP.ACCOUNT.FEATURES' | translate }}</span><div class="features"><label class="check"><input type="checkbox" [(ngModel)]="form.features.mail" name="fmail"/>{{ 'APP.SETTINGS.FEATURE_MAIL' | translate }}</label><label class="check"><input type="checkbox" [(ngModel)]="form.features.calendar" name="fcal"/>{{ 'APP.SETTINGS.FEATURE_CALENDAR' | translate }}</label><label class="check"><input type="checkbox" [(ngModel)]="form.features.contacts" name="fcon"/>{{ 'APP.SETTINGS.FEATURE_CONTACTS' | translate }}</label></div></div>}
+      <div class="field"><span class="field-label">{{ 'APP.ACCOUNT.SIGNATURE' | translate }}</span><textarea class="textarea" [(ngModel)]="form.signature" name="signature" [placeholder]="'APP.ACCOUNT.SIGNATURE_PLACEHOLDER' | translate"></textarea></div>
+      @if (form.authType === 'password') {
+      <div class="field"><span class="field-label">{{ 'APP.CONNECT.PASSWORD' | translate }}</span><input class="input" type="password" [(ngModel)]="form.password" name="password" [placeholder]="'APP.ACCOUNT.PASSWORD_KEEP' | translate" autocomplete="new-password"/></div>
+      <button type="button" class="btn btn--ghost btn--sm self-start" (click)="servers.set(!servers())"><app-icon [name]="servers() ? 'chevron-down' : 'chevron-right'"></app-icon>{{ 'APP.ACCOUNT.SERVERS' | translate }}</button>
+      @if (servers()) {
+      <div class="servers">
+        <div class="field"><span class="field-label">{{ 'APP.CONNECT.USERNAME' | translate }}</span><input class="input" type="text" [(ngModel)]="form.username" name="username"/></div>
+        <div class="field-row"><div class="field grow"><span class="field-label">IMAP {{ 'APP.CONNECT.SERVER' | translate }}</span><input class="input" type="text" [(ngModel)]="form.imapHost" name="imapHost"/></div><div class="field port"><span class="field-label">{{ 'APP.CONNECT.PORT' | translate }}</span><input class="input" type="number" [(ngModel)]="form.imapPort" name="imapPort"/></div></div>
+        <label class="check"><input type="checkbox" [(ngModel)]="form.imapSecure" name="imapSecure"/>IMAP SSL/TLS</label>
+        <div class="field-row"><div class="field grow"><span class="field-label">SMTP {{ 'APP.CONNECT.SERVER' | translate }}</span><input class="input" type="text" [(ngModel)]="form.smtpHost" name="smtpHost"/></div><div class="field port"><span class="field-label">{{ 'APP.CONNECT.PORT' | translate }}</span><input class="input" type="number" [(ngModel)]="form.smtpPort" name="smtpPort"/></div></div>
+        <label class="check"><input type="checkbox" [(ngModel)]="form.smtpSecure" name="smtpSecure"/>SMTP SSL/TLS <small class="muted">{{ 'APP.CONNECT.STARTTLS_HINT' | translate }}</small></label>
+      </div>}}
+      @if (error()) {<p class="error">{{ error() }}</p>}
+      <div class="foot"><button type="button" class="btn btn--ghost" (click)="closed.emit()">{{ 'APP.COMMON.CANCEL' | translate }}</button><button type="submit" class="btn btn--primary" [disabled]="busy()">{{ (busy() ? 'APP.COMMON.SAVING' : 'APP.COMMON.SAVE') | translate }}</button></div>
+    </form>}
+  </div>
+</div>

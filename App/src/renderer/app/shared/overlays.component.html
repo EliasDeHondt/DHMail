@@ -1,0 +1,44 @@
+@if (dialogs.menu(); as m) {
+<div #menuEl class="menu" [style.left.px]="m.x" [style.top.px]="m.y" role="menu">
+  @for (item of m.items; track $index) {
+    @if (item.separator) {<div class="menu-sep"></div>} @else {
+    <button type="button" class="menu-item" [class.menu-item--danger]="item.danger" [class.menu-item--active]="item.active" [class.menu-item--open]="openSub() === item" [disabled]="item.disabled" (click)="run(item, $event)" (mouseenter)="item.children ? toggleSub(item, $event) : openSub.set(null)" role="menuitem">
+      @if (item.color) {<span class="menu-dot" [style.background]="item.color"></span>} @else if (item.icon) {<app-icon [name]="item.icon"></app-icon>}
+      <span class="menu-label">{{ item.label }}</span>
+      @if (item.checked) {<app-icon name="check"></app-icon>}
+      @if (item.children) {<app-icon name="chevron-right"></app-icon>}
+    </button>}
+  }
+</div>
+@if (openSub(); as sub) {
+<div class="menu menu--sub" [style.left.px]="subPos().x" [style.top.px]="subPos().y" role="menu">
+  @for (item of sub.children; track $index) {
+    @if (item.separator) {<div class="menu-sep"></div>} @else {
+    <button type="button" class="menu-item" [class.menu-item--danger]="item.danger" [class.menu-item--active]="item.active" [disabled]="item.disabled" (click)="run(item, $event)" role="menuitem">
+      @if (item.color) {<span class="menu-dot" [style.background]="item.color"></span>} @else if (item.icon) {<app-icon [name]="item.icon"></app-icon>}
+      <span class="menu-label">{{ item.label }}</span>
+      @if (item.checked) {<app-icon name="check"></app-icon>}
+    </button>}
+  }
+</div>}
+}
+@if (dialogs.confirmState(); as c) {
+<div class="overlay overlay--top" (click)="dialogs.answer(false)">
+  <div class="confirm" role="alertdialog" aria-modal="true" (click)="$event.stopPropagation()">
+    <span class="confirm-badge" [class.confirm-badge--danger]="c.danger"><app-icon name="alert"></app-icon></span>
+    <p class="confirm-msg">{{ c.message }}</p>
+    <div class="confirm-actions">
+      <button type="button" class="btn btn--ghost" (click)="dialogs.answer(false)">{{ 'APP.COMMON.CANCEL' | translate }}</button>
+      <button type="button" class="btn" [class.btn--primary]="!c.danger" [class.btn--danger]="c.danger" (click)="dialogs.answer(true)" autofocus>{{ c.confirmLabel }}</button>
+    </div>
+  </div>
+</div>}
+<div class="toasts" aria-live="polite">
+  @for (t of toasts.toasts(); track t.id) {
+  <div class="toast" [class.toast--error]="t.kind === 'error'" [class.toast--success]="t.kind === 'success'">
+    <app-icon [name]="t.kind === 'error' ? 'alert' : t.kind === 'success' ? 'check' : 'info'"></app-icon>
+    <span class="toast-msg">{{ t.message }}</span>
+    @if (t.action) {<button type="button" class="toast-action" (click)="t.action.run(); toasts.dismiss(t.id)">{{ t.action.label }}</button>}
+    <button type="button" class="icon-btn icon-btn--sm" (click)="toasts.dismiss(t.id)"><app-icon name="close"></app-icon></button>
+  </div>}
+</div>

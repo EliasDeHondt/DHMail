@@ -1,0 +1,8 @@
+.vscode
+.claude
+App/node_modules
+App/dist
+App/release
+App/.angular
+App/oauth.json
+*.log

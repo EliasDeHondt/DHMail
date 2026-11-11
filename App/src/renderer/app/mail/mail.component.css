@@ -84,10 +84,6 @@
 .row--unread .row-date { color: var(--ink); font-weight: 600; }
 .row-cats { display: flex; gap: 4px; flex: none; max-width: 60%; overflow: hidden; }
 .row-cats .chip { cursor: pointer; }
-.row-flag { flex: none; display: inline-flex; width: 20px; height: 20px; padding: 0; align-items: center; justify-content: center; border: none; border-radius: 6px; background: none; color: var(--secondary); opacity: 0; transition: opacity 0.12s, color 0.12s; }
-.row-flag app-icon { --icon-size: 14px; }
-.row-flag--on { opacity: 1; color: #e74c3c; }
-.row:hover .row-flag { opacity: 1; }
 .row-hover { position: absolute; top: 6px; right: 8px; display: none; align-items: center; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: 8px; background: var(--background); }
 .row:hover .row-hover { display: flex; }
 .row:hover .row-date { visibility: hidden; }

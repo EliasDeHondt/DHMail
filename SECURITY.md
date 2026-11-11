@@ -1,4 +1,5 @@
 <img src="App/build/icon.png" width="96" alt="DHMail">
+
 # 💙🤍SECURITY🤍💙
 
 ## Reporting a Vulnerability

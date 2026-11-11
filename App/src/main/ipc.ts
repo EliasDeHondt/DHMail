@@ -17,12 +17,14 @@ import { listCategories, removeCategory, saveCategory } from './mail/categories'
 import * as cal from './calendar';
 import * as contacts from './contacts';
 import { bus, log } from './core/bus';
+import { suggestPlaces } from './geo';
 type Handlers = { [K in keyof Api]: (...args: Parameters<Api[K]>) => ReturnType<Api[K]> | Promise<ReturnType<Api[K]>> };
 export function activateAccount(account: Account) { mail.startAccount(account); cal.ensureAccountCalendars(account); contacts.ensureAccountSources(account); cal.syncAccountCalendars(account).catch(err => log('calendar activation failed', err?.message)); if (account.features.contacts) contacts.syncAllContacts().catch(err => log('contacts activation failed', err?.message)); }
 export function registerIpc(getWindow: () => BrowserWindow | null) {
   const win = () => getWindow() ?? undefined;
   const handlers: Handlers = {
     'app:info': () => ({ version: app.getVersion(), dataPath: app.getPath('userData'), platform: process.platform }),
+    'geo:suggest': (query, lang) => suggestPlaces(String(query ?? '').slice(0, 200), lang === 'en' ? 'en' : 'nl'),
     'app:openExternal': url => { if (/^(https?|mailto|tel):/i.test(url)) shell.openExternal(url); },
     'app:pickFiles': async () => { const r = await dialog.showOpenDialog(win()!, { properties: ['openFile', 'multiSelections'] }); return Promise.all(r.filePaths.map(async p => ({ path: p, name: basename(p), size: (await stat(p)).size }))); },
     'app:pickFile': async filters => { const r = await dialog.showOpenDialog(win()!, { properties: ['openFile'], filters }); const p = r.filePaths[0]; if (!p) return null; return { path: p, name: basename(p), content: await readFile(p, 'utf8') }; },

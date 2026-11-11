@@ -71,7 +71,7 @@
       <div class="pop-line"><app-icon name="calendar"></app-icon><span>{{ calendarOf(p.event.calendarId)?.name }}</span></div>
       @if (p.event.organizer) {<div class="pop-line"><app-icon name="user"></app-icon><span>{{ p.event.organizer }}</span></div>}
       @if (p.event.attendees.length) {<div class="pop-line"><app-icon name="people"></app-icon><span>{{ p.event.attendees.length }} {{ 'APP.CALENDAR.ATTENDEES' | translate }}</span></div>}
-      @if (p.event.description) {<div class="pop-desc">{{ p.event.description }}</div>}
+      @if (plain(p.event.description); as desc) {<div class="pop-desc">{{ desc }}</div>}
       <div class="pop-actions">
         <button type="button" class="btn btn--sm" (click)="editEvent(p.event)"><app-icon [name]="p.event.readOnly ? 'eye' : 'edit'"></app-icon>{{ (p.event.readOnly ? 'APP.COMMON.DETAILS' : 'APP.COMMON.EDIT') | translate }}</button>
         @if (!p.event.readOnly) {<button type="button" class="btn btn--sm btn--ghost" (click)="deleteEvent(p.event)"><app-icon name="trash"></app-icon>{{ 'APP.COMMON.DELETE' | translate }}</button>}

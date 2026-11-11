@@ -1,0 +1,63 @@
+<!--Author EliasDH Team-->
+<div class="date-picker">
+    <button class="date-picker-trigger cursor-pointer" [class.is-open]="open" type="button" [id]="inputId" [disabled]="disabled" aria-haspopup="dialog" [attr.aria-expanded]="open" [attr.aria-controls]="open ? dialogId : null" (click)="toggle()" (keydown)="onTriggerKeydown($event)">
+        <span class="date-picker-value cursor-pointer" [class.is-placeholder]="!displayValue">{{ triggerLabel }}</span>
+        <svg class="date-picker-icon cursor-pointer" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><rect class="cursor-pointer" x="3.5" y="5" width="17" height="15.5" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path class="cursor-pointer" d="M3.5 10h17M8 3v4M16 3v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <ng-container *ngIf="open">
+        <div class="date-picker-backdrop" (click)="close(false)"></div>
+        <div class="date-picker-dialog" [class.is-ready]="ready" [class.is-above]="openAbove" [style.top.px]="position.top" [style.bottom.px]="position.bottom" [style.left.px]="position.left" role="dialog" aria-modal="true" [id]="dialogId" [attr.aria-label]="'APP.COMMON.DATE_PICKER.CHOOSE_DATE'|translate" (keydown)="onDialogKeydown($event)">
+            <div class="date-picker-header">
+                <button class="date-picker-nav cursor-pointer" type="button" [attr.aria-label]="'APP.COMMON.DATE_PICKER.PREVIOUS'|translate" (click)="previous()">
+                    <svg class="cursor-pointer" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path class="cursor-pointer" d="m14.5 6-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="date-picker-title" aria-live="polite">
+                    <ng-container *ngIf="view !== 'years'">
+                        <button class="date-picker-title-btn cursor-pointer" type="button" *ngIf="view === 'days'" [class.is-active]="view !== 'days'" [attr.aria-label]="'APP.COMMON.DATE_PICKER.CHOOSE_MONTH'|translate" (click)="showMonths()">{{ monthName }}</button>
+                        <button class="date-picker-title-btn cursor-pointer" type="button" [attr.aria-label]="'APP.COMMON.DATE_PICKER.CHOOSE_YEAR'|translate" (click)="showYears()">{{ yearLabel }}</button>
+                    </ng-container>
+                    <button class="date-picker-title-btn is-active cursor-pointer" type="button" *ngIf="view === 'years'" [attr.aria-label]="'APP.COMMON.DATE_PICKER.BACK'|translate" (click)="showYears()">{{ yearRangeLabel }}</button>
+                </div>
+                <button class="date-picker-nav cursor-pointer" type="button" [attr.aria-label]="'APP.COMMON.DATE_PICKER.NEXT'|translate" (click)="next()">
+                    <svg class="cursor-pointer" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path class="cursor-pointer" d="m9.5 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+            </div>
+            <table class="date-picker-grid" role="grid" *ngIf="view === 'days'">
+                <thead>
+                    <tr>
+                        <th class="date-picker-weekday" scope="col" *ngFor="let weekday of weekdays" [attr.abbr]="weekday.long"><span aria-hidden="true">{{ weekday.short }}</span><span class="date-picker-sr-only">{{ weekday.long }}</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let week of weeks">
+                        <td class="date-picker-cell" role="gridcell" *ngFor="let day of week; trackBy: trackByIso" [attr.aria-selected]="day.inMonth ? day.selected : null">
+                            <button *ngIf="day.inMonth" class="date-picker-day cursor-pointer" type="button" [class.is-today]="day.today" [class.is-selected]="day.selected" [attr.data-date]="day.iso" [attr.tabindex]="isFocusable(day) ? 0 : -1" [attr.aria-label]="day.label" [attr.aria-current]="day.today ? 'date' : null" (click)="pick(day)">{{ day.day }}</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="date-picker-choices" *ngIf="view === 'months'">
+                <button class="date-picker-choice cursor-pointer" type="button" *ngFor="let month of months" [class.is-today]="month.current" [class.is-selected]="month.selected" (click)="pickMonth(month)">{{ month.label }}</button>
+            </div>
+            <div class="date-picker-choices" *ngIf="view === 'years'">
+                <button class="date-picker-choice cursor-pointer" type="button" *ngFor="let year of years" [class.is-today]="year.current" [class.is-selected]="year.selected" (click)="pickYear(year)">{{ year.year }}</button>
+            </div>
+            <div class="date-picker-time" *ngIf="mode === 'datetime' && view === 'days'">
+                <span class="date-picker-time-label">{{ 'APP.COMMON.DATE_PICKER.TIME'|translate }}</span>
+                <select class="date-picker-time-select cursor-pointer" [attr.aria-label]="'APP.COMMON.DATE_PICKER.HOURS'|translate" [value]="hours" (change)="setTime('hours', $any($event.target).value)">
+                    <option class="cursor-pointer" *ngFor="let hour of hourOptions" [value]="hour" [selected]="hour === hours">{{ pad(hour) }}</option>
+                </select>
+                <span class="date-picker-time-sep">:</span>
+                <select class="date-picker-time-select cursor-pointer" [attr.aria-label]="'APP.COMMON.DATE_PICKER.MINUTES'|translate" [value]="minutes" (change)="setTime('minutes', $any($event.target).value)">
+                    <option class="cursor-pointer" *ngFor="let minute of minuteOptions" [value]="minute" [selected]="minute === minutes">{{ pad(minute) }}</option>
+                    <option class="cursor-pointer" *ngIf="minutes % 5 !== 0" [value]="minutes" selected>{{ pad(minutes) }}</option>
+                </select>
+            </div>
+            <div class="date-picker-footer">
+                <button class="date-picker-action cursor-pointer" type="button" (click)="pickToday()">{{ (mode === 'month' ? 'APP.COMMON.DATE_PICKER.THIS_MONTH' : 'APP.COMMON.DATE_PICKER.TODAY')|translate }}</button>
+                <button class="date-picker-action date-picker-action--muted cursor-pointer" type="button" *ngIf="clearable && hasValue" (click)="clear()">{{ 'APP.COMMON.DATE_PICKER.CLEAR'|translate }}</button>
+                <button class="date-picker-action date-picker-action--primary cursor-pointer" type="button" *ngIf="mode === 'datetime'" (click)="close()">{{ 'APP.COMMON.DATE_PICKER.DONE'|translate }}</button>
+            </div>
+        </div>
+    </ng-container>
+</div>

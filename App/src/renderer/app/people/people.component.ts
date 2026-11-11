@@ -5,12 +5,13 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { StoreService } from '../core/store.service';
 import { BridgeService } from '../core/bridge.service';
 import { AppStateService } from '../core/app-state.service';
+import { DatePickerComponent } from '../shared/date-picker/date-picker.component';
 import { IconComponent } from '../shared/icon.component';
 import { AvatarComponent } from '../shared/avatar.component';
 import { ToastService } from '../shared/toast.service';
 import { DialogsService } from '../shared/dialogs.service';
 import { Contact, ContactField, ContactInput, ContactSource } from '../../../shared/types';
-@Component({ selector: 'app-people', standalone: true, imports: [FormsModule, TranslatePipe, IconComponent, AvatarComponent], templateUrl: './people.component.html', styleUrl: './people.component.css' })
+@Component({ selector: 'app-people', standalone: true, imports: [FormsModule, TranslatePipe, IconComponent, AvatarComponent, DatePickerComponent], templateUrl: './people.component.html', styleUrl: './people.component.css' })
 export class PeopleComponent implements OnDestroy {
   readonly store = inject(StoreService);
   readonly state = inject(AppStateService);

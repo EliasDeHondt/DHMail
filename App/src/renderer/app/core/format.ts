@@ -20,3 +20,10 @@ export const toLocalInput = (d: Date) => `${dayKey(d)}T${String(d.getHours()).pa
 export const contrast = (hex: string) => { const n = parseInt((hex || '#888888').replace('#', ''), 16); const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255; return (r * 299 + g * 587 + b * 114) / 1000 > 150 ? '#0c0e11' : '#ffffff'; };
 export const EMAIL_RE = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
 export const dateGroup = (iso: string | null, now = new Date()): string => { if (!iso) return 'OLDER'; const d = new Date(iso); if (sameDay(d, now)) return 'TODAY'; const y = addDays(now, -1); if (sameDay(d, y)) return 'YESTERDAY'; const week = startOfWeek(now); if (d >= week) return 'THIS_WEEK'; const lastWeek = addDays(week, -7); if (d >= lastWeek) return 'LAST_WEEK'; if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) return 'THIS_MONTH'; const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1); if (d.getFullYear() === lastMonth.getFullYear() && d.getMonth() === lastMonth.getMonth()) return 'LAST_MONTH'; return 'OLDER'; };
+const HTML_TAG = /<\/?(br|p|div|span|a|b|i|u|em|strong|ul|ol|li|h[1-6]|html|body|font|table|tr|td)\b[^>]*>/i;
+export function htmlToPlain(text: string | null | undefined): string {
+  const s = text ?? ''; if (!HTML_TAG.test(s) && !/&(nbsp|amp|lt|gt|quot|#\d+);/.test(s)) return s;
+  const doc = new DOMParser().parseFromString(s.replace(/\r?\n/g, ' ').replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|div|h[1-6]|tr)>/gi, '\n').replace(/<\/?(ul|ol)\b[^>]*>/gi, '\n').replace(/<li\b[^>]*>/gi, '\n• '), 'text/html');
+  for (const a of Array.from(doc.querySelectorAll('a[href]'))) { const href = a.getAttribute('href') ?? ''; const label = (a.textContent ?? '').trim(); if (/^(https?|mailto|tel):/i.test(href) && label && !href.replace(/^mailto:|^tel:/i, '').includes(label.replace(/\/$/, ''))) a.textContent = `${label} (${href.replace(/^mailto:/i, '')})`; }
+  return (doc.body.textContent ?? '').replace(/\u00a0/g, ' ').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+}

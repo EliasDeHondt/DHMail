@@ -27,7 +27,27 @@
       "SAVE": "Save",
       "SAVING": "Saving…",
       "ADD": "Add",
-      "NAME": "Name"
+      "NAME": "Name",
+      "DATE_PICKER": {
+        "CHOOSE_DATE": "Choose a date",
+        "CHOOSE_MONTH": "Choose a month",
+        "CHOOSE_YEAR": "Choose a year",
+        "PREVIOUS": "Previous",
+        "NEXT": "Next",
+        "BACK": "Back to the calendar",
+        "TODAY": "Today",
+        "THIS_MONTH": "This month",
+        "CLEAR": "Clear",
+        "DONE": "Done",
+        "TIME": "Time",
+        "HOURS": "Hours",
+        "MINUTES": "Minutes"
+      },
+      "DISCARD": {
+        "QUESTION": "Discard your changes?",
+        "KEEP": "Keep editing",
+        "DISCARD": "Discard"
+      }
     },
     "WELCOME": {
       "SUBTITLE": "Your mail, calendar and contacts in one place. Choose how you want to connect."
@@ -53,8 +73,6 @@
       "FORWARD": "Forward",
       "MARK_READ": "Mark as read",
       "MARK_UNREAD": "Mark as unread",
-      "FLAG": "Flag",
-      "UNFLAG": "Remove flag",
       "CATEGORIZE": "Categorize",
       "OPEN": "Open",
       "SELECTED_COUNT": "{{count}} selected",
@@ -174,6 +192,7 @@
       "START": "Start",
       "END": "End",
       "LOCATION": "Location",
+      "LOCATION_PLACEHOLDER": "Start typing an address",
       "DESCRIPTION": "Description",
       "INVALID_RANGE": "The end must be after the start.",
       "ADD_CALENDAR_SUB": "Subscribe to a calendar or create your own.",
@@ -342,7 +361,6 @@
       "SUGGEST_GOOGLE": "This address runs on Google. Connecting with Google is easier.",
       "SUGGEST_MICROSOFT": "This address runs on Microsoft. Connecting with Outlook is easier.",
       "GMAIL_APP_TITLE": "Gmail with an app password",
-      "GMAIL_APP_HINT": "The quick Google button is not set up in this build yet. Create an app password in your Google account (2-step verification must be on) and paste it below.",
       "GMAIL_APP_LINK": "Create an app password",
       "OUTLOOK_SETUP_TITLE": "One-time setup for Outlook",
       "OUTLOOK_SETUP_HINT": "Microsoft only lets mail programs sign in with their own app registration. You do this once; after that it is one click.",

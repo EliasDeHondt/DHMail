@@ -6,3 +6,4 @@ App/release
 App/.angular
 App/oauth.json
 *.log
+temp-pw.txt

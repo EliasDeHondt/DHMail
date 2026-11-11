@@ -27,7 +27,27 @@
       "SAVE": "Opslaan",
       "SAVING": "Opslaan…",
       "ADD": "Toevoegen",
-      "NAME": "Naam"
+      "NAME": "Naam",
+      "DATE_PICKER": {
+        "CHOOSE_DATE": "Kies een datum",
+        "CHOOSE_MONTH": "Kies een maand",
+        "CHOOSE_YEAR": "Kies een jaar",
+        "PREVIOUS": "Vorige",
+        "NEXT": "Volgende",
+        "BACK": "Terug naar de kalender",
+        "TODAY": "Vandaag",
+        "THIS_MONTH": "Deze maand",
+        "CLEAR": "Wissen",
+        "DONE": "Klaar",
+        "TIME": "Uur",
+        "HOURS": "Uren",
+        "MINUTES": "Minuten"
+      },
+      "DISCARD": {
+        "QUESTION": "Wil je de wijzigingen verwerpen?",
+        "KEEP": "Bewaren",
+        "DISCARD": "Verwerpen"
+      }
     },
     "WELCOME": {
       "SUBTITLE": "Je mail, agenda en contacten op één plek. Kies hoe je wil verbinden."
@@ -53,8 +73,6 @@
       "FORWARD": "Doorsturen",
       "MARK_READ": "Als gelezen markeren",
       "MARK_UNREAD": "Als ongelezen markeren",
-      "FLAG": "Vlag toevoegen",
-      "UNFLAG": "Vlag verwijderen",
       "CATEGORIZE": "Categoriseren",
       "OPEN": "Openen",
       "SELECTED_COUNT": "{{count}} geselecteerd",
@@ -174,6 +192,7 @@
       "START": "Begin",
       "END": "Einde",
       "LOCATION": "Locatie",
+      "LOCATION_PLACEHOLDER": "Begin een adres te typen",
       "DESCRIPTION": "Beschrijving",
       "INVALID_RANGE": "Het einde moet na het begin liggen.",
       "ADD_CALENDAR_SUB": "Abonneer je op een agenda of maak er zelf een.",
@@ -342,7 +361,6 @@
       "SUGGEST_GOOGLE": "Dit adres draait op Google. Verbinden met Google is eenvoudiger.",
       "SUGGEST_MICROSOFT": "Dit adres draait op Microsoft. Verbinden met Outlook is eenvoudiger.",
       "GMAIL_APP_TITLE": "Gmail met een app-wachtwoord",
-      "GMAIL_APP_HINT": "De snelle Google-knop is in deze versie nog niet ingesteld. Maak in je Google-account een app-wachtwoord aan (tweestapsverificatie moet aan staan) en plak het hieronder.",
       "GMAIL_APP_LINK": "App-wachtwoord aanmaken",
       "OUTLOOK_SETUP_TITLE": "Eenmalige instelling voor Outlook",
       "OUTLOOK_SETUP_HINT": "Microsoft laat mailprogramma's enkel aanmelden met een eigen app-registratie. Dit doe je één keer; daarna is het één klik.",

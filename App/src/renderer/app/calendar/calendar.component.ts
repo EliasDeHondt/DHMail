@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { StoreService } from '../core/store.service';
 import { BridgeService } from '../core/bridge.service';
-import { addDays, contrast, dayKey, isoWeek, sameDay, startOfDay, startOfWeek, timeShort, toLocalInput } from '../core/format';
+import { addDays, contrast, dayKey, htmlToPlain, isoWeek, sameDay, startOfDay, startOfWeek, timeShort, toLocalInput } from '../core/format';
 import { IconComponent } from '../shared/icon.component';
 import { ToastService } from '../shared/toast.service';
 import { DialogsService, MenuItem } from '../shared/dialogs.service';
@@ -51,6 +51,7 @@ export class CalendarComponent implements OnDestroy {
   readonly nowTop = computed(() => (this.now().getHours() * 60 + this.now().getMinutes()) / 60 * HOUR_PX);
   constructor() { this.load(); this.offs.push(this.bridge.on('calendar:changed', () => this.load())); this.tick = setInterval(() => this.now.set(new Date()), 60_000); }
   ngOnDestroy() { this.offs.forEach(f => f()); clearInterval(this.tick); }
+  plain = htmlToPlain;
   isAllDayLike = (e: CalendarEvent) => e.allDay || new Date(e.end).getTime() - new Date(e.start).getTime() >= 24 * 3600 * 1000;
   eventStart = (e: CalendarEvent) => e.allDay ? parseLocalDate(e.start) : new Date(e.start);
   eventEnd = (e: CalendarEvent) => e.allDay ? parseLocalDate(e.end) : new Date(e.end);

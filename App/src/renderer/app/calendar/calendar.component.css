@@ -53,7 +53,7 @@
 .hour-label { position: absolute; right: 8px; transform: translateY(-50%); font-size: 11px; color: var(--secondary); font-variant-numeric: tabular-nums; }
 .day-col { position: relative; border-left: 1px solid var(--line-soft); cursor: pointer; }
 .day-col--today { background: color-mix(in srgb, var(--primary) 4%, transparent); }
-.hour-line { position: absolute; left: 0; right: 0; height: 52px; border-top: 1px solid var(--line-soft); }
+.hour-line { position: absolute; left: 0; right: 0; height: 35px; border-top: 1px solid var(--line-soft); }
 .hour-line--work { background: color-mix(in srgb, var(--primary) 3%, transparent); }
 .now-line { position: absolute; left: 0; right: 0; height: 2px; background: var(--danger); z-index: 3; pointer-events: none; }
 .now-line::before { content: ''; position: absolute; left: -5px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--danger); }
@@ -90,3 +90,20 @@
 .pop-desc { max-height: 120px; overflow-y: auto; font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; padding-top: 4px; border-top: 1px solid var(--line-soft); }
 .pop-actions { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
 .pop-close { margin-left: auto; }
+
+.ev { padding: 2px 6px; touch-action: none; }
+.ev--short { flex-direction: row; align-items: center; padding-top: 0; padding-bottom: 0; }
+.ev-time-inline { margin-left: 6px; font-weight: 400; font-size: 11px; opacity: 0.85; }
+.ev--dragging { opacity: 0.35; }
+.ev-resize { position: absolute; left: 0; right: 0; z-index: 1; height: clamp(4px, 24%, 7px); }
+.ev-resize--top { top: 0; }
+.ev-resize--bottom { bottom: 0; }
+.ev-resize::after { content: ''; position: absolute; left: 50%; width: 18px; height: 3px; margin-left: -9px; border-radius: 2px; background: currentColor; opacity: 0; transition: opacity 0.12s; pointer-events: none; }
+.ev-resize--top::after { top: 1px; }
+.ev-resize--bottom::after { bottom: 1px; }
+.ev--draggable:hover .ev-resize::after { opacity: 0.5; }
+.ev-resize:hover::after { opacity: 0.9; }
+.ev--short .ev-resize::after { display: none; }
+.ev--ghost { z-index: 6; left: 0; width: calc(100% - 3px); pointer-events: none; box-shadow: 0 8px 22px rgba(0, 0, 0, 0.3); outline: 2px solid color-mix(in srgb, #fff 55%, transparent); outline-offset: -2px; }
+.cal-item--renaming { cursor: default; background: var(--hover); }
+.cal-rename { flex: 1; min-width: 0; height: 24px; padding: 0 6px; border: 1px solid var(--primary); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 13.5px; outline: none; }

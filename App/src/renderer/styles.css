@@ -108,5 +108,10 @@ input, textarea, [contenteditable="true"], [contenteditable="true"] * { cursor: 
 input[type="checkbox"], input[type="color"] { cursor: url('assets/svg/cursor-pointer.svg'), pointer; }
 button:disabled, button:disabled * { cursor: url('assets/svg/cursor-default.svg'), default; }
 .splitter { cursor: col-resize !important; }
+.ev.ev--draggable, .ev.ev--draggable * { cursor: url('assets/svg/cursor-grab.svg') 12 12, grab; }
+.ev.ev--draggable .ev-resize { cursor: url('assets/svg/cursor-ns-resize.svg') 12 12, ns-resize; }
+html.ev-drag-move, html.ev-drag-move * { cursor: url('assets/svg/cursor-grabbing.svg') 12 12, grabbing !important; }
+html.ev-drag-resize, html.ev-drag-resize * { cursor: url('assets/svg/cursor-ns-resize.svg') 12 12, ns-resize !important; }
+html.ev-drag-move, html.ev-drag-resize { user-select: none; }
 [draggable="true"]:active { cursor: url('assets/svg/cursor-grabbing.svg') 12 12, grabbing; }
 .spinner, .is-busy { cursor: url('assets/svg/cursor-wait.svg'), wait; }

@@ -21,7 +21,8 @@ CREATE INDEX IF NOT EXISTS idx_contacts_name ON contacts(display_name);
 CREATE TABLE IF NOT EXISTS recipients(address TEXT PRIMARY KEY, name TEXT NOT NULL DEFAULT '', used_at TEXT NOT NULL, uses INTEGER NOT NULL DEFAULT 1);
 `;
 const bind = (p: any[]) => p.map(v => v === undefined ? null : typeof v === 'boolean' ? (v ? 1 : 0) : v instanceof Date ? v.toISOString() : v);
-export function openDb(file: string) { db = new DatabaseSync(file); db.exec('PRAGMA journal_mode=WAL'); db.exec('PRAGMA foreign_keys=ON'); db.exec(SCHEMA); return db; }
+export function openDb(file: string) { db = new DatabaseSync(file); db.exec('PRAGMA journal_mode=WAL'); db.exec('PRAGMA foreign_keys=ON'); db.exec(SCHEMA); migrate(); return db; }
+function migrate() { const has = (table: string, col: string) => (db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[]).some(c => c.name === col); if (!has('calendars', 'renamed')) db.exec('ALTER TABLE calendars ADD COLUMN renamed INTEGER NOT NULL DEFAULT 0'); }
 export function closeDb() { if (db) db.close(); }
 export const run = (sql: string, ...p: any[]) => db.prepare(sql).run(...bind(p));
 export const get = <T = Row>(sql: string, ...p: any[]) => db.prepare(sql).get(...bind(p)) as T | undefined;

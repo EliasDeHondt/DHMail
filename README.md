@@ -6,8 +6,6 @@
 
 1. [📘Table of Contents](#📘table-of-contents)
 2. [🖖Introduction](#🖖introduction)
-3. [🚀Usage](#🚀usage)
-4. [🔗Links](#🔗links)
 
 ---
 
@@ -20,17 +18,3 @@ Please also see following documents:
 - [SECURITY](SECURITY.md)
 - [CONTRIBUTING](CONTRIBUTING.md)
 - [CODE OF CONDUCT](CODE-OF-CONDUCT.md)
-
-## 🚀Usage
-
-```powershell
-cd App
-npm install
-npm start
-npm run dist
-```
-
-One-click Outlook and Google sign-in reads its OAuth client ids from `App/oauth.json` (same shape as `App/oauth.example.json`).
-
-## 🔗Links
-- 📦 Repository [github.com/EliasDeHondt/DHMail](https://github.com/EliasDeHondt/DHMail).

@@ -124,3 +124,4 @@
 .ev-resize::after { background: var(--ev); }
 .ev--selected, .mev.ev--selected { outline: 2px solid var(--ev); outline-offset: 1px; z-index: 5; }
 .ev--cut { opacity: 0.45; }
+.slot-sel { position: absolute; left: 1px; right: 1px; z-index: 1; border-radius: 4px; background: color-mix(in srgb, var(--primary) 22%, transparent); outline: 1.5px solid var(--primary); outline-offset: -1.5px; pointer-events: none; }

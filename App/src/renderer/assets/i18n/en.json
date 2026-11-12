@@ -291,7 +291,7 @@
       "CALL": "Call",
       "WHATSAPP": "Send a WhatsApp message",
       "BIRTHDAY_WISH": "Birthday wish via WhatsApp",
-      "BIRTHDAY_TEXT": "Happy birthday {{name}} 🎉"
+      "BIRTHDAY_TEXT": "Happy birthday {{name}}!"
     },
     "ACCOUNT": {
       "TITLE_ADD": "Add account",

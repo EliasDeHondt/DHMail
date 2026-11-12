@@ -291,7 +291,7 @@
       "CALL": "Bellen",
       "WHATSAPP": "WhatsApp-bericht sturen",
       "BIRTHDAY_WISH": "Verjaardagswens via WhatsApp",
-      "BIRTHDAY_TEXT": "Gelukkige verjaardag {{name}} 🎉"
+      "BIRTHDAY_TEXT": "Gelukkige verjaardag {{name}}!"
     },
     "ACCOUNT": {
       "TITLE_ADD": "Account toevoegen",

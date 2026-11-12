@@ -101,12 +101,13 @@ a { color: var(--ink); }
 .row-check { width: 16px; height: 16px; accent-color: var(--primary); }
 .kbd { display: inline-block; padding: 0 5px; border: 1px solid var(--line); border-radius: 4px; font-size: 11px; color: var(--secondary); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
-* { cursor: url('assets/svg/cursor-auto.svg'), auto; }
-button, a, select, summary, label.check, [role="button"], [role="menuitem"], [role="tab"], input[type="checkbox"], input[type="color"], .row, .crow, .acct-head, .fitem, .mev, .ev, .day-col, .mcell, .mini-day, .cal-item, .chip, .swatch, .custom, .row-lead, .splitter { cursor: url('assets/svg/cursor-pointer.svg'), pointer; }
-button *, a *, label.check *, .row *, .crow *, .fitem *, .acct-head *, .ev *, .mev * { cursor: inherit; }
-input, textarea, [contenteditable="true"], [contenteditable="true"] * { cursor: url('assets/svg/cursor-text.svg'), text; }
-input[type="checkbox"], input[type="color"] { cursor: url('assets/svg/cursor-pointer.svg'), pointer; }
-button:disabled, button:disabled * { cursor: url('assets/svg/cursor-default.svg'), default; }
+:root { --cursor-auto: url('assets/svg/cursor-auto.svg') 3 3, auto; --cursor-default: url('assets/svg/cursor-default.svg') 3 3, default; --cursor-pointer: url('assets/svg/cursor-pointer.svg') 10 2, pointer; --cursor-text: url('assets/svg/cursor-text.svg') 12 12, text; --cursor-wait: url('assets/svg/cursor-wait.svg') 3 3, wait; }
+* { cursor: var(--cursor-auto); }
+button, a, select, summary, label.check, [role="button"], [role="menuitem"], [role="tab"], .row, .crow, .acct-head, .fitem, .mev, .ev, .day-col, .mcell, .mini-day, .cal-item, .chip, .chip-x, .swatch, .custom, .row-lead, .place-option, .icon-btn, .cursor-pointer, input[type="checkbox"], input[type="radio"], input[type="color"] { cursor: var(--cursor-pointer); }
+:where(button, a, select, summary, label.check, [role="button"], [role="menuitem"], [role="tab"], .row, .crow, .acct-head, .fitem, .mev, .ev, .day-col, .mcell, .mini-day, .cal-item, .chip, .chip-x, .swatch, .custom, .row-lead, .place-option, .icon-btn, .cursor-pointer) * { cursor: inherit; }
+input, textarea, [contenteditable="true"], [contenteditable="true"] * { cursor: var(--cursor-text); }
+input[type="checkbox"], input[type="radio"], input[type="color"] { cursor: var(--cursor-pointer); }
+button:disabled, button:disabled *, input:disabled, select:disabled { cursor: var(--cursor-default); }
 .splitter { cursor: url('assets/svg/cursor-ew-resize.svg') 12 12, col-resize !important; }
 .folders .acct-head, .folders .acct-head .acct-name, .folders .acct-head .acct-dot, .folders .acct-head .acct-chevron { cursor: url('assets/svg/cursor-grab.svg') 12 12, grab; }
 html.acct-reordering, html.acct-reordering * { cursor: url('assets/svg/cursor-grabbing.svg') 12 12, grabbing !important; user-select: none; }
@@ -117,4 +118,4 @@ html.ev-drag-move, html.ev-drag-move * { cursor: url('assets/svg/cursor-grabbing
 html.ev-drag-resize, html.ev-drag-resize * { cursor: url('assets/svg/cursor-ns-resize.svg') 12 12, ns-resize !important; }
 html.ev-drag-move, html.ev-drag-resize { user-select: none; }
 [draggable="true"]:active { cursor: url('assets/svg/cursor-grabbing.svg') 12 12, grabbing; }
-.spinner, .is-busy { cursor: url('assets/svg/cursor-wait.svg'), wait; }
+.spinner, .is-busy { cursor: var(--cursor-wait); }

@@ -76,14 +76,16 @@
           @else {
           @for (group of grouped(); track group.key) {
           <div class="group-head">{{ 'APP.MAIL.GROUP_' + group.key | translate }}</div>
-          @for (m of group.items; track m.uid) {
+          @for (c of group.items; track c.key) {
+          @if (c.items.length === 1) {
+          @let m = c.inFolder[0];
           <div class="row" [class.row--unread]="!m.seen" [class.row--pinned]="m.flagged" [class.row--open]="open()?.uid === m.uid && open()?.folderId === m.folderId" [class.row--picked]="selected().has(m.uid)" [class.row--selecting]="selected().size > 0" draggable="true" (dragstart)="onDragStart($event, m)" (click)="rowClick(m, $event)" (dblclick)="openMessage(m)" (contextmenu)="rowMenu($event, m)" tabindex="0" (keydown.enter)="openMessage(m)">
             <div class="row-lead" (click)="toggleCheck(m, $event)">
               <app-avatar [name]="m.from[0]?.name || ''" [address]="m.from[0]?.address || ''"></app-avatar>
               <span class="row-check"><app-icon name="check" [strokeWidth]="3"></app-icon></span>
             </div>
             <div class="row-main">
-              <div class="row-line"><span class="row-from">{{ folder()?.specialUse === 'sent' || folder()?.specialUse === 'drafts' ? addressesLabel(m.to) || ('APP.MAIL.NO_RECIPIENT' | translate) : addressLabel(m.from[0]) || ('APP.MAIL.UNKNOWN_SENDER' | translate) }}</span>@if (m.hasAttachments) {<app-icon class="row-clip" name="paperclip"></app-icon>}@if (m.flagged) {<app-icon class="row-pin" name="pin" [filled]="true" [title]="'APP.MAIL.PINNED' | translate"></app-icon>}<span class="row-date">{{ listDate(m.date) }}</span></div>
+              <div class="row-line"><span class="row-from">{{ rowSender(m) }}</span>@if (m.hasAttachments) {<app-icon class="row-clip" name="paperclip"></app-icon>}@if (m.flagged) {<app-icon class="row-pin" name="pin" [filled]="true" [title]="'APP.MAIL.PINNED' | translate"></app-icon>}<span class="row-date">{{ listDate(m.date) }}</span></div>
               <div class="row-line"><span class="row-subject">{{ m.subject || ('APP.MAIL.NO_SUBJECT' | translate) }}</span>@if (m.answered) {<app-icon class="row-answered" name="reply"></app-icon>}</div>
               <div class="row-line"><span class="row-preview">{{ m.preview || ' ' }}</span>
                 @if (m.categories.length) {<span class="row-cats">@for (c of m.categories; track c) {@if (categoryOf(c); as cat) {<span class="chip" [style.background]="cat.color + '33'" [style.color]="cat.color" (click)="categoryFilter.set(cat.id); $event.stopPropagation()">{{ cat.name }}</span>}}</span>}
@@ -96,7 +98,34 @@
               <button type="button" class="icon-btn icon-btn--sm" [class.icon-btn--on]="m.flagged" (click)="act(m.flagged ? 'unpin' : 'pin', [m]); $event.stopPropagation()" [title]="(m.flagged ? 'APP.MAIL.UNPIN' : 'APP.MAIL.PIN') | translate"><app-icon name="pin" [filled]="m.flagged"></app-icon></button>
               <button type="button" class="icon-btn icon-btn--sm" (click)="act(m.seen ? 'unread' : 'read', [m]); $event.stopPropagation()" [title]="(m.seen ? 'APP.MAIL.MARK_UNREAD' : 'APP.MAIL.MARK_READ') | translate"><app-icon [name]="m.seen ? 'unread' : 'mail-open'"></app-icon></button>
             </div>
+          </div>
+          } @else {
+          @let t = c.inFolder[0]; @let expanded = expandedThreads().has(c.key);
+          <div class="row row--thread" [class.row--unread]="c.unread" [class.row--pinned]="c.pinned" [class.row--expanded]="expanded" [class.row--open]="!expanded && conversationOpen(c)" [class.row--picked]="conversationPicked(c)" [class.row--selecting]="selected().size > 0" draggable="true" (dragstart)="conversationDragStart($event, c)" (click)="conversationClick(c, $event)" (contextmenu)="rowMenu($event, t, c.inFolder)" tabindex="0" (keydown.enter)="conversationClick(c, $any($event))" (keydown.arrowright)="!expanded && toggleThread(c.key)" (keydown.arrowleft)="expanded && toggleThread(c.key)" [attr.aria-expanded]="expanded">
+            <div class="row-lead" (click)="conversationCheck(c, $event)">
+              <app-avatar [name]="t.from[0]?.name || ''" [address]="t.from[0]?.address || ''"></app-avatar>
+              <span class="row-check"><app-icon name="check" [strokeWidth]="3"></app-icon></span>
+            </div>
+            <div class="row-main">
+              <div class="row-line"><button type="button" class="conv-toggle" (click)="toggleThread(c.key, $event)" [title]="(expanded ? 'APP.MAIL.CONVERSATION_COLLAPSE' : 'APP.MAIL.CONVERSATION_EXPAND') | translate"><app-icon [name]="expanded ? 'chevron-down' : 'chevron-right'"></app-icon></button><span class="row-from">{{ rowSender(t) }}</span>@if (conversationHasAttachments(c)) {<app-icon class="row-clip" name="paperclip"></app-icon>}@if (c.pinned) {<app-icon class="row-pin" name="pin" [filled]="true" [title]="'APP.MAIL.PINNED' | translate"></app-icon>}<span class="row-date">{{ listDate(c.latest.date) }}</span></div>
+              <div class="row-line"><span class="row-subject">{{ c.latest.subject || ('APP.MAIL.NO_SUBJECT' | translate) }}</span><span class="conv-count" [title]="'APP.MAIL.CONVERSATION_COUNT' | translate:{count: c.items.length}">{{ c.items.length }}</span>@if (c.latest.answered) {<app-icon class="row-answered" name="reply"></app-icon>}</div>
+              @if (!expanded) {<div class="row-line"><span class="row-preview">{{ c.latest.preview || ' ' }}</span></div>}
+            </div>
+            <div class="row-hover">
+              <button type="button" class="icon-btn icon-btn--sm" (click)="act('delete', c.inFolder); $event.stopPropagation()" [title]="'APP.COMMON.DELETE' | translate"><app-icon name="trash"></app-icon></button>
+              <button type="button" class="icon-btn icon-btn--sm" (click)="act('archive', c.inFolder); $event.stopPropagation()" [title]="'APP.MAIL.ARCHIVE' | translate"><app-icon name="archive"></app-icon></button>
+              <button type="button" class="icon-btn icon-btn--sm" [class.icon-btn--on]="c.pinned" (click)="act(c.pinned ? 'unpin' : 'pin', c.items); $event.stopPropagation()" [title]="(c.pinned ? 'APP.MAIL.UNPIN' : 'APP.MAIL.PIN') | translate"><app-icon name="pin" [filled]="c.pinned"></app-icon></button>
+              <button type="button" class="icon-btn icon-btn--sm" (click)="act(c.unread ? 'read' : 'unread', c.inFolder); $event.stopPropagation()" [title]="(c.unread ? 'APP.MAIL.MARK_READ' : 'APP.MAIL.MARK_UNREAD') | translate"><app-icon [name]="c.unread ? 'mail-open' : 'unread'"></app-icon></button>
+            </div>
+          </div>
+          @if (expanded) {@for (m of c.items; track m.id) {
+          <div class="row row--child" [class.row--unread]="!m.seen" [class.row--open]="isOpen(m)" (click)="openMessage(m)" (contextmenu)="rowMenu($event, m, [m])" tabindex="0" (keydown.enter)="openMessage(m)">
+            <div class="row-main">
+              <div class="row-line"><span class="row-from">{{ rowSender(m) }}</span>@if (m.hasAttachments) {<app-icon class="row-clip" name="paperclip"></app-icon>}@if (m.flagged) {<app-icon class="row-pin" name="pin" [filled]="true"></app-icon>}@if (m.answered) {<app-icon class="row-answered" name="reply"></app-icon>}<span class="row-date">{{ listDate(m.date) }}</span></div>
+              <div class="row-line"><span class="row-preview">{{ m.preview || ' ' }}</span>@if (m.folderId !== folderId()) {<span class="chip chip--folder">{{ folderLabel(m.folderId) }}</span>}</div>
+            </div>
           </div>}}
+          }}}
           @if (loadingMore()) {<div class="list-state"><span class="spinner"></span></div>}
           @else if (!serverResults() && !exhausted() && (messages().length < total() || messages().length < serverTotal())) {<button type="button" class="btn btn--ghost btn--block load-more" (click)="loadMore()">{{ 'APP.MAIL.LOAD_MORE' | translate }}</button>}
           }

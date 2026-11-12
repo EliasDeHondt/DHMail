@@ -166,6 +166,9 @@
       "PIN": "Pin",
       "UNPIN": "Unpin",
       "PINNED": "Pinned",
+      "CONVERSATION_EXPAND": "Show conversation",
+      "CONVERSATION_COLLAPSE": "Hide conversation",
+      "CONVERSATION_COUNT": "{{count}} messages in this conversation",
       "GROUP_PINNED": "Pinned",
       "DRAG_TO_REORDER": "Click to collapse or expand, drag to reorder"
     },
@@ -331,7 +334,16 @@
       "MADE_BY": "Made by",
       "VERSION": "Version",
       "DATA_PATH": "Data folder",
-      "PRIVACY_NOTE": "Passwords and tokens are encrypted with Windows DPAPI and stay on this computer."
+      "PRIVACY_NOTE": "Passwords and tokens are encrypted with Windows DPAPI and stay on this computer.",
+      "SECURITY": "Security",
+      "AUTO_LOCK": "Lock automatically after",
+      "AUTO_LOCK_HINT": "of inactivity. DHMail always asks for your PIN when it starts.",
+      "AUTO_LOCK_MINUTES": "{{count}} minutes",
+      "AUTO_LOCK_HOUR": "{{count}} hour",
+      "AUTO_LOCK_HOURS": "{{count}} hours",
+      "PIN": "PIN",
+      "CHANGE_PIN": "Change PIN",
+      "LOCK_NOW": "Lock now"
     },
     "CONNECT": {
       "OUTLOOK": "Connect with Outlook",
@@ -376,6 +388,28 @@
       "CLIENT_ID": "Application (client) ID",
       "CLIENT_ID_INVALID": "That does not look like a valid client ID (format 00000000-0000-0000-0000-000000000000).",
       "SAVE_AND_CONNECT": "Save and connect"
+    },
+    "LOCK": {
+      "TITLE_UNLOCK": "DHMail is locked",
+      "TITLE_SETUP": "Set up a PIN",
+      "TITLE_CHANGE": "Change PIN",
+      "SUB_UNLOCK": "Enter your PIN to continue.",
+      "SUB_SETUP": "Choose 4 to 8 digits. You will need this PIN every time you open DHMail.",
+      "SUB_CHANGE": "First enter your current PIN, then choose a new one.",
+      "STEP_ENTER": "PIN",
+      "STEP_CURRENT": "Current PIN",
+      "STEP_NEW": "New PIN",
+      "STEP_CONFIRM": "Repeat your PIN",
+      "HINT_LENGTH": "4 to 8 digits",
+      "HINT_CONTINUE": "Press Enter or ✓ to continue",
+      "TOO_SHORT": "Use at least 4 digits",
+      "WRONG": "Incorrect PIN",
+      "MISMATCH": "The PINs do not match. Try again.",
+      "RETRY": "Too many attempts · try again in {{seconds}} s",
+      "CHANGED": "PIN changed",
+      "BACKSPACE": "Remove digit",
+      "CONFIRM": "Confirm",
+      "DIGITS": "{{count}} digits entered"
     }
   }
 }

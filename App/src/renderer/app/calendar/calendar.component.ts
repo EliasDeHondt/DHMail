@@ -12,7 +12,7 @@ import { EventDialogComponent } from './event-dialog.component';
 import { CalendarDialogComponent } from './calendar-dialog.component';
 import { Calendar, CalendarEvent, EventInput } from '../../../shared/types';
 export type View = 'day' | 'workweek' | 'week' | 'month';
-export const HOUR_PX = 35;
+export const HOUR_PX = 42;
 const SNAP_MIN = 15;
 export type DragMode = 'move' | 'start' | 'end';
 export interface DragState { event: CalendarEvent; mode: DragMode; pointerId: number; x: number; y: number; grabOffset: number; moved: boolean; day: number; startMin: number; endMin: number; }

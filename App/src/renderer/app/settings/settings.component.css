@@ -41,7 +41,7 @@
 .about-title { margin: 4px 0 0; font-size: 36px; letter-spacing: 0.04em; }
 .about-title { color: var(--primary); }
 .by { color: var(--primary); }
-.block > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 6px; }
+.block > summary { list-style: none; display: flex; align-items: center; gap: 6px; }
 .block > summary::before { content: "›"; font-size: 16px; transition: transform 0.15s; }
 .block[open] > summary::before { transform: rotate(90deg); }
 .about-text { margin: 0; max-width: 520px; color: var(--secondary); }
@@ -49,3 +49,5 @@
 .about-meta { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; margin: 12px 0 0; font-size: 13px; text-align: left; }
 .about-meta dt { color: var(--secondary); }
 .about-meta dd { margin: 0; overflow-wrap: anywhere; }
+.security-title { margin-top: 8px; }
+.security-actions { display: flex; flex-wrap: wrap; gap: 8px; }

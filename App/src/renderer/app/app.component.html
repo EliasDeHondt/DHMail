@@ -29,3 +29,4 @@
   </div>
 </div>
 <app-overlays></app-overlays>
+@if (lock.mode() !== 'unlocked' && lock.mode() !== 'checking') {<app-lock-screen></app-lock-screen>}

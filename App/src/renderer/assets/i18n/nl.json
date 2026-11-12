@@ -166,6 +166,9 @@
       "PIN": "Vastzetten",
       "UNPIN": "Losmaken",
       "PINNED": "Vastgezet",
+      "CONVERSATION_EXPAND": "Conversatie tonen",
+      "CONVERSATION_COLLAPSE": "Conversatie verbergen",
+      "CONVERSATION_COUNT": "{{count}} berichten in deze conversatie",
       "GROUP_PINNED": "Vastgezet",
       "DRAG_TO_REORDER": "Klik om in of uit te klappen, sleep om de volgorde te wijzigen"
     },
@@ -331,7 +334,16 @@
       "MADE_BY": "Gemaakt door",
       "VERSION": "Versie",
       "DATA_PATH": "Gegevensmap",
-      "PRIVACY_NOTE": "Wachtwoorden en tokens worden versleuteld met Windows DPAPI en blijven op deze computer."
+      "PRIVACY_NOTE": "Wachtwoorden en tokens worden versleuteld met Windows DPAPI en blijven op deze computer.",
+      "SECURITY": "Beveiliging",
+      "AUTO_LOCK": "Automatisch vergrendelen na",
+      "AUTO_LOCK_HINT": "zonder activiteit. DHMail vraagt altijd je pincode bij het opstarten.",
+      "AUTO_LOCK_MINUTES": "{{count}} minuten",
+      "AUTO_LOCK_HOUR": "{{count}} uur",
+      "AUTO_LOCK_HOURS": "{{count}} uur",
+      "PIN": "Pincode",
+      "CHANGE_PIN": "Pincode wijzigen",
+      "LOCK_NOW": "Nu vergrendelen"
     },
     "CONNECT": {
       "OUTLOOK": "Verbinden met Outlook",
@@ -376,6 +388,28 @@
       "CLIENT_ID": "Application (client) ID",
       "CLIENT_ID_INVALID": "Dat lijkt geen geldig client-ID (formaat 00000000-0000-0000-0000-000000000000).",
       "SAVE_AND_CONNECT": "Opslaan en verbinden"
+    },
+    "LOCK": {
+      "TITLE_UNLOCK": "DHMail is vergrendeld",
+      "TITLE_SETUP": "Stel een pincode in",
+      "TITLE_CHANGE": "Pincode wijzigen",
+      "SUB_UNLOCK": "Voer je pincode in om verder te gaan.",
+      "SUB_SETUP": "Kies 4 tot 8 cijfers. Je hebt deze pincode nodig telkens je DHMail opent.",
+      "SUB_CHANGE": "Voer eerst je huidige pincode in en kies daarna een nieuwe.",
+      "STEP_ENTER": "Pincode",
+      "STEP_CURRENT": "Huidige pincode",
+      "STEP_NEW": "Nieuwe pincode",
+      "STEP_CONFIRM": "Herhaal je pincode",
+      "HINT_LENGTH": "4 tot 8 cijfers",
+      "HINT_CONTINUE": "Druk op Enter of ✓ om verder te gaan",
+      "TOO_SHORT": "Gebruik minstens 4 cijfers",
+      "WRONG": "Onjuiste pincode",
+      "MISMATCH": "De pincodes komen niet overeen. Probeer opnieuw.",
+      "RETRY": "Te veel pogingen · probeer opnieuw over {{seconds}} s",
+      "CHANGED": "Pincode gewijzigd",
+      "BACKSPACE": "Cijfer wissen",
+      "CONFIRM": "Bevestigen",
+      "DIGITS": "{{count}} cijfers ingevoerd"
     }
   }
 }

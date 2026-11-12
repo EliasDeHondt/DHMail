@@ -19,6 +19,8 @@ import * as cal from './calendar';
 import * as contacts from './contacts';
 import { bus, log } from './core/bus';
 import { suggestPlaces } from './geo';
+import { changePin, isUnlocked, lockStatus, setupPin, unlock } from './core/lock';
+const OPEN_WHILE_LOCKED = new Set(['app:info', 'app:titleBar', 'settings:get', 'lock:status', 'lock:setup', 'lock:unlock']);
 type Handlers = { [K in keyof Api]: (...args: Parameters<Api[K]>) => ReturnType<Api[K]> | Promise<ReturnType<Api[K]>> };
 export function activateAccount(account: Account) { mail.startAccount(account); importOutlookCategories(account).catch(err => log('outlook categories failed', err?.message)); cal.ensureAccountCalendars(account); contacts.ensureAccountSources(account); cal.syncAccountCalendars(account).catch(err => log('calendar activation failed', err?.message)); if (account.features.contacts) contacts.syncAllContacts().catch(err => log('contacts activation failed', err?.message)); }
 export function registerIpc(getWindow: () => BrowserWindow | null) {
@@ -32,6 +34,10 @@ export function registerIpc(getWindow: () => BrowserWindow | null) {
     'app:titleBar': colors => { try { win()?.setTitleBarOverlay({ color: colors.color, symbolColor: colors.symbolColor, height: 40 }); } catch {} },
     'settings:get': () => getSettings(),
     'settings:set': patch => setSettings(patch),
+    'lock:status': () => lockStatus(),
+    'lock:setup': pin => setupPin(String(pin ?? '')),
+    'lock:unlock': pin => unlock(String(pin ?? '')),
+    'lock:change': (current, next) => changePin(String(current ?? ''), String(next ?? '')),
     'accounts:list': () => listAccounts(),
     'accounts:reorder': ids => reorderAccounts(Array.isArray(ids) ? ids : []),
     'accounts:oauthReady': () => oauthReady(),
@@ -86,5 +92,5 @@ export function registerIpc(getWindow: () => BrowserWindow | null) {
     'contacts:remove': id => contacts.removeContact(id),
     'contacts:importVcf': text => contacts.importVcf(text)
   };
-  for (const [channel, fn] of Object.entries(handlers)) ipcMain.handle(channel, async (_event, ...args: any[]) => { try { return await (fn as any)(...args); } catch (err: any) { log('ipc failed', channel, err?.message); throw new Error(JSON.stringify({ message: describe(err), code: err instanceof OAuthError ? err.code : err?.code ?? null, status: err?.status ?? null })); } });
+  for (const [channel, fn] of Object.entries(handlers)) ipcMain.handle(channel, async (_event, ...args: any[]) => { try { if (!isUnlocked() && !OPEN_WHILE_LOCKED.has(channel)) throw Object.assign(new Error('DHMail is locked'), { status: 423 }); return await (fn as any)(...args); } catch (err: any) { log('ipc failed', channel, err?.message); throw new Error(JSON.stringify({ message: describe(err), code: err instanceof OAuthError ? err.code : err?.code ?? null, status: err?.status ?? null })); } });
 }

@@ -1,0 +1,23 @@
+<div class="lock-box" [class.shake]="shaking()" tabindex="-1" role="dialog" aria-modal="true" [attr.aria-label]="title() | translate">
+  <app-logo [wordmark]="true"></app-logo>
+  <h1 class="lock-title">{{ title() | translate }}</h1>
+  <p class="lock-sub">{{ (lock.mode() === 'setup' ? 'APP.LOCK.SUB_SETUP' : lock.mode() === 'change' ? 'APP.LOCK.SUB_CHANGE' : 'APP.LOCK.SUB_UNLOCK') | translate }}</p>
+  <div class="lock-step">{{ prompt() | translate }}</div>
+  <div class="lock-digits" aria-live="polite" [attr.aria-label]="'APP.LOCK.DIGITS' | translate:{count: entry().length}">
+    @for (i of boxes(); track i) {<span [class.f]="i < entry().length" [class.cur]="i === entry().length">{{ i < entry().length ? '•' : '' }}</span>}
+  </div>
+  <div class="lock-msg" [class.lock-msg--err]="message().kind === 'err' || waitSeconds() > 0" [class.lock-msg--ok]="message().kind === 'ok'">
+    @if (waitSeconds() > 0) {<span>{{ 'APP.LOCK.RETRY' | translate:{seconds: waitSeconds()} }}</span>}
+    @else if (message().text) {<span>{{ message().text }}</span>}
+    @else if (!fixedLength() && entry().length >= 4) {<span>{{ 'APP.LOCK.HINT_CONTINUE' | translate }}</span>}
+    @else if (!fixedLength()) {<span>{{ 'APP.LOCK.HINT_LENGTH' | translate }}</span>}
+  </div>
+  <div class="lock-pad">
+    @for (k of keys; track k) {
+      @if (k === 'back') {<button type="button" class="lock-key lock-key--muted" (click)="press(k)" [disabled]="busy() || waitSeconds() > 0" [attr.aria-label]="'APP.LOCK.BACKSPACE' | translate"><app-icon name="back"></app-icon></button>}
+      @else if (k === 'enter') {<button type="button" class="lock-key lock-key--enter" (click)="press(k)" [disabled]="busy() || waitSeconds() > 0 || entry().length < 4" [attr.aria-label]="'APP.LOCK.CONFIRM' | translate">@if (busy()) {<span class="spinner"></span>} @else {<app-icon name="check" [strokeWidth]="2.5"></app-icon>}</button>}
+      @else {<button type="button" class="lock-key" (click)="press(k)" [disabled]="busy() || waitSeconds() > 0">{{ k }}</button>}
+    }
+  </div>
+  @if (lock.mode() === 'change') {<button type="button" class="btn btn--ghost btn--sm lock-cancel" (click)="lock.cancelChange()">{{ 'APP.COMMON.CANCEL' | translate }}</button>}
+</div>

@@ -14,11 +14,11 @@ export interface ServerConfig { imapHost: string; imapPort: number; imapSecure: 
 export interface DiscoverResult { ok: boolean; config: ServerConfig | null; suggest: OAuthProvider | null; error: string | null; }
 export interface Folder { id: number; accountId: number; path: string; name: string; parentPath: string | null; delimiter: string; specialUse: SpecialUse | null; unseen: number; total: number; depth: number; sortOrder: number; selectable: boolean; }
 export interface Address { name: string; address: string; }
-export interface MessageSummary { id: number; accountId: number; folderId: number; uid: number; messageId: string | null; subject: string; from: Address[]; to: Address[]; cc: Address[]; date: string | null; size: number; seen: boolean; flagged: boolean; answered: boolean; draft: boolean; hasAttachments: boolean; preview: string | null; categories: number[]; }
+export interface MessageSummary { id: number; accountId: number; folderId: number; uid: number; messageId: string | null; subject: string; from: Address[]; to: Address[]; cc: Address[]; date: string | null; size: number; seen: boolean; flagged: boolean; answered: boolean; draft: boolean; hasAttachments: boolean; preview: string | null; categories: number[]; threadId?: string | null; }
 export interface AttachmentInfo { index: number; filename: string; contentType: string; size: number; cid: string | null; inline: boolean; }
 export interface MessageBody extends MessageSummary { html: string | null; text: string | null; attachments: AttachmentInfo[]; inReplyTo: string | null; references: string[]; bcc: Address[]; replyTo: Address[]; }
 export interface ListQuery { accountId: number; folderId: number; offset: number; limit: number; search?: string; unreadOnly?: boolean; flaggedOnly?: boolean; categoryId?: number | null; }
-export interface ListResult { messages: MessageSummary[]; total: number; serverTotal: number; }
+export interface ListResult { messages: MessageSummary[]; related?: MessageSummary[]; total: number; serverTotal: number; }
 export interface MessageRef { accountId: number; folderId: number; uid: number; }
 export interface OutgoingAttachment { filename: string; path?: string; contentBase64?: string; contentType?: string; size: number; }
 export interface OutgoingMail { accountId: number; from?: string; to: string[]; cc: string[]; bcc: string[]; subject: string; html: string; text?: string; attachments: OutgoingAttachment[]; inReplyTo?: string | null; references?: string[]; answered?: MessageRef | null; forwardOf?: MessageRef | null; draftUid?: number | null; }
@@ -37,7 +37,9 @@ export interface ContactSource { id: number; accountId: number | null; kind: Con
 export interface ContactSourceInput { name: string; url: string; username: string; password: string; }
 export interface PlaceSuggestion { label: string; title: string; detail: string; }
 export interface Suggestion { name: string; address: string; source: string; }
-export interface Settings { theme: 'light' | 'dark' | 'system'; language: 'nl' | 'en'; blockRemoteImages: boolean; notifications: boolean; markReadDelaySeconds: number; syncIntervalMinutes: number; weekStartsOn: number; workDayStart: number; workDayEnd: number; googleClientId: string; googleClientSecret: string; microsoftClientId: string; microsoftTenant: string; defaultAccountId: number | null; darkMailBodies: boolean; }
+export interface Settings { theme: 'light' | 'dark' | 'system'; language: 'nl' | 'en'; blockRemoteImages: boolean; notifications: boolean; markReadDelaySeconds: number; syncIntervalMinutes: number; weekStartsOn: number; workDayStart: number; workDayEnd: number; googleClientId: string; googleClientSecret: string; microsoftClientId: string; microsoftTenant: string; defaultAccountId: number | null; darkMailBodies: boolean; autoLockMinutes: number; }
+export interface LockStatus { hasPin: boolean; length: number | null; retryAfter: number; }
+export interface UnlockResult { ok: boolean; retryAfter: number; }
 export interface SavedFile { path: string; name: string; size: number; }
 export interface AppInfo { version: string; dataPath: string; platform: string; }
 export interface SyncState { accountId: number | null; kind: 'mail' | 'calendar' | 'contacts'; busy: boolean; message?: string; }
@@ -50,6 +52,10 @@ export interface Api {
   'app:titleBar': (colors: { color: string; symbolColor: string }) => void;
   'settings:get': () => Settings;
   'settings:set': (patch: Partial<Settings>) => Settings;
+  'lock:status': () => LockStatus;
+  'lock:setup': (pin: string) => UnlockResult;
+  'lock:unlock': (pin: string) => UnlockResult;
+  'lock:change': (current: string, next: string) => UnlockResult;
   'accounts:list': () => Account[];
   'accounts:reorder': (ids: number[]) => Account[];
   'accounts:oauthReady': () => Record<OAuthProvider, boolean>;

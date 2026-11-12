@@ -108,6 +108,9 @@ export interface Api {
   'contacts:photos': () => Record<string, string>;
   /** toId -1 = the local DHMail address book */
   'contacts:copy': (fromId: number, toId: number) => ContactCopyResult;
+  'contacts:copyOne': (contactId: number, toId: number) => ContactCopyResult;
+  /** new contact in an account's address book (Google, Outlook or CardDAV) */
+  'contacts:createIn': (input: ContactInput, toId: number) => ContactCopyResult;
   'contacts:addSource': (input: ContactSourceInput) => ContactSource[];
   'contacts:removeSource': (id: number) => ContactSource[];
   'contacts:sync': () => ContactSource[];

@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { all, get, json, now, run } from '../core/db';
-import { ContactCopyResult, ContactField } from '../../shared/types';
+import { ContactCopyResult, ContactField, ContactInput } from '../../shared/types';
 import { getSecret } from '../core/secrets';
 import { gapi } from '../calendar/google';
 import { graph } from '../calendar/microsoft';
@@ -11,7 +11,8 @@ import { log } from '../core/bus';
 // target: contacts that already exist there (same e-mail address, or same name when there is no address)
 // are skipped, and every field the target cannot hold is written into the notes so no information is lost.
 interface Row { displayName: string; firstName: string; lastName: string; emails: ContactField[]; phones: ContactField[]; company: string; title: string; notes: string; birthday: string | null; photo: string | null; }
-const readRows = (sourceId: number): Row[] => all('SELECT * FROM contacts WHERE source_id = ?', sourceId).map(r => ({ displayName: r.display_name ?? '', firstName: r.first_name ?? '', lastName: r.last_name ?? '', emails: json<ContactField[]>(r.emails, []).filter(e => e?.value), phones: json<ContactField[]>(r.phones, []).filter(p => p?.value), company: r.company ?? '', title: r.title ?? '', notes: r.notes ?? '', birthday: r.birthday || null, photo: r.photo || null }));
+const readRows = (sourceId: number): Row[] => all('SELECT * FROM contacts WHERE source_id = ?', sourceId).map(toRow);
+const toRow = (r: any): Row => ({ displayName: r.display_name ?? '', firstName: r.first_name ?? '', lastName: r.last_name ?? '', emails: json<ContactField[]>(r.emails, []).filter(e => e?.value), phones: json<ContactField[]>(r.phones, []).filter(p => p?.value), company: r.company ?? '', title: r.title ?? '', notes: r.notes ?? '', birthday: r.birthday || null, photo: r.photo || null });
 const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, ' ');
 const nameOf = (c: Row) => c.displayName || [c.firstName, c.lastName].filter(Boolean).join(' ') || c.emails[0]?.value || '';
 const birthdayParts = (b: string | null) => { const m = b ? /^(?:(\d{4})|--)?-?(\d{2})-(\d{2})/.exec(b.trim()) : null; return m ? { year: m[1] ? Number(m[1]) : null, month: Number(m[2]), day: Number(m[3]) } : null; };
@@ -121,21 +122,22 @@ async function toCardDav(source: any, list: Row[], result: ContactCopyResult) {
 }
 
 // ---------- entry point ----------
-export async function copyContacts(fromId: number, toId: number, syncSource: (id: number) => Promise<void>): Promise<ContactCopyResult> {
-  const from = get('SELECT * FROM contact_sources WHERE id = ?', fromId), to = get('SELECT * FROM contact_sources WHERE id = ?', toId);
-  if (!from || !to) throw Object.assign(new Error('Address book not found'), { status: 404 });
-  if (from.id === to.id) throw Object.assign(new Error('Choose two different address books'), { status: 400 });
+type Sync = (id: number) => Promise<void>;
+const sourceRow = (id: number) => { const s = get('SELECT * FROM contact_sources WHERE id = ?', id); if (!s) throw Object.assign(new Error('Address book not found'), { status: 404 }); return s; };
+
+/** Writes rows into an address book. With skipDuplicates, rows already present there are left out. */
+async function writeRows(rows: Row[], to: any, sync: Sync, skipDuplicates: boolean): Promise<ContactCopyResult> {
   // read the target fresh so contacts that are already there are recognised
-  if (to.kind !== 'local') await syncSource(to.id).catch(() => {});
-  const existing = readRows(to.id);
+  if (skipDuplicates && to.kind !== 'local') await sync(to.id).catch(() => {});
+  const existing = skipDuplicates ? readRows(to.id) : [];
   const haveEmail = new Set(existing.flatMap(c => c.emails.map(e => norm(e.value))));
   const haveName = new Set(existing.map(c => norm(nameOf(c))).filter(Boolean));
   const result: ContactCopyResult = { total: 0, created: 0, skipped: 0, failed: 0, errors: [] };
   const todo: Row[] = [];
-  for (const c of readRows(from.id)) {
+  for (const c of rows) {
     if (!nameOf(c)) continue;
     result.total++;
-    const dup = c.emails.length ? c.emails.some(e => haveEmail.has(norm(e.value))) : haveName.has(norm(nameOf(c)));
+    const dup = skipDuplicates && (c.emails.length ? c.emails.some(e => haveEmail.has(norm(e.value))) : haveName.has(norm(nameOf(c))));
     if (dup) { result.skipped++; continue; }
     todo.push(c);
     for (const e of c.emails) haveEmail.add(norm(e.value));
@@ -146,7 +148,29 @@ export async function copyContacts(fromId: number, toId: number, syncSource: (id
   else if (to.kind === 'microsoft') await toOutlook(to.account_id, todo, result);
   else if (to.kind === 'carddav') await toCardDav(to, todo, result);
   else throw Object.assign(new Error('This address book cannot be written to'), { status: 400 });
-  if (to.kind !== 'local') await syncSource(to.id).catch(() => {});
+  if (to.kind !== 'local' && todo.length) await sync(to.id).catch(() => {});
   result.errors = result.errors.slice(0, 10);
+  return result;
+}
+
+/** Copies a whole address book into another one (existing contacts in the target are skipped). */
+export async function copyContacts(fromId: number, toId: number, sync: Sync): Promise<ContactCopyResult> {
+  const from = sourceRow(fromId), to = sourceRow(toId);
+  if (from.id === to.id) throw Object.assign(new Error('Choose two different address books'), { status: 400 });
+  return writeRows(readRows(from.id), to, sync, true);
+}
+/** Copies one contact into another address book (skipped when it is already there). */
+export async function copyContactTo(contactId: number, toId: number, sync: Sync): Promise<ContactCopyResult> {
+  const row = get('SELECT * FROM contacts WHERE id = ?', contactId);
+  if (!row) throw Object.assign(new Error('Contact not found'), { status: 404 });
+  const to = sourceRow(toId);
+  if (row.source_id === to.id) throw Object.assign(new Error('The contact is already in this address book'), { status: 400 });
+  return writeRows([toRow(row)], to, sync, true);
+}
+/** Creates a new contact directly in an account's address book (Google, Outlook or CardDAV). */
+export async function createContactIn(input: ContactInput, toId: number, sync: Sync): Promise<ContactCopyResult> {
+  const row: Row = { displayName: input.displayName ?? '', firstName: input.firstName ?? '', lastName: input.lastName ?? '', emails: (input.emails ?? []).filter(e => e?.value), phones: (input.phones ?? []).filter(p => p?.value), company: input.company ?? '', title: input.title ?? '', notes: input.notes ?? '', birthday: input.birthday || null, photo: null };
+  const result = await writeRows([row], sourceRow(toId), sync, false);
+  if (result.failed) throw new Error(result.errors[0] ?? 'The contact could not be saved');
   return result;
 }

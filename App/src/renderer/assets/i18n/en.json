@@ -259,12 +259,15 @@
       "COPY_TITLE": "Copy contacts",
       "COPY_HINT": "Copies every contact from one address book to another. Nothing in the target is changed or deleted: contacts that are already there (same e-mail address, or same name without an address) are skipped, and details the target has no field for go into the notes.",
       "COPY_FROM": "From",
-      "COPY_TO": "To",
+      "COPY_TO": "Copy to…",
       "COPY_START": "Copy",
       "COPY_CONFIRM": "Copy {{count}} contacts from \"{{from}}\" to \"{{to}}\"?",
       "COPY_DONE": "{{created}} copied · {{skipped}} already there · {{failed}} failed",
       "COPY_CONSENT": "DHMail may not write contacts to this Outlook account yet. Add the Outlook account again via Settings → Accounts → Add account, grant access and try again.",
-      "LOCAL_BOOK": "DHMail (on this computer)"
+      "LOCAL_BOOK": "DHMail (on this computer)",
+      "SAVE_IN": "Save in",
+      "SAVED_IN": "Contact saved in {{name}}",
+      "ALREADY_IN": "This contact is already in {{name}}"
     },
     "ACCOUNT": {
       "TITLE_ADD": "Add account",

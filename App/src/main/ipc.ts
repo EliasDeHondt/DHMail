@@ -17,7 +17,7 @@ import { saveDraft, sendMail } from './mail/smtp';
 import { listCategories, removeCategory, saveCategory } from './mail/categories';
 import * as cal from './calendar';
 import * as contacts from './contacts';
-import { copyContacts } from './contacts/copy';
+import { copyContactTo, copyContacts, createContactIn } from './contacts/copy';
 import { bus, log } from './core/bus';
 import { suggestPlaces } from './geo';
 import { changePin, isUnlocked, lockStatus, setupPin, unlock } from './core/lock';
@@ -88,6 +88,8 @@ export function registerIpc(getWindow: () => BrowserWindow | null) {
     'contacts:list': query => contacts.listContacts(query),
     'contacts:sources': () => contacts.listSources(),
     'contacts:photos': () => contacts.contactPhotos(),
+    'contacts:copyOne': async (contactId, toId) => { const target = Number(toId) === -1 ? contacts.ensureLocalSource() : Number(toId); const r = await copyContactTo(Number(contactId), target, contacts.syncSource); bus.emitEvent('contacts:changed', { sourceId: target }); return r; },
+    'contacts:createIn': async (input, toId) => { const r = await createContactIn(input, Number(toId), contacts.syncSource); bus.emitEvent('contacts:changed', { sourceId: Number(toId) }); return r; },
     'contacts:copy': async (fromId, toId) => { const target = Number(toId) === -1 ? contacts.ensureLocalSource() : Number(toId); const r = await copyContacts(Number(fromId), target, contacts.syncSource); bus.emitEvent('contacts:changed', { sourceId: target }); return r; },
     'contacts:addSource': input => contacts.addSource(input),
     'contacts:removeSource': id => contacts.removeSource(id),

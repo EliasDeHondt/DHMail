@@ -122,3 +122,5 @@
 .ev--tentative { opacity: 1; border-left-style: dashed; background-image: repeating-linear-gradient(135deg, transparent 0 5px, color-mix(in srgb, var(--ev) 18%, transparent) 5px 8px); }
 .mev--timed { --dot: var(--ev); }
 .ev-resize::after { background: var(--ev); }
+.ev--selected, .mev.ev--selected { outline: 2px solid var(--ev); outline-offset: 1px; z-index: 5; }
+.ev--cut { opacity: 0.45; }

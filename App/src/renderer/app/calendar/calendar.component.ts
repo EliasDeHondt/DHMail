@@ -38,6 +38,12 @@ export class CalendarComponent implements OnDestroy {
   readonly editing = signal<Partial<EventInput> & { readOnly?: boolean; event?: CalendarEvent } | null>(null);
   readonly addingCalendar = signal(false);
   readonly popover = signal<{ event: CalendarEvent; x: number; y: number } | null>(null);
+  /** clicked event (Ctrl+C / Ctrl+X / Delete act on it) */
+  readonly selectedId = signal<number | null>(null);
+  /** event on the clipboard; 'cut' moves it on paste */
+  readonly clip = signal<{ event: CalendarEvent; mode: 'copy' | 'cut' } | null>(null);
+  /** slot under the mouse: where Ctrl+V pastes */
+  private hoverSlot: { day: Date; minutes: number | null } | null = null;
   readonly hours = Array.from({ length: 24 }, (_, i) => i);
   readonly hourPx = HOUR_PX;
   readonly Math = Math;
@@ -83,14 +89,71 @@ export class CalendarComponent implements OnDestroy {
   miniGo(n: number) { const m = this.miniMonth(); this.miniMonth.set(new Date(m.getFullYear(), m.getMonth() + n, 1)); }
   async toggleCalendar(c: Calendar) { try { this.store.calendars.set(await this.bridge.invoke('calendar:update', c.id, { visible: !c.visible })); this.load(); } catch (err) { this.toast.error(err); } }
   async syncAll() { this.loading.set(true); try { this.store.calendars.set(await this.bridge.invoke('calendar:sync', null)); await this.load(); } catch (err) { this.toast.error(err); } finally { this.loading.set(false); } }
-  calendarMenu(e: MouseEvent, c: Calendar) { const t = (k: string, p?: any) => this.translate.instant(k, p); const items: MenuItem[] = [{ label: t('APP.CALENDAR.REFRESH'), icon: 'refresh', action: () => this.bridge.invoke('calendar:sync', c.id).then(list => { this.store.calendars.set(list); this.load(); }).catch(err => this.toast.error(err)) }, { label: t('APP.CALENDAR.RENAME'), icon: 'edit', action: () => this.startRename(c) }, { label: t('APP.CALENDAR.COLOR'), icon: 'tag', children: COLOR_PRESETS.map(color => ({ label: color, color, checked: color.toLowerCase() === c.color.toLowerCase(), action: async () => { this.store.calendars.set(await this.bridge.invoke('calendar:update', c.id, { color })); this.load(); } })) }]; if (c.source !== 'birthdays' && c.source !== 'holidays' && !(c.source === 'google' || c.source === 'microsoft')) items.push({ separator: true }, { label: t('APP.COMMON.REMOVE'), icon: 'trash', danger: true, action: async () => { if (await this.dialogs.confirm(t('APP.CALENDAR.REMOVE_CONFIRM', { name: c.name }), t('APP.COMMON.REMOVE'), true)) { this.store.calendars.set(await this.bridge.invoke('calendar:remove', c.id)); this.load(); } } }); this.dialogs.openMenu(e, items); }
+  /** show only one calendar (whatever the provider) */
+  async showOnly(c: Calendar) { for (const x of this.store.calendars()) if (x.visible !== (x.id === c.id)) this.store.calendars.set(await this.bridge.invoke('calendar:update', x.id, { visible: x.id === c.id })); this.load(); }
+  async showAll() { for (const x of this.store.calendars()) if (!x.visible) this.store.calendars.set(await this.bridge.invoke('calendar:update', x.id, { visible: true })); this.load(); }
+  /** copy or move every event of one calendar to another one */
+  async transfer(from: Calendar, to: Calendar, mode: 'copy' | 'move') {
+    const t = (k: string, p?: any) => this.translate.instant(k, p);
+    if (!await this.dialogs.confirm(t(mode === 'move' ? 'APP.CALENDAR.MOVE_CONFIRM' : 'APP.CALENDAR.COPY_CONFIRM', { from: from.name, to: to.name }), t(mode === 'move' ? 'APP.CALENDAR.MOVE_START' : 'APP.CALENDAR.COPY_START'), mode === 'move')) return;
+    this.toast.show(t('APP.CALENDAR.TRANSFER_BUSY', { from: from.name, to: to.name }), 'info');
+    try {
+      const r = await this.bridge.invoke('calendar:transfer', from.id, to.id, mode);
+      const key = mode === 'move' ? (r.movedAll ? 'APP.CALENDAR.MOVE_DONE' : 'APP.CALENDAR.MOVE_PARTIAL') : 'APP.CALENDAR.COPY_ALL_DONE';
+      this.toast.show(t(key, { copied: r.copied, total: r.total, failed: r.failed, deleted: r.deleted }), r.failed ? 'error' : 'success');
+      if (r.errors.length) console.warn('calendar transfer', r.errors);
+      this.store.calendars.set(await this.bridge.invoke('calendar:list')); await this.load();
+    } catch (err) { this.toast.error(err); }
+  }
+  calendarMenu(e: MouseEvent, c: Calendar) { const t = (k: string, p?: any) => this.translate.instant(k, p); const items: MenuItem[] = [{ label: t('APP.CALENDAR.REFRESH'), icon: 'refresh', action: () => this.bridge.invoke('calendar:sync', c.id).then(list => { this.store.calendars.set(list); this.load(); }).catch(err => this.toast.error(err)) }, { label: t('APP.CALENDAR.RENAME'), icon: 'edit', action: () => this.startRename(c) }, { label: t('APP.CALENDAR.COLOR'), icon: 'tag', children: COLOR_PRESETS.map(color => ({ label: color, color, checked: color.toLowerCase() === c.color.toLowerCase(), action: async () => { this.store.calendars.set(await this.bridge.invoke('calendar:update', c.id, { color })); this.load(); } })) }]; const others = this.writable().filter(w => w.id !== c.id); const label = (w: Calendar) => w.group ? `${w.name} · ${w.group}` : w.name; items.push({ separator: true }, { label: t('APP.CALENDAR.ONLY_THIS'), icon: 'eye', action: () => this.showOnly(c) }, { label: t('APP.CALENDAR.SHOW_ALL'), icon: 'calendar', action: () => this.showAll() }); if (others.length && c.source !== 'birthdays' && c.source !== 'holidays') { items.push({ separator: true }, { label: t('APP.CALENDAR.COPY_ALL_TO'), icon: 'copy', children: others.map(w => ({ label: label(w), action: () => this.transfer(c, w, 'copy') })) }); if (!c.readOnly && ['google', 'microsoft', 'caldav', 'local'].includes(c.source)) items.push({ label: t('APP.CALENDAR.MOVE_ALL_TO'), icon: 'move', children: others.map(w => ({ label: label(w), action: () => this.transfer(c, w, 'move') })) }); } if (c.source !== 'birthdays' && c.source !== 'holidays' && !(c.source === 'google' || c.source === 'microsoft')) items.push({ separator: true }, { label: t('APP.COMMON.REMOVE'), icon: 'trash', danger: true, action: async () => { if (await this.dialogs.confirm(t('APP.CALENDAR.REMOVE_CONFIRM', { name: c.name }), t('APP.COMMON.REMOVE'), true)) { this.store.calendars.set(await this.bridge.invoke('calendar:remove', c.id)); this.load(); } } }); this.dialogs.openMenu(e, items); }
   newEvent(start?: Date, allDay = false) { const cal = this.writable()[0]; if (!cal) { this.toast.show(this.translate.instant('APP.CALENDAR.NO_WRITABLE'), 'error'); return; } const s = start ?? this.roundNow(); const en = new Date(s.getTime() + 60 * 60 * 1000); this.editing.set({ calendarId: cal.id, title: '', description: '', location: '', allDay, start: allDay ? dayKey(s) : toLocalInput(s), end: allDay ? dayKey(addDays(s, 1)) : toLocalInput(en) }); }
   private roundNow() { const d = new Date(); d.setMinutes(d.getMinutes() < 30 ? 30 : 60, 0, 0); return d; }
-  slotClick(day: Date, e: MouseEvent) { if (this.suppressClick || this.drag() || (e.target as HTMLElement).closest('.ev')) return; const rect = (e.currentTarget as HTMLElement).getBoundingClientRect(); const minutes = Math.floor((e.clientY - rect.top) / HOUR_PX * 60 / 30) * 30; const s = new Date(day); s.setHours(0, minutes, 0, 0); this.newEvent(s); }
-  showEvent(ev: CalendarEvent, e: MouseEvent) { e.stopPropagation(); if (this.suppressClick) { this.suppressClick = false; return; } this.popover.set({ event: ev, x: Math.min(e.clientX, window.innerWidth - 340), y: Math.min(e.clientY, window.innerHeight - 260) }); }
+  hoverTime(day: Date, e: MouseEvent) { const rect = (e.currentTarget as HTMLElement).getBoundingClientRect(); this.hoverSlot = { day, minutes: Math.max(0, Math.min(24 * 60 - 15, Math.floor((e.clientY - rect.top) / HOUR_PX * 60 / 15) * 15)) }; }
+  hoverDay(day: Date) { this.hoverSlot = { day, minutes: null }; }
+  leaveGrid() { this.hoverSlot = null; }
+  @HostListener('document:keydown', ['$event']) onKey(e: KeyboardEvent) {
+    const t = e.target as HTMLElement | null;
+    if (this.editing() || this.drag() || document.querySelector('.overlay, app-lock-screen') || (t && (t.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName)))) return;
+    const sel = this.events().find(x => x.id === this.selectedId()) ?? null;
+    const k = e.key.toLowerCase();
+    if ((e.ctrlKey || e.metaKey) && (k === 'c' || k === 'x') && sel) {
+      e.preventDefault();
+      if (k === 'x' && (sel.readOnly || !this.writable().some(c => c.id === sel.calendarId))) { this.toast.show(this.translate.instant('APP.CALENDAR.CANNOT_MOVE'), 'error'); return; }
+      this.clip.set({ event: sel, mode: k === 'x' ? 'cut' : 'copy' });
+      this.toast.show(this.translate.instant(k === 'x' ? 'APP.CALENDAR.CUT_DONE' : 'APP.CALENDAR.COPY_DONE'), 'info');
+    }
+    else if ((e.ctrlKey || e.metaKey) && k === 'v' && this.clip()) { e.preventDefault(); this.paste(); }
+    else if ((e.key === 'Delete' || e.key === 'Backspace') && sel && !sel.readOnly && !e.ctrlKey) { e.preventDefault(); this.deleteEvent(sel); }
+    else if (e.key === 'Escape') { this.selectedId.set(null); if (this.clip()?.mode === 'cut') this.clip.set(null); }
+  }
+  /** pastes the clipboard event at the slot under the mouse, keeping its length (a cut event is moved there) */
+  private async paste() {
+    const c = this.clip(); const slot = this.hoverSlot;
+    if (!c) return;
+    if (!slot) { this.toast.show(this.translate.instant('APP.CALENDAR.PASTE_WHERE'), 'info'); return; }
+    const ev = c.event, oldStart = new Date(ev.start), length = new Date(ev.end).getTime() - oldStart.getTime();
+    const start = new Date(slot.day);
+    if (ev.allDay) start.setHours(0, 0, 0, 0); else if (slot.minutes === null) start.setHours(oldStart.getHours(), oldStart.getMinutes(), 0, 0); else start.setHours(0, slot.minutes, 0, 0);
+    const end = new Date(start.getTime() + length);
+    const day = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const times = ev.allDay ? { start: day(start), end: day(end) } : { start: start.toISOString(), end: end.toISOString() };
+    const calendarId = this.writable().some(w => w.id === ev.calendarId) ? ev.calendarId : this.writable()[0]?.id;
+    if (!calendarId) { this.toast.show(this.translate.instant('APP.CALENDAR.NO_WRITABLE'), 'error'); return; }
+    try {
+      if (c.mode === 'cut') { await this.bridge.invoke('calendar:saveEvent', { id: ev.id, calendarId: ev.calendarId, title: ev.title, description: ev.description, location: ev.location, allDay: ev.allDay, ...times }); this.clip.set(null); }
+      else {
+        const created = await this.bridge.invoke('calendar:saveEvent', { calendarId, title: ev.title, description: ev.description, location: ev.location, allDay: ev.allDay, ...times });
+        if (ev.categories.length) await this.bridge.invoke('calendar:setCategories', created.id, ev.categories.map(x => x.name)).catch(() => {});
+        this.selectedId.set(created.id);
+      }
+    } catch (err) { this.toast.error(err); }
+    await this.load();
+  }
+  slotClick(day: Date, e: MouseEvent) { this.selectedId.set(null); if (this.suppressClick || this.drag() || (e.target as HTMLElement).closest('.ev')) return; const rect = (e.currentTarget as HTMLElement).getBoundingClientRect(); const minutes = Math.floor((e.clientY - rect.top) / HOUR_PX * 60 / 30) * 30; const s = new Date(day); s.setHours(0, minutes, 0, 0); this.newEvent(s); }
+  showEvent(ev: CalendarEvent, e: MouseEvent) { e.stopPropagation(); if (this.suppressClick) { this.suppressClick = false; return; } this.selectedId.set(ev.id); this.popover.set({ event: ev, x: Math.min(e.clientX, window.innerWidth - 340), y: Math.min(e.clientY, window.innerHeight - 260) }); }
   editEvent(ev: CalendarEvent) { this.popover.set(null); this.editing.set({ id: ev.id, calendarId: ev.calendarId, title: ev.title, description: ev.description, location: ev.location, allDay: ev.allDay, start: ev.allDay ? ev.start.slice(0, 10) : toLocalInput(new Date(ev.start)), end: ev.allDay ? ev.end.slice(0, 10) : toLocalInput(new Date(ev.end)), readOnly: ev.readOnly, event: ev }); }
   /** Right-click on an event: pick categories (their colour colours the event), open, edit or delete it. */
-  eventMenu(e: MouseEvent, ev: CalendarEvent) { e.preventDefault(); e.stopPropagation(); this.popover.set(null); const t = (k: string) => this.translate.instant(k); const has = (name: string) => ev.categories.some(c => c.name.trim().toLowerCase() === name.trim().toLowerCase()); const items: MenuItem[] = this.store.categories().map(c => ({ label: c.name, color: c.color, checked: has(c.name), action: () => this.toggleEventCategory(ev, c.name) })); if (ev.categories.length) items.push({ label: t('APP.CALENDAR.CLEAR_CATEGORIES'), icon: 'close', action: () => this.setEventCategories(ev, []) }); items.push({ label: t('APP.MAIL.MANAGE_CATEGORIES'), icon: 'tag', action: () => this.router.navigate(['/settings'], { queryParams: { tab: 'categories' } }) }, { separator: true }, { label: t(ev.readOnly ? 'APP.COMMON.DETAILS' : 'APP.COMMON.EDIT'), icon: ev.readOnly ? 'eye' : 'edit', action: () => this.editEvent(ev) }); if (!ev.readOnly) items.push({ label: t('APP.COMMON.DELETE'), icon: 'trash', danger: true, action: () => this.deleteEvent(ev) }); this.dialogs.openMenu(e, items); }
+  eventMenu(e: MouseEvent, ev: CalendarEvent) { e.preventDefault(); e.stopPropagation(); this.popover.set(null); this.selectedId.set(ev.id); const t = (k: string) => this.translate.instant(k); const has = (name: string) => ev.categories.some(c => c.name.trim().toLowerCase() === name.trim().toLowerCase()); const items: MenuItem[] = this.store.categories().map(c => ({ label: c.name, color: c.color, checked: has(c.name), action: () => this.toggleEventCategory(ev, c.name) })); if (ev.categories.length) items.push({ label: t('APP.CALENDAR.CLEAR_CATEGORIES'), icon: 'close', action: () => this.setEventCategories(ev, []) }); items.push({ label: t('APP.MAIL.MANAGE_CATEGORIES'), icon: 'tag', action: () => this.router.navigate(['/settings'], { queryParams: { tab: 'categories' } }) }, { separator: true }, { label: t(ev.readOnly ? 'APP.COMMON.DETAILS' : 'APP.COMMON.EDIT'), icon: ev.readOnly ? 'eye' : 'edit', action: () => this.editEvent(ev) }); if (!ev.readOnly) items.push({ label: t('APP.COMMON.DELETE'), icon: 'trash', danger: true, action: () => this.deleteEvent(ev) }); this.dialogs.openMenu(e, items); }
   private toggleEventCategory(ev: CalendarEvent, name: string) { const lower = name.trim().toLowerCase(); const names = ev.categories.map(c => c.name); this.setEventCategories(ev, names.some(n => n.trim().toLowerCase() === lower) ? names.filter(n => n.trim().toLowerCase() !== lower) : [...names, name]); }
   private async setEventCategories(ev: CalendarEvent, names: string[]) { const colors = new Map(this.store.categories().map(c => [c.name.trim().toLowerCase(), c.color])); const categories = names.map(n => ({ name: n, color: colors.get(n.trim().toLowerCase()) ?? ev.color })); const same = (x: CalendarEvent) => x.id === ev.id || (x.calendarId === ev.calendarId && x.uid === ev.uid); this.events.update(list => list.map(x => same(x) ? { ...x, categories, color: categories[0]?.color ?? this.calendarOf(x.calendarId)?.color ?? x.color } : x)); try { await this.bridge.invoke('calendar:setCategories', ev.id, names); } catch (err) { this.toast.error(err); } await this.load(); }
   async deleteEvent(ev: CalendarEvent) { this.popover.set(null); if (!await this.dialogs.confirm(this.translate.instant('APP.CALENDAR.DELETE_CONFIRM', { title: ev.title }), this.translate.instant('APP.COMMON.DELETE'), true)) return; try { await this.bridge.invoke('calendar:deleteEvent', ev.id); this.editing.set(null); await this.load(); } catch (err) { this.toast.error(err); } }

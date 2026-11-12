@@ -36,3 +36,4 @@
 .compose-error { padding: 8px 20px 0; }
 .compose-foot { display: flex; align-items: center; gap: 8px; flex: none; padding: 10px 20px; border-top: 1px solid var(--line-soft); background: var(--background); }
 .compose-hint { margin-left: auto; font-size: 12px; color: var(--secondary); }
+.tool-select { height: 30px; max-width: 180px; margin-left: 6px; padding: 0 26px 0 8px; border: 1px solid var(--line); border-radius: 8px; background-color: var(--surface); color: var(--text); font-size: 12.5px; }

@@ -8,6 +8,10 @@ const checkedWithoutPhoto = new Map<string, number>();
 async function attachPhotos(accountId: number, list: ParsedContact[], known: Map<string, string | null>) {
   const todo = list.filter(c => { if (!c.remoteId) return false; const have = known.get(c.remoteId); if (have) { c.photo = have; return false; } return Date.now() - (checkedWithoutPhoto.get(`${accountId}:${c.remoteId}`) ?? 0) > 12 * 3600_000; });
   let next = 0;
-  const worker = async () => { while (next < todo.length) { const c = todo[next++]; try { c.photo = await graphDataUrl(accountId, `/me/contacts/${encodeURIComponent(c.remoteId!)}/photo/$value`); if (!c.photo) checkedWithoutPhoto.set(`${accountId}:${c.remoteId}`, Date.now()); } catch (err: any) { if (err?.status === 429) { log('contact photos throttled'); next = todo.length; } } } };
-  await Promise.all(Array.from({ length: 6 }, worker));
+  // Outlook allows only a few parallel requests per mailbox: 3 workers, and wait + retry when it asks us to slow down
+  let failures = 0;
+  const fetchPhoto = async (c: ParsedContact) => { for (let attempt = 0; attempt < 4; attempt++) { try { return { photo: await graphDataUrl(accountId, `/me/contacts/${encodeURIComponent(c.remoteId!)}/photo/$value`), ok: true }; } catch (err: any) { const status = err?.status ?? 0; if (status !== 429 && status < 500) return { photo: null, ok: false }; await new Promise(r => setTimeout(r, (err?.retryAfter ?? 2 ** attempt) * 1000)); } } return { photo: null, ok: false }; };
+  const worker = async () => { while (next < todo.length && failures < 25) { const c = todo[next++]; const r = await fetchPhoto(c); c.photo = r.photo; if (r.ok && !r.photo) checkedWithoutPhoto.set(`${accountId}:${c.remoteId}`, Date.now()); if (!r.ok) failures++; } };
+  await Promise.all(Array.from({ length: 3 }, worker));
+  if (failures) log('contact photos: some could not be loaded', failures);
 }

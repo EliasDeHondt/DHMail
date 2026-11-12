@@ -1,0 +1,40 @@
+<div class="shead"><h2 class="stitle">{{ 'APP.SETTINGS.TAB_SIGNATURES' | translate }}</h2><button type="button" class="btn btn--primary btn--sm" (click)="create()"><app-icon name="plus"></app-icon>{{ 'APP.SIGNATURES.NEW' | translate }}</button></div>
+@if (draft(); as d) {
+<form class="sig-edit" (ngSubmit)="save()">
+  <div class="field"><span class="field-label">{{ 'APP.SIGNATURES.NAME' | translate }}</span><input class="input" type="text" [(ngModel)]="d.name" name="sigName" [placeholder]="'APP.SIGNATURES.NAME_PLACEHOLDER' | translate"/></div>
+  <div class="field"><span class="field-label">{{ 'APP.SIGNATURES.MAILBOXES' | translate }}</span>
+    <div class="sig-boxes">@for (a of mailAccounts(); track a.id) {<label class="check"><input type="checkbox" [checked]="d.accountIds.includes(a.id)" (change)="toggleAccount(a.id, $any($event.target).checked)"/>{{ a.email }}@if (!d.accountIds.includes(a.id) && currentOf(a.id); as cur) {<small class="muted"> · {{ 'APP.SIGNATURES.NOW' | translate:{name: cur} }}</small>}</label>}</div>
+    <p class="hint">{{ 'APP.SIGNATURES.MAILBOXES_HINT' | translate }}</p>
+  </div>
+  <div class="field"><span class="field-label">{{ 'APP.SIGNATURES.TEXT' | translate }}</span>
+    <div class="sig-tools">
+      <button type="button" class="icon-btn icon-btn--sm" (mousedown)="$event.preventDefault()" (click)="exec('bold')" [title]="'APP.MAIL.BOLD' | translate"><app-icon name="bold"></app-icon></button>
+      <button type="button" class="icon-btn icon-btn--sm" (mousedown)="$event.preventDefault()" (click)="exec('italic')" [title]="'APP.MAIL.ITALIC' | translate"><app-icon name="italic"></app-icon></button>
+      <button type="button" class="icon-btn icon-btn--sm" (mousedown)="$event.preventDefault()" (click)="exec('underline')" [title]="'APP.MAIL.UNDERLINE' | translate"><app-icon name="underline"></app-icon></button>
+      <button type="button" class="icon-btn icon-btn--sm" (mousedown)="$event.preventDefault()" (click)="link()" [title]="'APP.MAIL.LINK' | translate"><app-icon name="link"></app-icon></button>
+      <button type="button" class="icon-btn icon-btn--sm" (mousedown)="$event.preventDefault()" (click)="image()" [title]="'APP.SIGNATURES.IMAGE' | translate"><app-icon name="image"></app-icon></button>
+      <button type="button" class="icon-btn icon-btn--sm" (mousedown)="$event.preventDefault()" (click)="exec('removeFormat')" [title]="'APP.MAIL.CLEAR_FORMAT' | translate"><app-icon name="clear-format"></app-icon></button>
+    </div>
+    <div #editor class="sig-editor" contenteditable="true" (paste)="onPaste($event)"></div>
+  </div>
+  @if (askScope()) {
+  <div class="sig-scope">
+    <p><strong>{{ 'APP.SIGNATURES.SCOPE_TITLE' | translate }}</strong></p>
+    <div class="sig-scope-row">
+      <button type="button" class="btn btn--primary btn--sm" (click)="saveFor('all')" [disabled]="saving()">{{ 'APP.SIGNATURES.SCOPE_ALL' | translate:{count: d.accountIds.length} }}</button>
+      <span class="muted">{{ 'APP.SIGNATURES.SCOPE_OR' | translate }}</span>
+      <select class="select sig-scope-select" [(ngModel)]="scopeAccount" name="scopeAccount">@for (id of d.accountIds; track id) {<option [ngValue]="id">{{ accountName(id) }}</option>}</select>
+      <button type="button" class="btn btn--sm" (click)="saveFor('one')" [disabled]="saving()">{{ 'APP.SIGNATURES.SCOPE_ONE' | translate }}</button>
+    </div>
+  </div>}
+  <div class="sig-actions"><button type="button" class="btn btn--ghost" (click)="cancel()">{{ 'APP.COMMON.CANCEL' | translate }}</button>@if (!askScope()) {<button type="submit" class="btn btn--primary" [disabled]="saving()">{{ 'APP.COMMON.SAVE' | translate }}</button>}</div>
+</form>
+}
+@if (!store.signatures().length && !draft()) {<div class="empty"><app-icon name="edit"></app-icon><strong>{{ 'APP.SIGNATURES.EMPTY' | translate }}</strong><span>{{ 'APP.SIGNATURES.EMPTY_HINT' | translate }}</span></div>}
+<div class="cards">
+  @for (s of store.signatures(); track s.id) {
+  <div class="card sig-card" [class.sig-card--open]="draft()?.id === s.id">
+    <div class="sig-card-head"><strong>{{ s.name }}</strong><span class="spacer"></span><button type="button" class="icon-btn icon-btn--sm" (click)="edit(s)" [title]="'APP.COMMON.EDIT' | translate"><app-icon name="edit"></app-icon></button><button type="button" class="icon-btn icon-btn--sm icon-btn--danger" (click)="remove(s)" [title]="'APP.COMMON.REMOVE' | translate"><app-icon name="trash"></app-icon></button></div>
+    <div class="sig-chips">@for (m of usedBy(s); track m) {<span class="chip sig-chip">{{ m }}</span>} @empty {<span class="muted">{{ 'APP.SIGNATURES.UNUSED' | translate }}</span>}</div>
+  </div>}
+</div>

@@ -216,7 +216,26 @@
       "NAME_PLACEHOLDER": "Bv. Feestdagen",
       "MISSING_SOURCE": "Vul een link in of kies een bestand.",
       "DEFAULT_NAME": "Agenda",
-      "CLEAR_CATEGORIES": "Categorieën wissen"
+      "CLEAR_CATEGORIES": "Categorieën wissen",
+      "COPY_DONE": "Afspraak gekopieerd. Wijs met de muis een tijdstip aan en druk op Ctrl+V.",
+      "CUT_DONE": "Afspraak geknipt. Wijs met de muis een tijdstip aan en druk op Ctrl+V.",
+      "PASTE_WHERE": "Wijs met de muis het tijdstip aan waar je wilt plakken.",
+      "CANNOT_MOVE": "Deze afspraak kan je niet verplaatsen.",
+      "GUESTS": "Deelnemers",
+      "GUESTS_PLACEHOLDER": "Nodig mensen uit via hun e-mailadres",
+      "GUESTS_HINT": "Bij opslaan krijgen de deelnemers een uitnodiging per e-mail.",
+      "ONLY_THIS": "Alleen deze agenda tonen",
+      "SHOW_ALL": "Alle agenda's tonen",
+      "COPY_ALL_TO": "Alle afspraken kopiëren naar",
+      "MOVE_ALL_TO": "Alle afspraken verplaatsen naar",
+      "COPY_CONFIRM": "Alle afspraken van \"{{from}}\" kopiëren naar \"{{to}}\"? Herhalende afspraken blijven herhalend.",
+      "MOVE_CONFIRM": "Alle afspraken van \"{{from}}\" verplaatsen naar \"{{to}}\"? Elke afspraak wordt pas uit \"{{from}}\" verwijderd nadat ze in \"{{to}}\" staat. Dit kan bij een grote agenda enkele minuten duren.",
+      "COPY_START": "Kopiëren",
+      "MOVE_START": "Verplaatsen",
+      "TRANSFER_BUSY": "Afspraken van {{from}} naar {{to}}… Je kan verder werken.",
+      "COPY_ALL_DONE": "{{copied}} van {{total}} afspraken gekopieerd · {{failed}} mislukt",
+      "MOVE_DONE": "Alle {{copied}} afspraken verplaatst",
+      "MOVE_PARTIAL": "{{copied}} van {{total}} gekopieerd, {{deleted}} uit de bron verwijderd · {{failed}} mislukt (die staan nog in de oude agenda)"
     },
     "PEOPLE": {
       "NEW_CONTACT": "Nieuw contact",
@@ -268,7 +287,11 @@
       "SAVE_IN": "Opslaan in",
       "SAVED_IN": "Contact opgeslagen in {{name}}",
       "ALREADY_IN": "Dit contact staat al in {{name}}",
-      "DRAG_HINT": "Sleep naar een adresboek om te kopiëren"
+      "DRAG_HINT": "Sleep naar een adresboek om te kopiëren",
+      "CALL": "Bellen",
+      "WHATSAPP": "WhatsApp-bericht sturen",
+      "BIRTHDAY_WISH": "Verjaardagswens via WhatsApp",
+      "BIRTHDAY_TEXT": "Gelukkige verjaardag {{name}} 🎉"
     },
     "ACCOUNT": {
       "TITLE_ADD": "Account toevoegen",
@@ -325,7 +348,6 @@
       "SOURCE_LOCAL": "Lokaal",
       "SOURCE_BIRTHDAYS": "Verjaardagen",
       "CATEGORIES": "Categorieën",
-      "CATEGORIES_INTRO": "Geef berichten een kleur en een naam. Categorieën blijven aan een bericht hangen, ook als je het naar een andere map verplaatst.",
       "NEW_CATEGORY": "Nieuwe categorie",
       "CATEGORY_NAME": "Naam van de categorie",
       "DELETE_CATEGORY_CONFIRM": "Categorie \"{{name}}\" verwijderen? Ze wordt van alle berichten gehaald.",
@@ -345,21 +367,19 @@
       "WEEK_START_SUNDAY": "Zondag",
       "WORK_HOURS": "Werkuren",
       "SAVED": "Instellingen opgeslagen",
-      "ABOUT_TEXT": "DHMail is een eigen mail-, agenda- en contactenprogramma. Het praat rechtstreeks met je mailserver via IMAP en SMTP, met Microsoft Graph en met de Google-API's. Er zit geen tussenserver tussen.",
       "MADE_BY": "Gemaakt door",
       "VERSION": "Versie",
       "DATA_PATH": "Gegevensmap",
-      "PRIVACY_NOTE": "Wachtwoorden en tokens worden versleuteld met Windows DPAPI en blijven op deze computer.",
       "SECURITY": "Beveiliging",
       "AUTO_LOCK": "Automatisch vergrendelen na",
-      "AUTO_LOCK_HINT": "zonder activiteit. DHMail vraagt altijd je pincode bij het opstarten.",
       "AUTO_LOCK_MINUTES": "{{count}} minuten",
       "AUTO_LOCK_HOUR": "{{count}} uur",
       "AUTO_LOCK_HOURS": "{{count}} uur",
       "PIN": "Pincode",
       "CHANGE_PIN": "Pincode wijzigen",
       "LOCK_NOW": "Nu vergrendelen",
-      "SOURCE_HOLIDAYS": "Feestdagen"
+      "SOURCE_HOLIDAYS": "Feestdagen",
+      "TAB_SIGNATURES": "Handtekeningen"
     },
     "CONNECT": {
       "OUTLOOK": "Verbinden met Outlook",
@@ -432,6 +452,29 @@
       "BACKSPACE": "Cijfer wissen",
       "CONFIRM": "Bevestigen",
       "DIGITS": "{{count}} cijfers ingevoerd"
+    },
+    "SIGNATURES": {
+      "NEW": "Nieuwe handtekening",
+      "NAME": "Naam",
+      "NAME_PLACEHOLDER": "Bijvoorbeeld Werk of EliasDH",
+      "MAILBOXES": "Standaard in deze mailboxen",
+      "MAILBOXES_HINT": "Een mailbox heeft één standaardhandtekening. Die komt automatisch onder elke nieuwe mail, elk antwoord en elke doorgestuurde mail.",
+      "NOW": "nu: {{name}}",
+      "TEXT": "Handtekening",
+      "IMAGE": "Afbeelding of logo invoegen",
+      "IMAGE_TOO_BIG": "Die afbeelding is te groot (max. 1,5 MB).",
+      "LINK_PROMPT": "Link (https://…)",
+      "SCOPE_TITLE": "Deze handtekening wordt in meerdere mailboxen gebruikt. Waar wil je de wijziging?",
+      "SCOPE_ALL": "In alle {{count}} mailboxen",
+      "SCOPE_OR": "of alleen voor",
+      "SCOPE_ONE": "Alleen deze mailbox",
+      "SAVED": "Handtekening opgeslagen",
+      "REMOVE_CONFIRM": "Handtekening \"{{name}}\" verwijderen?",
+      "EMPTY": "Nog geen handtekeningen",
+      "EMPTY_HINT": "Maak een handtekening en kies in welke mailboxen ze standaard gebruikt wordt.",
+      "UNUSED": "Niet standaard in een mailbox",
+      "PICK": "Handtekening",
+      "NONE": "Geen handtekening"
     }
   }
 }

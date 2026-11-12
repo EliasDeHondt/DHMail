@@ -11,10 +11,11 @@ import { ColorPickerComponent } from '../shared/color-picker.component';
 import { ToastService } from '../shared/toast.service';
 import { DialogsService } from '../shared/dialogs.service';
 import { AccountDialogComponent } from './account-dialog.component';
+import { SignaturesComponent } from './signatures.component';
 import { CalendarDialogComponent } from '../calendar/calendar-dialog.component';
 import { Account, AppInfo, Calendar, Category, Settings } from '../../../shared/types';
-type Tab = 'accounts' | 'calendars' | 'categories' | 'general' | 'about';
-@Component({ selector: 'app-settings', standalone: true, imports: [FormsModule, TranslatePipe, IconComponent, LogoComponent, ColorPickerComponent, AccountDialogComponent, CalendarDialogComponent], templateUrl: './settings.component.html', styleUrl: './settings.component.css' })
+type Tab = 'accounts' | 'signatures' | 'calendars' | 'categories' | 'general' | 'about';
+@Component({ selector: 'app-settings', standalone: true, imports: [FormsModule, TranslatePipe, IconComponent, LogoComponent, ColorPickerComponent, AccountDialogComponent, CalendarDialogComponent, SignaturesComponent], templateUrl: './settings.component.html', styleUrl: './settings.component.css' })
 export class SettingsComponent implements OnDestroy {
   readonly store = inject(StoreService);
   readonly lock = inject(LockService);
@@ -26,7 +27,7 @@ export class SettingsComponent implements OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   readonly tab = signal<Tab>('accounts');
-  readonly tabs: Tab[] = ['accounts', 'calendars', 'categories', 'general', 'about'];
+  readonly tabs: Tab[] = ['accounts', 'signatures', 'calendars', 'categories', 'general', 'about'];
   readonly editing = signal<Account | null | 'new'>(null);
   readonly addingCalendar = signal(false);
   readonly info = signal<AppInfo | null>(null);

@@ -21,14 +21,17 @@ export interface ListQuery { accountId: number; folderId: number; offset: number
 export interface ListResult { messages: MessageSummary[]; related?: MessageSummary[]; total: number; serverTotal: number; }
 export interface MessageRef { accountId: number; folderId: number; uid: number; }
 export interface OutgoingAttachment { filename: string; path?: string; contentBase64?: string; contentType?: string; size: number; }
-export interface OutgoingMail { accountId: number; from?: string; to: string[]; cc: string[]; bcc: string[]; subject: string; html: string; text?: string; attachments: OutgoingAttachment[]; inReplyTo?: string | null; references?: string[]; answered?: MessageRef | null; forwardOf?: MessageRef | null; draftUid?: number | null; }
+export interface OutgoingMail { /** calendar invitation (iMIP) sent along with the mail */ icalEvent?: { method: string; content: string }; accountId: number; from?: string; to: string[]; cc: string[]; bcc: string[]; subject: string; html: string; text?: string; attachments: OutgoingAttachment[]; inReplyTo?: string | null; references?: string[]; answered?: MessageRef | null; forwardOf?: MessageRef | null; draftUid?: number | null; }
 export interface DraftResult { uid: number | null; }
 export interface Category { id: number; name: string; color: string; sortOrder: number; }
 export interface Calendar { id: number; accountId: number | null; source: CalendarSource; remoteId: string | null; name: string; color: string; url: string | null; username: string | null; visible: boolean; readOnly: boolean; group: string; sortOrder: number; lastSync: string | null; error: string | null; }
 export interface Attendee { name: string; email: string; status: string; }
 export interface CalendarEvent { id: number; calendarId: number; uid: string; remoteId: string | null; title: string; description: string; location: string; start: string; end: string; allDay: boolean; status: string; organizer: string | null; attendees: Attendee[]; recurring: boolean; color: string; readOnly: boolean; categories: EventCategory[]; }
 export interface EventCategory { name: string; color: string; }
-export interface EventInput { id?: number; calendarId: number; title: string; description: string; location: string; start: string; end: string; allDay: boolean; }
+export interface Signature { id: number; name: string; html: string; /** mailboxes that use this signature by default */ accountIds: number[]; }
+export interface SignatureInput { id?: number; name: string; html: string; accountIds: number[]; }
+export interface CalendarTransferResult { total: number; copied: number; failed: number; deleted: number; errors: string[]; /** move: everything was copied and removed from the source */ movedAll: boolean; }
+export interface EventInput { id?: number; calendarId: number; title: string; description: string; location: string; start: string; end: string; allDay: boolean; /** e-mail addresses to invite; undefined = leave the guest list as it is */ attendees?: string[]; }
 export interface CalendarInput { source: CalendarSource; name: string; color: string; url?: string; username?: string; password?: string; icsData?: string; }
 export interface ContactField { value: string; label: string; }
 export interface Contact { id: number; source: ContactSourceKind; accountId: number | null; sourceId: number | null; remoteId: string | null; displayName: string; firstName: string; lastName: string; emails: ContactField[]; phones: ContactField[]; company: string; title: string; notes: string; birthday: string | null; photo: string | null; readOnly: boolean; updatedAt: string; }
@@ -103,6 +106,13 @@ export interface Api {
   'calendar:events': (start: string, end: string) => CalendarEvent[];
   'calendar:saveEvent': (input: EventInput) => CalendarEvent;
   'calendar:deleteEvent': (id: number) => void;
+  'signatures:list': () => Signature[];
+  'signatures:save': (input: SignatureInput) => Signature[];
+  /** edit a shared signature for one mailbox only */
+  'signatures:fork': (id: number, accountId: number, input: SignatureInput) => Signature[];
+  'signatures:remove': (id: number) => Signature[];
+  /** copy or move every event of one calendar to another (any provider) */
+  'calendar:transfer': (fromId: number, toId: number, mode: 'copy' | 'move') => CalendarTransferResult;
   'calendar:setCategories': (id: number, names: string[]) => CalendarEvent | null;
   'contacts:list': (query?: string) => Contact[];
   'contacts:sources': () => ContactSource[];

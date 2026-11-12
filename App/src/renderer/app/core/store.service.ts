@@ -2,7 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { BridgeService } from './bridge.service';
 import { ThemeService } from './theme.service';
-import { Account, AccountStatus, Calendar, Category, Folder, Settings, SpecialUse, SyncState } from '../../../shared/types';
+import { Account, AccountStatus, Calendar, Category, Folder, Settings, SpecialUse, SyncState, Signature } from '../../../shared/types';
 export const DEFAULT_SETTINGS: Settings = { theme: 'system', language: 'nl', blockRemoteImages: true, notifications: true, markReadDelaySeconds: 2, syncIntervalMinutes: 2, weekStartsOn: 1, workDayStart: 8, workDayEnd: 18, googleClientId: '', googleClientSecret: '', microsoftClientId: '', microsoftTenant: 'common', defaultAccountId: null, darkMailBodies: true, autoLockMinutes: 30 };
 @Injectable({ providedIn: 'root' })
 export class StoreService {
@@ -19,12 +19,15 @@ export class StoreService {
   readonly syncState = signal<SyncState | null>(null);
   /** Contact photo per e-mail address (lower case), used by every avatar. */
   readonly photos = signal<Record<string, string>>({});
+  readonly signatures = signal<Signature[]>([]);
+  /** default signature of a mailbox */
+  signatureFor(accountId: number | null | undefined) { return accountId ? this.signatures().find(s => s.accountIds.includes(accountId)) ?? null : null; }
   photoFor(address: string | null | undefined) { return address ? this.photos()[address.trim().toLowerCase()] ?? null : null; }
   loadPhotos() { this.bridge.invoke('contacts:photos').then(p => this.photos.set(p ?? {}), () => {}); }
   readonly mailAccounts = computed(() => this.accounts().filter(a => a.features.mail));
   readonly unreadTotal = computed(() => Object.values(this.folders()).flat().filter(f => f.specialUse === 'inbox').reduce((n, f) => n + f.unseen, 0));
   readonly locale = computed(() => this.settings().language === 'nl' ? 'nl-BE' : 'en-GB');
-  async init() { if (this.ready()) return; const [settings, accounts, categories, calendars, statuses] = await Promise.all([this.bridge.invoke('settings:get'), this.bridge.invoke('accounts:list'), this.bridge.invoke('categories:list'), this.bridge.invoke('calendar:list'), this.bridge.invoke('accounts:status')]); this.applySettings(settings); this.accounts.set(accounts); this.categories.set(categories); this.calendars.set(calendars); this.statuses.set(Object.fromEntries(statuses.map(s => [s.accountId, s]))); await Promise.all(accounts.map(a => this.loadFolders(a.id))); this.bridge.on('mail:counts', folders => { if (folders.length) this.folders.update(f => ({ ...f, [folders[0].accountId]: folders })); }); this.bridge.on('account:status', s => this.statuses.update(m => ({ ...m, [s.accountId]: s }))); this.bridge.on('calendar:changed', () => this.reloadCalendars()); this.bridge.on('sync:state', s => this.syncState.set(s.busy ? s : null)); this.bridge.on('contacts:changed', () => this.loadPhotos()); this.loadPhotos(); this.ready.set(true); }
+  async init() { if (this.ready()) return; const [settings, accounts, categories, calendars, statuses] = await Promise.all([this.bridge.invoke('settings:get'), this.bridge.invoke('accounts:list'), this.bridge.invoke('categories:list'), this.bridge.invoke('calendar:list'), this.bridge.invoke('accounts:status')]); this.applySettings(settings); this.accounts.set(accounts); this.categories.set(categories); this.calendars.set(calendars); this.statuses.set(Object.fromEntries(statuses.map(s => [s.accountId, s]))); await Promise.all(accounts.map(a => this.loadFolders(a.id))); this.bridge.on('mail:counts', folders => { if (folders.length) this.folders.update(f => ({ ...f, [folders[0].accountId]: folders })); }); this.bridge.on('account:status', s => this.statuses.update(m => ({ ...m, [s.accountId]: s }))); this.bridge.on('calendar:changed', () => this.reloadCalendars()); this.bridge.on('sync:state', s => this.syncState.set(s.busy ? s : null)); this.bridge.on('contacts:changed', () => this.loadPhotos()); this.loadPhotos(); this.bridge.invoke('signatures:list').then(s => this.signatures.set(s), () => {}); this.ready.set(true); }
   applySettings(s: Settings) { this.settings.set(s); this.theme.set(s.theme); this.translate.use(s.language); document.documentElement.lang = s.language; }
   async saveSettings(patch: Partial<Settings>) { this.applySettings(await this.bridge.invoke('settings:set', patch)); }
   async loadFolders(accountId: number) { const folders = await this.bridge.invoke('mail:folders', accountId).catch(() => [] as Folder[]); this.folders.update(f => ({ ...f, [accountId]: folders })); return folders; }

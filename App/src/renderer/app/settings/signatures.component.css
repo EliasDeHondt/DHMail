@@ -1,0 +1,20 @@
+:host { display: flex; flex-direction: column; gap: 14px; }
+.sig-edit { display: flex; flex-direction: column; gap: 14px; max-width: 720px; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.sig-boxes { display: flex; flex-direction: column; gap: 6px; }
+.muted { color: var(--secondary); }
+.sig-tools { display: flex; gap: 2px; padding: 4px; border: 1px solid var(--line); border-bottom: none; border-radius: 8px 8px 0 0; background: var(--surface-2); }
+.sig-editor { min-height: 140px; max-height: 360px; overflow: auto; padding: 12px 14px; border: 1px solid var(--line); border-radius: 0 0 8px 8px; background: var(--background); color: var(--text); font-size: 14px; line-height: 1.5; outline: none; cursor: text; }
+.sig-editor:focus { border-color: var(--primary); }
+.sig-editor img { max-width: 240px; height: auto; }
+.sig-scope { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border-left: 3px solid var(--primary); border-radius: 4px 10px 10px 4px; background: var(--tint); }
+.sig-scope p { margin: 0; }
+.sig-scope-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.sig-scope-select { width: auto; min-width: 200px; height: 30px; }
+.sig-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.cards { display: flex; flex-direction: column; gap: 8px; max-width: 720px; }
+.sig-card { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.sig-card--open { border-color: var(--primary); }
+.sig-card-head { display: flex; align-items: center; gap: 6px; }
+.spacer { flex: 1; }
+.sig-chips { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12.5px; }
+.sig-chip { background: var(--tint); color: var(--ink); }

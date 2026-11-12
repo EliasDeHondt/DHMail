@@ -1,7 +1,7 @@
 <div class="settings">
   <aside class="snav">
     <h1 class="snav-title">{{ 'APP.SETTINGS.TITLE' | translate }}</h1>
-    @for (t of tabs; track t) {<button type="button" class="snav-item" [class.snav-item--active]="tab() === t" (click)="setTab(t)"><app-icon [name]="t === 'accounts' ? 'user' : t === 'calendars' ? 'calendar' : t === 'categories' ? 'tag' : t === 'general' ? 'settings' : 'info'"></app-icon>{{ ('APP.SETTINGS.TAB_' + t.toUpperCase()) | translate }}</button>}
+    @for (t of tabs; track t) {<button type="button" class="snav-item" [class.snav-item--active]="tab() === t" (click)="setTab(t)"><app-icon [name]="t === 'accounts' ? 'user' : t === 'signatures' ? 'edit' : t === 'calendars' ? 'calendar' : t === 'categories' ? 'tag' : t === 'general' ? 'settings' : 'info'"></app-icon>{{ ('APP.SETTINGS.TAB_' + t.toUpperCase()) | translate }}</button>}
   </aside>
   <section class="spane">
     @if (tab() === 'accounts') {
@@ -16,6 +16,7 @@
       </div>}
     </div>
     }
+    @if (tab() === 'signatures') {<app-signatures></app-signatures>}
     @if (tab() === 'calendars') {
     <div class="shead"><h2 class="stitle">{{ 'APP.SETTINGS.CALENDARS' | translate }}</h2><button type="button" class="btn btn--primary btn--sm" (click)="addingCalendar.set(true)"><app-icon name="plus"></app-icon>{{ 'APP.CALENDAR.ADD_CALENDAR' | translate }}</button></div>
     <div class="cards">
@@ -24,7 +25,6 @@
     </div>}
     @if (tab() === 'categories') {
     <div class="shead"><h2 class="stitle">{{ 'APP.SETTINGS.CATEGORIES' | translate }}</h2><button type="button" class="btn btn--primary btn--sm" (click)="newCategory.set({ name: '', color: '#4f94f0' })"><app-icon name="plus"></app-icon>{{ 'APP.SETTINGS.NEW_CATEGORY' | translate }}</button></div>
-    <p class="hint">{{ 'APP.SETTINGS.CATEGORIES_INTRO' | translate }}</p>
     @if (newCategory(); as n) {<form class="cat-form" (ngSubmit)="saveCategory(n)"><input class="input" type="text" [(ngModel)]="n.name" name="newName" [placeholder]="'APP.SETTINGS.CATEGORY_NAME' | translate" autofocus required/><app-color-picker [value]="n.color" (valueChange)="n.color = $event"></app-color-picker><button type="submit" class="btn btn--primary btn--sm">{{ 'APP.COMMON.ADD' | translate }}</button><button type="button" class="btn btn--ghost btn--sm" (click)="newCategory.set(null)">{{ 'APP.COMMON.CANCEL' | translate }}</button></form>}
     <div class="cards">
       @for (c of store.categories(); track c.id) {
@@ -42,11 +42,11 @@
       <div class="field-row"><div class="field"><span class="field-label">{{ 'APP.SETTINGS.MARK_READ_DELAY' | translate }}</span><input class="input" type="number" min="0" max="60" [(ngModel)]="general.markReadDelaySeconds" name="markRead"/></div><div class="field"><span class="field-label">{{ 'APP.SETTINGS.SYNC_INTERVAL' | translate }}</span><input class="input" type="number" min="1" max="60" [(ngModel)]="general.syncIntervalMinutes" name="syncInterval"/></div></div>
       <div class="field-row"><div class="field"><span class="field-label">{{ 'APP.SETTINGS.WEEK_START' | translate }}</span><select class="select" [(ngModel)]="general.weekStartsOn" name="weekStart"><option [ngValue]="1">{{ 'APP.SETTINGS.WEEK_START_MONDAY' | translate }}</option><option [ngValue]="0">{{ 'APP.SETTINGS.WEEK_START_SUNDAY' | translate }}</option></select></div><div class="field"><span class="field-label">{{ 'APP.SETTINGS.WORK_HOURS' | translate }}</span><div class="hours"><input class="input" type="number" min="0" max="23" [(ngModel)]="general.workDayStart" name="workStart"/><span>–</span><input class="input" type="number" min="1" max="24" [(ngModel)]="general.workDayEnd" name="workEnd"/></div></div></div>
       <h3 class="section-title security-title">{{ 'APP.SETTINGS.SECURITY' | translate }}</h3>
-      <div class="field-row"><div class="field"><span class="field-label">{{ 'APP.SETTINGS.AUTO_LOCK' | translate }}</span><select class="select" [(ngModel)]="general.autoLockMinutes" name="autoLock">@for (m of lockOptions; track m) {<option [ngValue]="m">{{ lockLabel(m) }}</option>}</select><p class="hint">{{ 'APP.SETTINGS.AUTO_LOCK_HINT' | translate }}</p></div><div class="field"><span class="field-label">{{ 'APP.SETTINGS.PIN' | translate }}</span><div class="security-actions"><button type="button" class="btn" (click)="lock.beginChange()"><app-icon name="key"></app-icon>{{ 'APP.SETTINGS.CHANGE_PIN' | translate }}</button><button type="button" class="btn" (click)="lock.lock()" [title]="'Ctrl+L'"><app-icon name="shield"></app-icon>{{ 'APP.SETTINGS.LOCK_NOW' | translate }}</button></div></div></div>
+      <div class="field-row"><div class="field"><span class="field-label">{{ 'APP.SETTINGS.AUTO_LOCK' | translate }}</span><select class="select" [(ngModel)]="general.autoLockMinutes" name="autoLock">@for (m of lockOptions; track m) {<option [ngValue]="m">{{ lockLabel(m) }}</option>}</select></div><div class="field"><span class="field-label">{{ 'APP.SETTINGS.PIN' | translate }}</span><div class="security-actions"><button type="button" class="btn" (click)="lock.beginChange()"><app-icon name="key"></app-icon>{{ 'APP.SETTINGS.CHANGE_PIN' | translate }}</button><button type="button" class="btn" (click)="lock.lock()" [title]="'Ctrl+L'"><app-icon name="shield"></app-icon>{{ 'APP.SETTINGS.LOCK_NOW' | translate }}</button></div></div></div>
       <div class="block-actions"><span class="spacer"></span><button type="submit" class="btn btn--primary">{{ 'APP.COMMON.SAVE' | translate }}</button></div>
     </form>}
     @if (tab() === 'about') {
-    <div class="about"><app-logo class="about-logo" [wordmark]="false"></app-logo><h2 class="about-title">DHMail</h2><p class="about-text">{{ 'APP.SETTINGS.ABOUT_TEXT' | translate }}</p><p class="about-by">{{ 'APP.SETTINGS.MADE_BY' | translate }} <b class="by">Elias De Hondt</b></p>@if (info(); as i) {<dl class="about-meta"><dt>{{ 'APP.SETTINGS.VERSION' | translate }}</dt><dd>{{ i.version }}</dd><dt>{{ 'APP.SETTINGS.DATA_PATH' | translate }}</dt><dd>{{ i.dataPath }}</dd></dl>}<p class="hint">{{ 'APP.SETTINGS.PRIVACY_NOTE' | translate }}</p></div>}
+    <div class="about"><app-logo class="about-logo" [wordmark]="false"></app-logo><h2 class="about-title">DHMail</h2><p class="about-by">{{ 'APP.SETTINGS.MADE_BY' | translate }} <b class="by">Elias De Hondt</b></p>@if (info(); as i) {<dl class="about-meta"><dt>{{ 'APP.SETTINGS.VERSION' | translate }}</dt><dd>{{ i.version }}</dd><dt>{{ 'APP.SETTINGS.DATA_PATH' | translate }}</dt><dd>{{ i.dataPath }}</dd></dl>}</div>}
   </section>
   @if (editing(); as e) {<app-account-dialog [account]="e === 'new' ? null : e" (closed)="editing.set(null)" (saved)="editing.set(null)"></app-account-dialog>}
   @if (addingCalendar()) {<app-calendar-dialog (closed)="addingCalendar.set(false)" (saved)="addingCalendar.set(false)"></app-calendar-dialog>}

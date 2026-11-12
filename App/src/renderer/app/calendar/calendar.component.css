@@ -55,7 +55,7 @@
 .day-col--today { background: color-mix(in srgb, var(--primary) 4%, transparent); }
 .hour-line { position: absolute; left: 0; right: 0; height: 40px; border-top: 1px solid var(--line-soft); }
 .hour-line--work { background: color-mix(in srgb, var(--primary) 3%, transparent); }
-.now-line { position: absolute; left: 0; right: 0; height: 2px; background: var(--danger); z-index: 3; pointer-events: none; }
+.now-line { position: absolute; left: 0; right: 0; height: 2px; background: var(--danger); z-index: 8; pointer-events: none; }
 .now-line::before { content: ''; position: absolute; left: -5px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--danger); }
 .ev { position: absolute; z-index: 2; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 3px 6px; margin-left: 2px; border: none; border-radius: 6px; font-size: 12px; text-align: left; overflow: hidden; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18); transition: filter 0.12s; }
 .ev:hover { filter: brightness(1.08); z-index: 4; }

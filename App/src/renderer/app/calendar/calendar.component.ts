@@ -69,7 +69,10 @@ export class CalendarComponent implements OnDestroy {
   constructor() { this.load(); this.offs.push(this.bridge.on('calendar:changed', () => this.load())); this.tick = setInterval(() => this.now.set(new Date()), 60_000); }
   ngOnDestroy() { this.offs.forEach(f => f()); clearInterval(this.tick); this.clearDragCursor(); }
   plain = htmlToPlain;
-  isAllDayLike = (e: CalendarEvent) => e.allDay || new Date(e.end).getTime() - new Date(e.start).getTime() >= 24 * 3600 * 1000;
+  /** only real all-day events go to the row at the top; timed events stay in the time grid, also when they run over several days */
+  isAllDayLike = (e: CalendarEvent) => e.allDay;
+  /** 15:00 – 17:00, or 15:00 – di 17:00 when the event ends on another day */
+  rangeLabel(e: CalendarEvent) { const s = new Date(e.start), en = new Date(e.end); const day = (d: Date) => d.toLocaleDateString(this.store.locale(), { weekday: 'short' }); return sameDay(s, new Date(en.getTime() - 1)) ? `${this.time(s)} – ${this.time(en)}` : `${day(s)} ${this.time(s)} – ${day(en)} ${this.time(en)}`; }
   eventStart = (e: CalendarEvent) => e.allDay ? parseLocalDate(e.start) : new Date(e.start);
   eventEnd = (e: CalendarEvent) => e.allDay ? parseLocalDate(e.end) : new Date(e.end);
   time = (d: Date) => timeShort(d, this.store.locale());

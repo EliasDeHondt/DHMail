@@ -33,6 +33,7 @@ export interface CalendarInput { source: CalendarSource; name: string; color: st
 export interface ContactField { value: string; label: string; }
 export interface Contact { id: number; source: ContactSourceKind; accountId: number | null; sourceId: number | null; remoteId: string | null; displayName: string; firstName: string; lastName: string; emails: ContactField[]; phones: ContactField[]; company: string; title: string; notes: string; birthday: string | null; photo: string | null; readOnly: boolean; updatedAt: string; }
 export interface ContactInput { id?: number; displayName: string; firstName: string; lastName: string; emails: ContactField[]; phones: ContactField[]; company: string; title: string; notes: string; birthday: string | null; }
+export interface ContactCopyResult { total: number; created: number; skipped: number; failed: number; errors: string[]; }
 export interface ContactSource { id: number; accountId: number | null; kind: ContactSourceKind; url: string | null; username: string | null; name: string; lastSync: string | null; error: string | null; }
 export interface ContactSourceInput { name: string; url: string; username: string; password: string; }
 export interface PlaceSuggestion { label: string; title: string; detail: string; }
@@ -104,6 +105,9 @@ export interface Api {
   'calendar:setCategories': (id: number, names: string[]) => CalendarEvent | null;
   'contacts:list': (query?: string) => Contact[];
   'contacts:sources': () => ContactSource[];
+  'contacts:photos': () => Record<string, string>;
+  /** toId -1 = the local DHMail address book */
+  'contacts:copy': (fromId: number, toId: number) => ContactCopyResult;
   'contacts:addSource': (input: ContactSourceInput) => ContactSource[];
   'contacts:removeSource': (id: number) => ContactSource[];
   'contacts:sync': () => ContactSource[];

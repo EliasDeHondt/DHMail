@@ -3,14 +3,14 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { StoreService } from '../core/store.service';
-import { BridgeService } from '../core/bridge.service';
+import { ApiError, BridgeService } from '../core/bridge.service';
 import { AppStateService } from '../core/app-state.service';
 import { DatePickerComponent } from '../shared/date-picker/date-picker.component';
 import { IconComponent } from '../shared/icon.component';
 import { AvatarComponent } from '../shared/avatar.component';
 import { ToastService } from '../shared/toast.service';
 import { DialogsService } from '../shared/dialogs.service';
-import { Contact, ContactField, ContactInput, ContactSource } from '../../../shared/types';
+import { Contact, ContactCopyResult, ContactField, ContactInput, ContactSource } from '../../../shared/types';
 @Component({ selector: 'app-people', standalone: true, imports: [FormsModule, TranslatePipe, IconComponent, AvatarComponent, DatePickerComponent], templateUrl: './people.component.html', styleUrl: './people.component.css' })
 export class PeopleComponent implements OnDestroy {
   readonly store = inject(StoreService);
@@ -29,6 +29,21 @@ export class PeopleComponent implements OnDestroy {
   readonly syncing = signal(false);
   readonly editing = signal<ContactInput | null>(null);
   readonly addingSource = signal(false);
+  readonly copying = signal(false);
+  readonly copyResult = signal<ContactCopyResult | null>(null);
+  copyForm: { from: number | null; to: number | null } = { from: null, to: null };
+  hasLocal() { return this.sources().some(s => s.kind === 'local'); }
+  countFor(sourceId: number) { return this.contacts().filter(c => c.sourceId === sourceId).length; }
+  startCopy() { const list = this.sources(); this.copyForm = { from: list[0]?.id ?? null, to: list[1]?.id ?? (this.hasLocal() ? null : -1) }; this.copyResult.set(null); this.error.set(null); this.addingSource.set(false); this.editing.set(null); this.copying.set(true); }
+  async copyContacts() {
+    const { from, to } = this.copyForm; if (from === null || to === null || from === to) return;
+    const name = (id: number) => id === -1 ? this.translate.instant('APP.PEOPLE.LOCAL_BOOK') : this.sources().find(s => s.id === id)?.name ?? '';
+    if (!await this.dialogs.confirm(this.translate.instant('APP.PEOPLE.COPY_CONFIRM', { count: this.countFor(from), from: name(from), to: name(to) }), this.translate.instant('APP.PEOPLE.COPY_START'))) return;
+    this.saving.set(true); this.error.set(null); this.copyResult.set(null);
+    try { this.copyResult.set(await this.bridge.invoke('contacts:copy', from, to)); await this.load(); }
+    catch (err) { const e = err as ApiError; this.error.set(e?.code === 'CONTACTS_WRITE_CONSENT' ? this.translate.instant('APP.PEOPLE.COPY_CONSENT') : e?.message ?? String(err)); }
+    finally { this.saving.set(false); }
+  }
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
   readonly sourceForm = { name: '', url: '', username: '', password: '' };

@@ -3,7 +3,7 @@
     <div class="side-head"><span class="section-title">{{ 'APP.PEOPLE.SOURCES' | translate }}</span><button type="button" class="icon-btn icon-btn--sm" (click)="sync()" [title]="'APP.PEOPLE.SYNC' | translate"><app-icon name="refresh" [class.spinning]="syncing()"></app-icon></button></div>
     <button type="button" class="src" [class.src--active]="sourceFilter() === null" (click)="sourceFilter.set(null)"><app-icon name="people"></app-icon><span class="src-name">{{ 'APP.PEOPLE.ALL_CONTACTS' | translate }}</span><span class="src-count">{{ contacts().length }}</span></button>
     @for (s of sources(); track s.id) {<button type="button" class="src" [class.src--active]="sourceFilter() === s.id" (click)="sourceFilter.set(s.id)" [title]="s.error || s.name"><app-icon [name]="sourceIcon(s)"></app-icon><span class="src-name">{{ s.name }}</span>@if (s.error) {<app-icon class="src-err" name="alert"></app-icon>}@if (s.kind === 'carddav') {<span class="icon-btn icon-btn--sm src-x" (click)="removeSource(s); $event.stopPropagation()"><app-icon name="close"></app-icon></span>}</button>}
-    <div class="side-actions"><button type="button" class="btn btn--sm btn--ghost" (click)="addingSource.set(true); error.set(null)"><app-icon name="plus"></app-icon>CardDAV</button></div>
+    <div class="side-actions"><button type="button" class="btn btn--sm btn--ghost" (click)="addingSource.set(true); copying.set(false); error.set(null)"><app-icon name="plus"></app-icon>CardDAV</button><button type="button" class="btn btn--sm btn--ghost" (click)="startCopy()"><app-icon name="copy"></app-icon>{{ 'APP.PEOPLE.COPY' | translate }}</button></div>
   </aside>
   <section class="list">
     <div class="search"><app-icon name="search"></app-icon><input type="search" [ngModel]="query()" (ngModelChange)="query.set($event)" [placeholder]="'APP.PEOPLE.SEARCH' | translate"/></div>
@@ -26,6 +26,16 @@
       <div class="field"><span class="field-label">{{ 'APP.PEOPLE.NOTES' | translate }}</span><textarea class="textarea" [(ngModel)]="f.notes" name="notes"></textarea></div>
       @if (error()) {<p class="error">{{ error() }}</p>}
       <div class="edit-actions"><button type="button" class="btn btn--ghost" (click)="editing.set(null)">{{ 'APP.COMMON.CANCEL' | translate }}</button><button type="submit" class="btn btn--primary" [disabled]="saving()">{{ 'APP.COMMON.SAVE' | translate }}</button></div>
+    </form>}
+    @else if (copying()) {
+    <form class="edit" (ngSubmit)="copyContacts()">
+      <h2 class="detail-title">{{ 'APP.PEOPLE.COPY_TITLE' | translate }}</h2>
+      <p class="hint">{{ 'APP.PEOPLE.COPY_HINT' | translate }}</p>
+      <div class="field-row"><div class="field"><span class="field-label">{{ 'APP.PEOPLE.COPY_FROM' | translate }}</span><select class="select" [(ngModel)]="copyForm.from" name="copyFrom">@for (s of sources(); track s.id) {<option [ngValue]="s.id">{{ s.name }} ({{ countFor(s.id) }})</option>}</select></div>
+      <div class="field"><span class="field-label">{{ 'APP.PEOPLE.COPY_TO' | translate }}</span><select class="select" [(ngModel)]="copyForm.to" name="copyTo">@for (s of sources(); track s.id) {@if (s.id !== copyForm.from) {<option [ngValue]="s.id">{{ s.name }}</option>}}@if (!hasLocal()) {<option [ngValue]="-1">{{ 'APP.PEOPLE.LOCAL_BOOK' | translate }}</option>}</select></div></div>
+      @if (copyResult(); as r) {<div class="copy-result"><strong>{{ 'APP.PEOPLE.COPY_DONE' | translate:{created: r.created, skipped: r.skipped, failed: r.failed} }}</strong>@for (e of r.errors; track $index) {<span class="hint">{{ e }}</span>}</div>}
+      @if (error()) {<p class="error">{{ error() }}</p>}
+      <div class="edit-actions"><button type="button" class="btn btn--ghost" (click)="copying.set(false)">{{ 'APP.COMMON.CLOSE' | translate }}</button><button type="submit" class="btn btn--primary" [disabled]="saving() || copyForm.from === copyForm.to || copyForm.to === null">@if (saving()) {<span class="spinner"></span>}{{ 'APP.PEOPLE.COPY_START' | translate }}</button></div>
     </form>}
     @else if (addingSource()) {
     <form class="edit" (ngSubmit)="addSource()">

@@ -254,7 +254,17 @@
       "DELETE_CONFIRM": "{{name}} verwijderen?",
       "IMPORTED": "{{count}} contact(en) geïmporteerd",
       "SOURCE_URL_REQUIRED": "Vul het adres van de server in.",
-      "REMOVE_SOURCE_CONFIRM": "Adresboek \"{{name}}\" verwijderen uit DHMail?"
+      "REMOVE_SOURCE_CONFIRM": "Adresboek \"{{name}}\" verwijderen uit DHMail?",
+      "COPY": "Kopiëren",
+      "COPY_TITLE": "Contacten kopiëren",
+      "COPY_HINT": "Kopieert alle contacten van het ene adresboek naar het andere. In het doeladresboek wordt niets aangepast of verwijderd: contacten die er al staan (zelfde e-mailadres, of zelfde naam zonder e-mailadres) worden overgeslagen, en gegevens waar het doel geen veld voor heeft, komen in de notities.",
+      "COPY_FROM": "Van",
+      "COPY_TO": "Naar",
+      "COPY_START": "Kopiëren",
+      "COPY_CONFIRM": "{{count}} contacten van \"{{from}}\" naar \"{{to}}\" kopiëren?",
+      "COPY_DONE": "{{created}} gekopieerd · {{skipped}} stonden er al · {{failed}} mislukt",
+      "COPY_CONSENT": "DHMail mag nog geen contacten in dit Outlook-account schrijven. Voeg het Outlook-account opnieuw toe via Instellingen → Accounts → Account toevoegen, geef toestemming en probeer opnieuw.",
+      "LOCAL_BOOK": "DHMail (op deze computer)"
     },
     "ACCOUNT": {
       "TITLE_ADD": "Account toevoegen",

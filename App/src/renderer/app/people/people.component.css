@@ -52,3 +52,5 @@
 .multi-label { width: 130px; flex: none; }
 .self-start { align-self: flex-start; }
 .edit-actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 8px; }
+.side-actions { display: flex; flex-wrap: wrap; gap: 4px; }
+.copy-result { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--tint); }

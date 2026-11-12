@@ -254,7 +254,17 @@
       "DELETE_CONFIRM": "Delete {{name}}?",
       "IMPORTED": "{{count}} contact(s) imported",
       "SOURCE_URL_REQUIRED": "Enter the server address.",
-      "REMOVE_SOURCE_CONFIRM": "Remove address book \"{{name}}\" from DHMail?"
+      "REMOVE_SOURCE_CONFIRM": "Remove address book \"{{name}}\" from DHMail?",
+      "COPY": "Copy",
+      "COPY_TITLE": "Copy contacts",
+      "COPY_HINT": "Copies every contact from one address book to another. Nothing in the target is changed or deleted: contacts that are already there (same e-mail address, or same name without an address) are skipped, and details the target has no field for go into the notes.",
+      "COPY_FROM": "From",
+      "COPY_TO": "To",
+      "COPY_START": "Copy",
+      "COPY_CONFIRM": "Copy {{count}} contacts from \"{{from}}\" to \"{{to}}\"?",
+      "COPY_DONE": "{{created}} copied · {{skipped}} already there · {{failed}} failed",
+      "COPY_CONSENT": "DHMail may not write contacts to this Outlook account yet. Add the Outlook account again via Settings → Accounts → Add account, grant access and try again.",
+      "LOCAL_BOOK": "DHMail (on this computer)"
     },
     "ACCOUNT": {
       "TITLE_ADD": "Add account",

@@ -24,8 +24,10 @@ const HIDDEN_PATHS = /^\[(Gmail|Google Mail)\]\/Chats$/i;
 const SYNC_ISSUES = /^(sync issues|synchronisatieproblemen|synchronisierungsprobleme|problèmes de synchronisation|problemas de sincronización|problemi di sincronizzazione)$/i;
 const HIDDEN_NAMES = /^(notes|notities|outbox|postvak uit|archiveren)$/i;
 const isHiddenFolder = (f: Folder) => HIDDEN_PATHS.test(f.path) || !f.specialUse && !f.parentPath && HIDDEN_NAMES.test(f.name) || SYNC_ISSUES.test(f.delimiter ? f.path.split(f.delimiter)[0] : f.path);
+const GMAIL_ROOT = /^\[(gmail|google mail)\]$/i;
 export function getFolders(accountId: number): Folder[] {
-  const rows = all(`SELECT * FROM folders WHERE account_id = ? ORDER BY sort_order, path`, accountId).map(mapFolder);
+  // Gmail keeps its system folders inside a "[Gmail]" container: show them at the top level and drop the container
+  const rows = all(`SELECT * FROM folders WHERE account_id = ? ORDER BY sort_order, path`, accountId).map(mapFolder).filter(f => !GMAIL_ROOT.test(f.path)).map(f => f.parentPath && GMAIL_ROOT.test(f.parentPath) ? { ...f, parentPath: null, depth: 0 } : f);
   // every mailbox shows an Archive: its own archive folder, or Gmail's "All Mail" (that is where Gmail archives to)
   const gmailArchive = !rows.some(f => f.specialUse === 'archive') ? rows.find(f => f.specialUse === 'all') : undefined;
   const seen = new Set<string>();

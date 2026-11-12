@@ -1,5 +1,12 @@
 @if (mode() === 'choose') {
 <div class="choices">
+  <button type="button" class="choice choice--brand" [disabled]="!!busy()" (click)="eliasdh()">
+    <span class="choice-logo choice-logo--brand"><img src="assets/eliasdh.png" alt="" draggable="false"/></span>
+    <span class="choice-text"><span class="choice-name">{{ 'APP.CONNECT.ELIASDH' | translate }}</span><span class="choice-sub">{{ 'APP.CONNECT.ELIASDH_SUB' | translate }}</span></span>
+    @if (busy() === 'eliasdh') {<span class="spinner"></span>} @else {<app-icon class="choice-chevron" name="chevron-right"></app-icon>}
+  </button>
+  <button type="button" class="others-toggle" (click)="showOthers.set(!showOthers())" [attr.aria-expanded]="showOthers()"><app-icon [name]="showOthers() ? 'chevron-down' : 'chevron-right'"></app-icon>{{ 'APP.CONNECT.OTHER_OPTIONS' | translate }}</button>
+  @if (showOthers()) {
   <button type="button" class="choice" [disabled]="!!busy()" (click)="oauth('microsoft')">
     <span class="choice-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#f25022" d="M2 2h9.5v9.5H2z"/><path fill="#7fba00" d="M12.5 2H22v9.5h-9.5z"/><path fill="#00a4ef" d="M2 12.5h9.5V22H2z"/><path fill="#ffb900" d="M12.5 12.5H22V22h-9.5z"/></svg></span>
     <span class="choice-text"><span class="choice-name">{{ 'APP.CONNECT.OUTLOOK' | translate }}</span><span class="choice-sub">{{ 'APP.CONNECT.OUTLOOK_SUB' | translate }}</span></span>
@@ -14,7 +21,7 @@
     <span class="choice-logo choice-logo--imap"><app-icon name="at"></app-icon></span>
     <span class="choice-text"><span class="choice-name">{{ 'APP.CONNECT.OTHER' | translate }}</span><span class="choice-sub">{{ 'APP.CONNECT.OTHER_SUB' | translate }}</span></span>
     <app-icon class="choice-chevron" name="chevron-right"></app-icon>
-  </button>
+  </button>}
 </div>
 @if (status()) {<p class="status"><span class="spinner"></span>{{ status() }}</p>}
 @if (error()) {<p class="error">{{ error() }}</p>}

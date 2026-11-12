@@ -60,7 +60,8 @@ export interface Api {
   'accounts:list': () => Account[];
   'accounts:reorder': (ids: number[]) => Account[];
   'accounts:oauthReady': () => Record<OAuthProvider, boolean>;
-  'accounts:connect': (provider: OAuthProvider) => Account;
+  /** domain: only accept accounts of this Google Workspace domain (EliasDH Mail = eliasdh.com) */
+  'accounts:connect': (provider: OAuthProvider, domain?: string) => Account;
   'accounts:discover': (email: string, password: string, username?: string) => DiscoverResult;
   'accounts:add': (input: AccountInput) => Account;
   'accounts:update': (id: number, patch: Partial<AccountInput>) => Account;

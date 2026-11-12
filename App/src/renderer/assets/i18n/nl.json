@@ -263,11 +263,12 @@
       "COPY_START": "Kopiëren",
       "COPY_CONFIRM": "{{count}} contacten van \"{{from}}\" naar \"{{to}}\" kopiëren?",
       "COPY_DONE": "{{created}} gekopieerd · {{skipped}} stonden er al · {{failed}} mislukt",
-      "COPY_CONSENT": "DHMail mag nog geen contacten in dit Outlook-account schrijven. Voeg het Outlook-account opnieuw toe via Instellingen → Accounts → Account toevoegen, geef toestemming en probeer opnieuw.",
+      "COPY_CONSENT": "DHMail mag nog geen contacten in dit Outlook-account schrijven. Ga naar Instellingen → Accounts, open het Outlook-account, kies \"Opnieuw aanmelden\" en geef toestemming. Probeer daarna opnieuw.",
       "LOCAL_BOOK": "DHMail (op deze computer)",
       "SAVE_IN": "Opslaan in",
       "SAVED_IN": "Contact opgeslagen in {{name}}",
-      "ALREADY_IN": "Dit contact staat al in {{name}}"
+      "ALREADY_IN": "Dit contact staat al in {{name}}",
+      "DRAG_HINT": "Sleep naar een adresboek om te kopiëren"
     },
     "ACCOUNT": {
       "TITLE_ADD": "Account toevoegen",
@@ -401,7 +402,11 @@
       "OPEN_ENTRA": "Microsoft Entra openen",
       "CLIENT_ID": "Application (client) ID",
       "CLIENT_ID_INVALID": "Dat lijkt geen geldig client-ID (formaat 00000000-0000-0000-0000-000000000000).",
-      "SAVE_AND_CONNECT": "Opslaan en verbinden"
+      "SAVE_AND_CONNECT": "Opslaan en verbinden",
+      "ELIASDH": "EliasDH Mail",
+      "ELIASDH_SUB": "Voor bedrijven met een @eliasdh.com-adres",
+      "OTHER_OPTIONS": "Andere mogelijkheden",
+      "ELIASDH_WRONG": "Meld je aan met je @eliasdh.com-adres."
     },
     "LOCK": {
       "TITLE_UNLOCK": "DHMail is vergrendeld",

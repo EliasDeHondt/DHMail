@@ -9,8 +9,8 @@ import { DatePickerComponent } from '../shared/date-picker/date-picker.component
 import { IconComponent } from '../shared/icon.component';
 import { AvatarComponent } from '../shared/avatar.component';
 import { ToastService } from '../shared/toast.service';
-import { DialogsService, MenuItem } from '../shared/dialogs.service';
-import { Contact, ContactCopyResult, ContactField, ContactInput, ContactSource } from '../../../shared/types';
+import { DialogsService } from '../shared/dialogs.service';
+import { Contact, ContactField, ContactInput, ContactSource } from '../../../shared/types';
 @Component({ selector: 'app-people', standalone: true, imports: [FormsModule, TranslatePipe, IconComponent, AvatarComponent, DatePickerComponent], templateUrl: './people.component.html', styleUrl: './people.component.css' })
 export class PeopleComponent implements OnDestroy {
   readonly store = inject(StoreService);
@@ -32,19 +32,24 @@ export class PeopleComponent implements OnDestroy {
   saveTarget = -1;
   writableSources() { return this.sources().filter(s => s.kind !== 'local'); }
   readonly addingSource = signal(false);
-  readonly copying = signal(false);
-  readonly copyResult = signal<ContactCopyResult | null>(null);
-  copyForm: { from: number | null; to: number | null } = { from: null, to: null };
+  readonly dropTarget = signal<number | null>(null);
+  readonly dragging = signal<{ kind: 'contact' | 'source'; id: number; sourceId: number } | null>(null);
   hasLocal() { return this.sources().some(s => s.kind === 'local'); }
   countFor(sourceId: number) { return this.contacts().filter(c => c.sourceId === sourceId).length; }
-  startCopy() { const list = this.sources(); this.copyForm = { from: list[0]?.id ?? null, to: list[1]?.id ?? (this.hasLocal() ? null : -1) }; this.copyResult.set(null); this.error.set(null); this.addingSource.set(false); this.editing.set(null); this.copying.set(true); }
+  // drag a contact (or a whole address book) onto another address book to copy it there
+  dragContact(e: DragEvent, c: Contact) { this.dragging.set({ kind: 'contact', id: c.id, sourceId: c.sourceId ?? -1 }); e.dataTransfer?.setData('text/plain', c.displayName); if (e.dataTransfer) e.dataTransfer.effectAllowed = 'copy'; }
+  dragSource(e: DragEvent, s: ContactSource) { this.dragging.set({ kind: 'source', id: s.id, sourceId: s.id }); e.dataTransfer?.setData('text/plain', s.name); if (e.dataTransfer) e.dataTransfer.effectAllowed = 'copy'; }
+  endDrag() { this.dragging.set(null); this.dropTarget.set(null); }
+  dragOver(e: DragEvent, s: ContactSource) { const d = this.dragging(); if (!d || d.sourceId === s.id) return; e.preventDefault(); if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy'; this.dropTarget.set(s.id); }
+  async drop(e: DragEvent, s: ContactSource) { e.preventDefault(); const d = this.dragging(); this.endDrag(); if (!d || d.sourceId === s.id) return; if (d.kind === 'contact') { const c = this.contacts().find(x => x.id === d.id); if (c) await this.copyOne(c, s.id); } else { this.copyForm = { from: d.id, to: s.id }; await this.copyContacts(); } }
+  copyForm: { from: number | null; to: number | null } = { from: null, to: null };
   async copyContacts() {
     const { from, to } = this.copyForm; if (from === null || to === null || from === to) return;
     const name = (id: number) => id === -1 ? this.translate.instant('APP.PEOPLE.LOCAL_BOOK') : this.sources().find(s => s.id === id)?.name ?? '';
     if (!await this.dialogs.confirm(this.translate.instant('APP.PEOPLE.COPY_CONFIRM', { count: this.countFor(from), from: name(from), to: name(to) }), this.translate.instant('APP.PEOPLE.COPY_START'))) return;
-    this.saving.set(true); this.error.set(null); this.copyResult.set(null);
-    try { this.copyResult.set(await this.bridge.invoke('contacts:copy', from, to)); await this.load(); }
-    catch (err) { const e = err as ApiError; this.error.set(e?.code === 'CONTACTS_WRITE_CONSENT' ? this.translate.instant('APP.PEOPLE.COPY_CONSENT') : e?.message ?? String(err)); }
+    this.saving.set(true);
+    try { const r = await this.bridge.invoke('contacts:copy', from, to); this.toast.show(this.translate.instant('APP.PEOPLE.COPY_DONE', { created: r.created, skipped: r.skipped, failed: r.failed }), r.failed ? 'error' : 'success'); await this.load(); }
+    catch (err) { const e = err as ApiError; this.toast.error(e?.code === 'CONTACTS_WRITE_CONSENT' ? this.translate.instant('APP.PEOPLE.COPY_CONSENT') : err); }
     finally { this.saving.set(false); }
   }
   readonly saving = signal(false);
@@ -66,8 +71,6 @@ export class PeopleComponent implements OnDestroy {
   addField(list: ContactField[]) { list.push({ value: '', label: '' }); }
   removeField(list: ContactField[], i: number) { list.splice(i, 1); if (!list.length) list.push({ value: '', label: '' }); }
   async save() { const f = this.editing(); if (!f) return; const display = f.displayName.trim() || [f.firstName, f.lastName].filter(Boolean).join(' ').trim() || f.emails[0]?.value.trim(); if (!display) { this.error.set(this.translate.instant('APP.PEOPLE.NAME_REQUIRED')); return; } this.saving.set(true); try { if (!f.id && this.saveTarget !== -1) { const clean = { ...f, displayName: display, emails: f.emails.filter(e => e.value.trim()).map(e => ({ value: e.value.trim(), label: e.label })), phones: f.phones.filter(p => p.value.trim()).map(p => ({ value: p.value.trim(), label: p.label })), birthday: f.birthday || null }; await this.bridge.invoke('contacts:createIn', clean, this.saveTarget); this.editing.set(null); this.sourceFilter.set(this.saveTarget); await this.load(); this.toast.show(this.translate.instant('APP.PEOPLE.SAVED_IN', { name: this.sourceName(this.saveTarget) }), 'success'); return; } const saved = await this.bridge.invoke('contacts:save', { ...f, displayName: display, emails: f.emails.filter(e => e.value.trim()).map(e => ({ value: e.value.trim(), label: e.label })), phones: f.phones.filter(p => p.value.trim()).map(p => ({ value: p.value.trim(), label: p.label })), birthday: f.birthday || null }); this.editing.set(null); await this.load(); this.selected.set(this.contacts().find(c => c.id === saved.id) ?? saved); } catch (err) { const e = err as ApiError; this.error.set(e?.code === 'CONTACTS_WRITE_CONSENT' ? this.translate.instant('APP.PEOPLE.COPY_CONSENT') : e?.message ?? String(err)); } finally { this.saving.set(false); } }
-  canCopy(c: Contact) { return this.sources().some(s => s.id !== c.sourceId) || !this.hasLocal(); }
-  copyMenu(e: MouseEvent, c: Contact) { const targets = this.sources().filter(s => s.id !== c.sourceId); const items: MenuItem[] = targets.map(s => ({ label: s.name, icon: this.sourceIcon(s), action: () => this.copyOne(c, s.id) })); if (!this.hasLocal()) items.push({ label: this.translate.instant('APP.PEOPLE.LOCAL_BOOK'), icon: 'user', action: () => this.copyOne(c, -1) }); this.dialogs.openMenu(e, items); }
   async copyOne(c: Contact, toId: number) { try { const r = await this.bridge.invoke('contacts:copyOne', c.id, toId); const name = toId === -1 ? this.translate.instant('APP.PEOPLE.LOCAL_BOOK') : this.sourceName(toId); if (r.created) this.toast.show(this.translate.instant('APP.PEOPLE.SAVED_IN', { name }), 'success'); else if (r.skipped) this.toast.show(this.translate.instant('APP.PEOPLE.ALREADY_IN', { name }), 'info'); else this.toast.error(r.errors[0] ?? ''); await this.load(); } catch (err) { const e = err as ApiError; this.toast.error(e?.code === 'CONTACTS_WRITE_CONSENT' ? this.translate.instant('APP.PEOPLE.COPY_CONSENT') : err); } }
   async remove(c: Contact) { if (!await this.dialogs.confirm(this.translate.instant('APP.PEOPLE.DELETE_CONFIRM', { name: c.displayName }), this.translate.instant('APP.COMMON.DELETE'), true)) return; try { await this.bridge.invoke('contacts:remove', c.id); this.selected.set(null); await this.load(); } catch (err) { this.toast.error(err); } }
   async importVcf() { try { const f = await this.bridge.invoke('app:pickFile', [{ name: 'vCard', extensions: ['vcf', 'vcard'] }]); if (!f) return; const n = await this.bridge.invoke('contacts:importVcf', f.content); this.toast.show(this.translate.instant('APP.PEOPLE.IMPORTED', { count: n }), 'success'); await this.load(); } catch (err) { this.toast.error(err); } }

@@ -263,11 +263,12 @@
       "COPY_START": "Copy",
       "COPY_CONFIRM": "Copy {{count}} contacts from \"{{from}}\" to \"{{to}}\"?",
       "COPY_DONE": "{{created}} copied · {{skipped}} already there · {{failed}} failed",
-      "COPY_CONSENT": "DHMail may not write contacts to this Outlook account yet. Add the Outlook account again via Settings → Accounts → Add account, grant access and try again.",
+      "COPY_CONSENT": "DHMail may not write contacts to this Outlook account yet. Go to Settings → Accounts, open the Outlook account, choose \"Sign in again\" and grant access, then retry.",
       "LOCAL_BOOK": "DHMail (on this computer)",
       "SAVE_IN": "Save in",
       "SAVED_IN": "Contact saved in {{name}}",
-      "ALREADY_IN": "This contact is already in {{name}}"
+      "ALREADY_IN": "This contact is already in {{name}}",
+      "DRAG_HINT": "Drop on an address book to copy"
     },
     "ACCOUNT": {
       "TITLE_ADD": "Add account",
@@ -401,7 +402,11 @@
       "OPEN_ENTRA": "Open Microsoft Entra",
       "CLIENT_ID": "Application (client) ID",
       "CLIENT_ID_INVALID": "That does not look like a valid client ID (format 00000000-0000-0000-0000-000000000000).",
-      "SAVE_AND_CONNECT": "Save and connect"
+      "SAVE_AND_CONNECT": "Save and connect",
+      "ELIASDH": "EliasDH Mail",
+      "ELIASDH_SUB": "For businesses with an @eliasdh.com address",
+      "OTHER_OPTIONS": "Other options",
+      "ELIASDH_WRONG": "Sign in with your @eliasdh.com address."
     },
     "LOCK": {
       "TITLE_UNLOCK": "DHMail is locked",

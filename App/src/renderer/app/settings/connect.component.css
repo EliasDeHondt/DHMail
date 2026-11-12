@@ -33,3 +33,9 @@
 .port { flex: 1 !important; }
 .muted { color: var(--secondary); font-size: 12px; }
 .steps { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.6; color: var(--secondary); }
+.choice--brand { border-color: color-mix(in srgb, var(--primary) 45%, var(--line)); background: color-mix(in srgb, var(--primary) 7%, var(--surface)); }
+.choice-logo--brand { border: none; background: none; overflow: hidden; }
+.choice-logo--brand img { width: 42px; height: 42px; border-radius: 12px; }
+.others-toggle { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; margin-top: 4px; padding: 4px 6px; border: none; border-radius: 8px; background: none; color: var(--secondary); font-size: 13px; font-weight: 600; }
+.others-toggle:hover { background: var(--hover); color: var(--text); }
+.others-toggle app-icon { --icon-size: 16px; }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { StoreService } from '../core/store.service';
@@ -14,6 +14,7 @@ export class AccountDialogComponent implements OnInit {
   private translate = inject(TranslateService);
   @Input() account: Account | null = null;
   @Output() closed = new EventEmitter<void>();
+  @HostListener('document:keydown.escape') onEscape() { this.closed.emit(); }
   @Output() saved = new EventEmitter<Account>();
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);

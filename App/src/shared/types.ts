@@ -1,7 +1,7 @@
 export type Provider = 'google' | 'microsoft' | 'imap';
 export type AuthType = 'oauth' | 'password';
 export type SpecialUse = 'inbox' | 'sent' | 'drafts' | 'trash' | 'junk' | 'archive' | 'all' | 'flagged' | 'important';
-export type CalendarSource = 'google' | 'microsoft' | 'caldav' | 'ics' | 'local' | 'birthdays';
+export type CalendarSource = 'google' | 'microsoft' | 'caldav' | 'ics' | 'local' | 'birthdays' | 'holidays';
 export type ContactSourceKind = 'google' | 'microsoft' | 'carddav' | 'local';
 export type AccountState = 'idle' | 'connecting' | 'online' | 'syncing' | 'error' | 'offline';
 export interface AccountFeatures { mail: boolean; calendar: boolean; contacts: boolean; }
@@ -49,7 +49,7 @@ export interface Api {
   'geo:suggest': (query: string, lang?: string) => PlaceSuggestion[];
   'app:pickFiles': () => SavedFile[];
   'app:pickFile': (filters: { name: string; extensions: string[] }[]) => { path: string; name: string; content: string } | null;
-  'app:titleBar': (colors: { color: string; symbolColor: string }) => void;
+  'app:titleBar': (colors: { color: string; symbolColor: string; modal?: boolean }) => void;
   'settings:get': () => Settings;
   'settings:set': (patch: Partial<Settings>) => Settings;
   'lock:status': () => LockStatus;

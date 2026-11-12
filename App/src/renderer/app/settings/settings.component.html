@@ -15,13 +15,7 @@
         <div class="card-actions">@if (a.authType === 'oauth') {<button type="button" class="btn btn--sm" [disabled]="busy() === a.id" (click)="reauth(a)">{{ 'APP.SETTINGS.SIGN_IN_AGAIN' | translate }}</button>}<button type="button" class="icon-btn" (click)="reconnect(a)" [title]="'APP.MAIL.RECONNECT' | translate"><app-icon name="refresh"></app-icon></button><button type="button" class="icon-btn" (click)="editing.set(a)" [title]="'APP.COMMON.EDIT' | translate"><app-icon name="edit"></app-icon></button><button type="button" class="icon-btn icon-btn--danger" [disabled]="busy() === a.id" (click)="removeAccount(a)" [title]="'APP.COMMON.REMOVE' | translate"><app-icon name="trash"></app-icon></button></div>
       </div>}
     </div>
-    <details class="block">
-      <summary class="section-title">{{ 'APP.SETTINGS.OAUTH_TITLE' | translate }}</summary>
-      <p class="hint">{{ 'APP.SETTINGS.OAUTH_INTRO' | translate }}</p>
-      <div class="field-row"><div class="field"><span class="field-label">{{ 'APP.SETTINGS.GOOGLE_CLIENT_ID' | translate }}</span><input class="input" type="text" [(ngModel)]="client.googleClientId" name="gid"/></div><div class="field"><span class="field-label">{{ 'APP.SETTINGS.GOOGLE_CLIENT_SECRET' | translate }}</span><input class="input" type="password" [(ngModel)]="client.googleClientSecret" name="gsec"/></div></div>
-      <div class="field-row"><div class="field"><span class="field-label">{{ 'APP.SETTINGS.MICROSOFT_CLIENT_ID' | translate }}</span><input class="input" type="text" [(ngModel)]="client.microsoftClientId" name="mid"/></div><div class="field"><span class="field-label">{{ 'APP.SETTINGS.MICROSOFT_TENANT' | translate }}</span><input class="input" type="text" [(ngModel)]="client.microsoftTenant" name="mten" placeholder="common"/></div></div>
-      <div class="block-actions"><button type="button" class="btn btn--ghost btn--sm" (click)="openExternal('https://console.cloud.google.com/apis/credentials')"><app-icon name="external"></app-icon>Google Cloud</button><button type="button" class="btn btn--ghost btn--sm" (click)="openExternal('https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade')"><app-icon name="external"></app-icon>Microsoft Entra</button><span class="spacer"></span><button type="button" class="btn btn--primary btn--sm" (click)="saveClient()">{{ 'APP.COMMON.SAVE' | translate }}</button></div>
-    </details>}
+    }
     @if (tab() === 'calendars') {
     <div class="shead"><h2 class="stitle">{{ 'APP.SETTINGS.CALENDARS' | translate }}</h2><button type="button" class="btn btn--primary btn--sm" (click)="addingCalendar.set(true)"><app-icon name="plus"></app-icon>{{ 'APP.CALENDAR.ADD_CALENDAR' | translate }}</button></div>
     <div class="cards">

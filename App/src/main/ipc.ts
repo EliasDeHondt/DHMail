@@ -31,7 +31,7 @@ export function registerIpc(getWindow: () => BrowserWindow | null) {
     'app:openExternal': url => { if (/^(https?|mailto|tel):/i.test(url)) shell.openExternal(url); },
     'app:pickFiles': async () => { const r = await dialog.showOpenDialog(win()!, { properties: ['openFile', 'multiSelections'] }); return Promise.all(r.filePaths.map(async p => ({ path: p, name: basename(p), size: (await stat(p)).size }))); },
     'app:pickFile': async filters => { const r = await dialog.showOpenDialog(win()!, { properties: ['openFile'], filters }); const p = r.filePaths[0]; if (!p) return null; return { path: p, name: basename(p), content: await readFile(p, 'utf8') }; },
-    'app:titleBar': colors => { try { win()?.setTitleBarOverlay({ color: colors.color, symbolColor: colors.symbolColor, height: 40 }); } catch {} },
+    'app:titleBar': colors => { try { const w = win(); w?.setTitleBarOverlay({ color: colors.color, symbolColor: colors.symbolColor, height: 40 }); if (w && typeof colors.modal === 'boolean') { w.setMinimizable(!colors.modal); w.setMaximizable(!colors.modal); w.setClosable(!colors.modal); } } catch {} },
     'settings:get': () => getSettings(),
     'settings:set': patch => setSettings(patch),
     'lock:status': () => lockStatus(),

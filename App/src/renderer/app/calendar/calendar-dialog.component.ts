@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
+import { Component, EventEmitter, HostListener, Output, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BridgeService } from '../core/bridge.service';
@@ -15,6 +15,7 @@ export class CalendarDialogComponent {
   private toast = inject(ToastService);
   private translate = inject(TranslateService);
   @Output() closed = new EventEmitter<void>();
+  @HostListener('document:keydown.escape') onEscape() { this.closed.emit(); }
   @Output() saved = new EventEmitter<void>();
   readonly kind = signal<'ics' | 'file' | 'caldav' | 'local'>('ics');
   readonly busy = signal(false);

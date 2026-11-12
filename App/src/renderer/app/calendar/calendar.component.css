@@ -53,7 +53,7 @@
 .hour-label { position: absolute; right: 8px; transform: translateY(-50%); font-size: 11px; color: var(--secondary); font-variant-numeric: tabular-nums; }
 .day-col { position: relative; border-left: 1px solid var(--line-soft); }
 .day-col--today { background: color-mix(in srgb, var(--primary) 4%, transparent); }
-.hour-line { position: absolute; left: 0; right: 0; height: 42px; border-top: 1px solid var(--line-soft); }
+.hour-line { position: absolute; left: 0; right: 0; height: 60px; border-top: 1px solid var(--line-soft); }
 .hour-line--work { background: color-mix(in srgb, var(--primary) 3%, transparent); }
 .now-line { position: absolute; left: 0; right: 0; height: 2px; background: var(--danger); z-index: 3; pointer-events: none; }
 .now-line::before { content: ''; position: absolute; left: -5px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--danger); }

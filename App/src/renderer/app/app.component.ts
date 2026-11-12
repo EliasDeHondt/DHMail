@@ -1,4 +1,4 @@
-import { Component, HostListener, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Component, HostListener, NgZone, computed, effect, inject, signal, untracked } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -26,7 +26,9 @@ export class AppComponent {
   readonly failed = signal<string | null>(null);
   readonly busy = computed(() => Object.values(this.store.statuses()).some(s => s.state === 'syncing' || s.state === 'connecting') || !!this.store.syncState());
   readonly errors = computed(() => Object.values(this.store.statuses()).filter(s => s.state === 'error').length);
-  constructor() { this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(e => { const seg = (e as NavigationEnd).urlAfterRedirects.split(/[/?#]/).filter(Boolean)[0] as any; this.state.module.set(seg || 'mail'); }); effect(() => { if (this.lock.mode() === 'unlocked') untracked(() => this.openApp()); }); this.boot(); }
+  constructor() { this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(e => { const seg = (e as NavigationEnd).urlAfterRedirects.split(/[/?#]/).filter(Boolean)[0] as any; this.state.module.set(seg || 'mail'); }); effect(() => { if (this.lock.mode() === 'unlocked') untracked(() => this.openApp()); }); this.watchModals(); this.boot(); }
+  // dim + disable the native window buttons whenever a dialog backdrop (.overlay) is on screen
+  private watchModals() { inject(NgZone).runOutsideAngular(() => { let queued = false; const check = () => { queued = false; this.theme.setModal(!!document.querySelector('.overlay')); }; new MutationObserver(() => { if (!queued) { queued = true; requestAnimationFrame(check); } }).observe(document.body, { childList: true, subtree: true }); }); }
   // settings first (theme + language for the lock screen), then the PIN; app data only loads once unlocked
   private async boot() { try { this.store.applySettings(await this.bridge.invoke('settings:get')); await this.lock.start(); } catch (err) { this.failed.set(err instanceof Error ? err.message : String(err)); } }
   private async openApp() { if (this.initializing || this.store.ready()) return; this.initializing = true; try { await this.store.init(); if (!this.store.accounts().length) this.router.navigate(['/welcome']); this.bridge.on('notification:open', ref => { this.state.pendingOpen.set(ref); this.router.navigate(['/mail']); }); } catch (err) { this.failed.set(err instanceof Error ? err.message : String(err)); } finally { this.initializing = false; } }

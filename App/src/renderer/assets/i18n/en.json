@@ -235,7 +235,15 @@
       "TRANSFER_BUSY": "Events from {{from}} to {{to}}… You can keep working.",
       "COPY_ALL_DONE": "{{copied}} of {{total}} events copied · {{failed}} failed",
       "MOVE_DONE": "All {{copied}} events moved",
-      "MOVE_PARTIAL": "{{copied}} of {{total}} copied, {{deleted}} removed from the source · {{failed}} failed (still in the old calendar)"
+      "MOVE_PARTIAL": "{{copied}} of {{total}} copied, {{deleted}} removed from the source · {{failed}} failed (still in the old calendar)",
+      "SHOW_AS": "Show as",
+      "SHOW_BUSY": "Busy",
+      "SHOW_FREE": "Free",
+      "SHOW_TENTATIVE": "Tentative",
+      "SHOW_OOF": "Away",
+      "SHOW_ELSEWHERE": "Working elsewhere",
+      "PRIVATE": "Private",
+      "ALL_DAY_HINT": "Double-click for an all-day event"
     },
     "PEOPLE": {
       "NEW_CONTACT": "New contact",
@@ -266,7 +274,7 @@
       "ADD_CARDDAV": "Add CardDAV address book",
       "CARDDAV_HINT": "For iCloud, Nextcloud, Fastmail and other servers. Google and Microsoft contacts come with your account automatically.",
       "SEND_MAIL": "Send e-mail",
-      "READ_ONLY_HINT": "This contact is synced and can only be edited at its source.",
+      "READ_ONLY_HINT": "Google keeps this address under \"other contacts\", where it cannot be changed. Drag it onto an address book to make it a regular contact.",
       "SELECT": "Pick a contact",
       "SELECT_HINT": "Select a person to see their details.",
       "NAME_REQUIRED": "Enter at least a name or an email address.",

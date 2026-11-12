@@ -157,6 +157,8 @@ export class CalendarComponent implements OnDestroy {
   readonly selectedSlot = signal<{ day: Date; minutes: number } | null>(null);
   private slotAt(day: Date, e: MouseEvent) { const rect = (e.currentTarget as HTMLElement).getBoundingClientRect(); return { day, minutes: Math.max(0, Math.min(23 * 60 + 30, Math.floor((e.clientY - rect.top) / HOUR_PX * 60 / 30) * 30)) }; }
   slotClick(day: Date, e: MouseEvent) { this.selectedId.set(null); if (this.suppressClick || this.drag() || (e.target as HTMLElement).closest('.ev')) return; this.selectedSlot.set(this.slotAt(day, e)); }
+  /** double click in the row at the top: an all-day event on that day */
+  allDayDblClick(e: MouseEvent) { if ((e.target as HTMLElement).closest('.ev')) return; const box = (e.currentTarget as HTMLElement).getBoundingClientRect(); const n = this.days().length; const i = Math.floor((e.clientX - box.left - 56) / ((box.width - 56) / n)); const day = this.days()[i]; if (day) this.newEvent(new Date(day), true); }
   slotDblClick(day: Date, e: MouseEvent) { if (this.drag() || (e.target as HTMLElement).closest('.ev')) return; const slot = this.slotAt(day, e); this.selectedSlot.set(slot); const s = new Date(day); s.setHours(0, slot.minutes, 0, 0); this.newEvent(s, false, 30); }
   isSelectedSlot = (day: Date) => { const s = this.selectedSlot(); return !!s && sameDay(s.day, day); };
   showEvent(ev: CalendarEvent, e: MouseEvent) { e.stopPropagation(); if (this.suppressClick) { this.suppressClick = false; return; } this.popover.set(null); this.selectedId.set(ev.id); this.selectedSlot.set(null); }

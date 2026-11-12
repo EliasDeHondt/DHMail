@@ -294,6 +294,30 @@ export class DatePickerComponent implements ControlValueAccessor, OnInit, OnDest
         this.close();
     }
 
+    /** time typed as text: "1230" or "12:30"; after two digits the colon is added automatically */
+    timeText(): string { return `${pad(this.hours)}:${pad(this.minutes)}`; }
+    onTimeInput(event: Event): void {
+        const el = event.target as HTMLInputElement;
+        const deleting = (event as InputEvent).inputType?.startsWith('delete');
+        let digits = el.value.replace(/\D/g, '');
+        if (digits.length && Number(digits[0]) > 2) digits = '0' + digits;
+        digits = digits.slice(0, 4);
+        el.value = digits.length > 2 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : digits.length === 2 && !deleting ? `${digits}:` : digits;
+        if (digits.length === 4) this.commitTimeText(event);
+    }
+    commitTimeText(event: Event): void {
+        const el = event.target as HTMLInputElement;
+        const m = /^(\d{1,2}):?(\d{0,2})$/.exec(el.value.trim());
+        if (!m) { el.value = this.timeText(); return; }
+        const hours = Math.min(23, Number(m[1]));
+        const minutes = m[2] === '' ? 0 : Math.min(59, m[2].length === 1 ? Number(m[2]) * 10 : Number(m[2]));
+        el.value = `${pad(hours)}:${pad(minutes)}`;
+        if (hours === this.hours && minutes === this.minutes) return;
+        this.hours = hours; this.minutes = minutes;
+        const date = this.value.slice(0, 10) || toIso(new Date());
+        this.commit(`${date}T${pad(this.hours)}:${pad(this.minutes)}`);
+    }
+
     setTime(part: 'hours' | 'minutes', raw: string): void {
         const parsed = Number(raw);
         if (!Number.isFinite(parsed)) return;

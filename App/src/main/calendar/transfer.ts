@@ -29,6 +29,8 @@ export interface Item {
   parent?: string;
   /** an override that is already inside the raw object of its series */
   partOfRaw?: boolean;
+  showAs?: string;
+  isPrivate?: boolean;
 }
 
 const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Brussels';
@@ -122,6 +124,7 @@ export function itemToIcs(item: Item, uid: string): string {
   if (item.description) lines.push(`DESCRIPTION:${esc(item.description)}`);
   if (item.location) lines.push(`LOCATION:${esc(item.location)}`);
   for (const a of item.attendees) lines.push(`ATTENDEE;PARTSTAT=NEEDS-ACTION:mailto:${a}`);
+  const show = item.showAs ?? 'busy'; lines.push(`TRANSP:${show === 'free' ? 'TRANSPARENT' : 'OPAQUE'}`, `X-MICROSOFT-CDO-BUSYSTATUS:${({ busy: 'BUSY', free: 'FREE', tentative: 'TENTATIVE', oof: 'OOF', elsewhere: 'WORKINGELSEWHERE' } as any)[show] ?? 'BUSY'}`); if (item.isPrivate) lines.push('CLASS:PRIVATE');
   lines.push('END:VEVENT', 'END:VCALENDAR');
   return lines.map(l => l.length > 73 ? l.match(/.{1,73}/g)!.join('\r\n ') : l).join('\r\n') + '\r\n';
 }
@@ -139,7 +142,8 @@ export function icsToItems(text: string): Item[] {
     const rrule = v.getFirstPropertyValue('rrule');
     const exdates: Date[] = []; for (const p of v.getAllProperties('exdate')) for (const t of p.getValues()) exdates.push(t.isDate ? localDate(t.toString()) : t.toJSDate());
     const attendees = v.getAllProperties('attendee').map((p: any) => String(p.getFirstValue() ?? '').replace(/^mailto:/i, '')).filter(Boolean);
-    return { title: ev.summary ?? '', description: ev.description ?? '', location: ev.location ?? '', allDay, start, end, rrule: rrule ? rrule.toString() : undefined, exdates, attendees };
+    const busy = String(v.getFirstPropertyValue('x-microsoft-cdo-busystatus') ?? '').toUpperCase(); const showAs = busy === 'OOF' ? 'oof' : busy === 'WORKINGELSEWHERE' ? 'elsewhere' : busy === 'TENTATIVE' || String(v.getFirstPropertyValue('status') ?? '').toUpperCase() === 'TENTATIVE' ? 'tentative' : busy === 'FREE' || String(v.getFirstPropertyValue('transp') ?? '').toUpperCase() === 'TRANSPARENT' ? 'free' : 'busy';
+    return { title: ev.summary ?? '', description: ev.description ?? '', location: ev.location ?? '', allDay, start, end, rrule: rrule ? rrule.toString() : undefined, exdates, attendees, showAs, isPrivate: /^(PRIVATE|CONFIDENTIAL)$/i.test(String(v.getFirstPropertyValue('class') ?? '')) };
   };
   for (const v of vevents) if (!v.getFirstPropertyValue('recurrence-id')) { const it = toItem(v); masters.set(String(v.getFirstPropertyValue('uid')), it); out.push(it); }
   for (const v of vevents) { const rid: any = v.getFirstPropertyValue('recurrence-id'); if (!rid) continue; const master = masters.get(String(v.getFirstPropertyValue('uid'))); if (master) master.exdates.push(rid.isDate ? localDate(rid.toString()) : rid.toJSDate()); if (String(v.getFirstPropertyValue('status') ?? '').toUpperCase() !== 'CANCELLED') { const it = toItem(v); it.rrule = undefined; it.exdates = []; out.push(it); } }
@@ -155,7 +159,7 @@ async function readGoogle(accountId: number, calId: string): Promise<Item[]> {
     const start = allDay ? localDate(e.start.date) : new Date(e.start.dateTime), end = allDay ? localDate(e.end.date) : new Date(e.end.dateTime);
     const rec: string[] = e.recurrence ?? []; const rrule = rec.find(l => l.startsWith('RRULE:'))?.slice(6);
     const exdates: Date[] = []; for (const l of rec.filter(x => x.startsWith('EXDATE'))) for (const v of l.slice(l.indexOf(':') + 1).split(',')) exdates.push(/^\d{8}$/.test(v) ? localDate(`${v.slice(0, 4)}-${v.slice(4, 6)}-${v.slice(6, 8)}`) : v.endsWith('Z') ? new Date(`${v.slice(0, 4)}-${v.slice(4, 6)}-${v.slice(6, 8)}T${v.slice(9, 11)}:${v.slice(11, 13)}:${v.slice(13, 15)}Z`) : new Date(+v.slice(0, 4), +v.slice(4, 6) - 1, +v.slice(6, 8), +v.slice(9, 11), +v.slice(11, 13), +v.slice(13, 15)));
-    return { title: e.summary ?? '', description: e.description ?? '', location: e.location ?? '', allDay, start, end, rrule, exdates, attendees: (e.attendees ?? []).filter((a: any) => !a.self && !a.organizer).map((a: any) => a.email).filter(Boolean), source: { id: e.id } };
+    return { title: e.summary ?? '', description: e.description ?? '', location: e.location ?? '', allDay, start, end, rrule, exdates, attendees: (e.attendees ?? []).filter((a: any) => !a.self && !a.organizer).map((a: any) => a.email).filter(Boolean), source: { id: e.id }, showAs: e.eventType === 'outOfOffice' ? 'oof' : e.eventType === 'workingLocation' ? 'elsewhere' : e.status === 'tentative' ? 'tentative' : e.transparency === 'transparent' ? 'free' : 'busy', isPrivate: e.visibility === 'private' || e.visibility === 'confidential' };
   };
   const masters = new Map<string, Item>(); const out: Item[] = [];
   for (const e of raw) if (!e.recurringEventId && e.status !== 'cancelled' && e.start) { const it = toItem(e); masters.set(e.id, it); out.push(it); }
@@ -168,11 +172,11 @@ async function readGoogle(accountId: number, calId: string): Promise<Item[]> {
   return out;
 }
 
-const MS_FIELDS = 'id,subject,body,location,start,end,isAllDay,recurrence,type,attendees,isCancelled,originalStart';
+const MS_FIELDS = 'id,subject,body,location,start,end,isAllDay,recurrence,type,attendees,isCancelled,originalStart,showAs,sensitivity';
 async function graphPages(accountId: number, url: string) { const out: any[] = []; let next: string | null = url; while (next) { const data: any = await graph(accountId, next, { headers: { Prefer: 'outlook.timezone="UTC", outlook.body-content-type="text"' } }); out.push(...(data?.value ?? [])); next = data?.['@odata.nextLink'] ?? null; } return out; }
 async function readOutlook(accountId: number, calId: string): Promise<Item[]> {
   const utc = (t: any) => new Date(String(t.dateTime).replace(/(\.\d+)?$/, '') + 'Z');
-  const toItem = (e: any): Item => { const allDay = !!e.isAllDay; const s = utc(e.start), en = utc(e.end); return { title: e.subject ?? '', description: e.body?.content ?? '', location: e.location?.displayName ?? '', allDay, start: allDay ? localDate(String(e.start.dateTime)) : s, end: allDay ? localDate(String(e.end.dateTime)) : en, exdates: [], attendees: (e.attendees ?? []).map((a: any) => a.emailAddress?.address).filter(Boolean), source: { id: e.id } }; };
+  const toItem = (e: any): Item => { const allDay = !!e.isAllDay; const s = utc(e.start), en = utc(e.end); return { title: e.subject ?? '', description: e.body?.content ?? '', location: e.location?.displayName ?? '', allDay, start: allDay ? localDate(String(e.start.dateTime)) : s, end: allDay ? localDate(String(e.end.dateTime)) : en, exdates: [], attendees: (e.attendees ?? []).map((a: any) => a.emailAddress?.address).filter(Boolean), source: { id: e.id }, showAs: ({ free: 'free', tentative: 'tentative', oof: 'oof', workingElsewhere: 'elsewhere' } as any)[e.showAs] ?? 'busy', isPrivate: e.sensitivity === 'private' || e.sensitivity === 'confidential' }; };
   const list = await graphPages(accountId, `/me/calendars/${encodeURIComponent(calId)}/events?$top=100&$select=${MS_FIELDS}`);
   const out: Item[] = []; const horizon = new Date(); horizon.setFullYear(horizon.getFullYear() + 3);
   for (const e of list) {
@@ -203,7 +207,7 @@ async function readCalDav(cal: any): Promise<Item[]> {
 }
 
 function readStored(cal: any): Item[] {
-  return all('SELECT * FROM events WHERE calendar_id = ? AND (recurrence_id IS NULL OR recurrence_id = \'\')', cal.id).map(r => ({ title: r.title, description: r.description, location: r.location, allDay: !!r.all_day, start: r.all_day ? localDate(r.start) : new Date(r.start), end: r.all_day ? localDate(r.end) : new Date(r.end), exdates: [], attendees: JSON.parse(r.attendees || '[]').map((a: any) => a.email).filter(Boolean), source: { id: String(r.id) } }));
+  return all('SELECT * FROM events WHERE calendar_id = ? AND (recurrence_id IS NULL OR recurrence_id = \'\')', cal.id).map(r => ({ title: r.title, description: r.description, location: r.location, allDay: !!r.all_day, start: r.all_day ? localDate(r.start) : new Date(r.start), end: r.all_day ? localDate(r.end) : new Date(r.end), exdates: [], attendees: JSON.parse(r.attendees || '[]').map((a: any) => a.email).filter(Boolean), source: { id: String(r.id) }, showAs: r.show_as || 'busy', isPrivate: !!r.private }));
 }
 
 // ---------------------------------------------------------------- writers
@@ -211,6 +215,7 @@ async function writeGoogle(accountId: number, calId: string, it: Item) {
   const body: any = { summary: it.title, description: it.description || undefined, location: it.location || undefined, start: it.allDay ? { date: ymd(it.start) } : { dateTime: wall(it.start), timeZone: TZ }, end: it.allDay ? { date: ymd(it.end) } : { dateTime: wall(it.end), timeZone: TZ } };
   if (it.rrule) body.recurrence = [`RRULE:${it.rrule}`, ...it.exdates.map(x => it.allDay ? `EXDATE;VALUE=DATE:${icsDate(x)}` : `EXDATE;TZID=${TZ}:${icsLocal(x)}`)];
   if (it.attendees.length) body.attendees = it.attendees.map(email => ({ email }));
+  body.transparency = it.showAs === 'free' ? 'transparent' : 'opaque'; if (it.isPrivate) body.visibility = 'private';
   await gapi(accountId, `/calendars/${encodeURIComponent(calId)}/events?sendUpdates=none`, { method: 'POST', body: JSON.stringify(body) });
 }
 async function writeOutlook(accountId: number, calId: string, it: Item) {
@@ -219,7 +224,7 @@ async function writeOutlook(accountId: number, calId: string, it: Item) {
   const recurrence = it.rrule ? rruleToGraph(it.rrule, it.start, it.allDay) : null;
   if (it.rrule && !recurrence) { for (const d of expand(it, it.start, horizonFor(it))) await writeOutlook(accountId, calId, { ...it, rrule: undefined, exdates: [], start: d, end: new Date(d.getTime() + (it.end.getTime() - it.start.getTime())) }); return; }
   const when = (d: Date) => ({ dateTime: it.allDay ? `${ymd(d)}T00:00:00` : wall(d), timeZone: TZ });
-  const created = await graph(accountId, `/me/calendars/${encodeURIComponent(calId)}/events`, { method: 'POST', body: JSON.stringify({ subject: it.title, body: { contentType: 'text', content: (it.description ?? '') + note }, location: { displayName: it.location ?? '' }, isAllDay: it.allDay, start: when(it.start), end: when(it.end), ...(recurrence ? { recurrence } : {}) }) });
+  const created = await graph(accountId, `/me/calendars/${encodeURIComponent(calId)}/events`, { method: 'POST', body: JSON.stringify({ subject: it.title, body: { contentType: 'text', content: (it.description ?? '') + note }, location: { displayName: it.location ?? '' }, isAllDay: it.allDay, start: when(it.start), end: when(it.end), showAs: it.showAs === 'elsewhere' ? 'workingElsewhere' : it.showAs ?? 'busy', sensitivity: it.isPrivate ? 'private' : 'normal', ...(recurrence ? { recurrence } : {}) }) });
   if (recurrence && it.exdates.length && created?.id) {
     const from = new Date(Math.min(...it.exdates.map(d => d.getTime())) - 86400000), to = new Date(Math.max(...it.exdates.map(d => d.getTime())) + 2 * 86400000);
     const inst = await graphPages(accountId, `/me/events/${encodeURIComponent(created.id)}/instances?startDateTime=${from.toISOString()}&endDateTime=${to.toISOString()}&$top=100&$select=id,start`);
@@ -236,7 +241,7 @@ function writeLocal(cal: any, it: Item) {
   // local calendars keep single events: a series is written out as its occurrences (up to two years ahead)
   for (const d of it.rrule ? expand(it, it.start, horizonFor(it)) : [it.start]) {
     const e = new Date(d.getTime() + length);
-    run('INSERT INTO events(calendar_id, uid, title, description, location, start, end, all_day, status, attendees, recurring, updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)', cal.id, randomUUID(), it.title, it.description, it.location, it.allDay ? ymd(d) : d.toISOString(), it.allDay ? ymd(e) : e.toISOString(), it.allDay, 'CONFIRMED', JSON.stringify(it.attendees.map(email => ({ name: '', email, status: 'NEEDS-ACTION' }))), 0, stamp);
+    run('INSERT INTO events(calendar_id, uid, title, description, location, start, end, all_day, status, attendees, recurring, show_as, private, updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)', cal.id, randomUUID(), it.title, it.description, it.location, it.allDay ? ymd(d) : d.toISOString(), it.allDay ? ymd(e) : e.toISOString(), it.allDay, 'CONFIRMED', JSON.stringify(it.attendees.map(email => ({ name: '', email, status: 'NEEDS-ACTION' }))), 0, it.showAs ?? 'busy', !!it.isPrivate, stamp);
   }
 }
 

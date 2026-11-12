@@ -13,6 +13,7 @@ import { OverlaysComponent } from './shared/overlays.component';
 import { ToastService } from './shared/toast.service';
 import { LockService } from './core/lock.service';
 import { LockScreenComponent } from './shared/lock-screen.component';
+import { enableCustomSelects } from './core/custom-select';
 @Component({ selector: 'app-root', standalone: true, imports: [RouterModule, FormsModule, TranslatePipe, IconComponent, LogoComponent, OverlaysComponent, LockScreenComponent], templateUrl: './app.component.html', styleUrl: './app.component.css' })
 export class AppComponent {
   readonly store = inject(StoreService);
@@ -26,7 +27,7 @@ export class AppComponent {
   readonly failed = signal<string | null>(null);
   readonly busy = computed(() => Object.values(this.store.statuses()).some(s => s.state === 'syncing' || s.state === 'connecting') || !!this.store.syncState());
   readonly errors = computed(() => Object.values(this.store.statuses()).filter(s => s.state === 'error').length);
-  constructor() { this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(e => { const seg = (e as NavigationEnd).urlAfterRedirects.split(/[/?#]/).filter(Boolean)[0] as any; this.state.module.set(seg || 'mail'); }); effect(() => { if (this.lock.mode() === 'unlocked') untracked(() => this.openApp()); }); this.watchModals(); this.boot(); }
+  constructor() { this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(e => { const seg = (e as NavigationEnd).urlAfterRedirects.split(/[/?#]/).filter(Boolean)[0] as any; this.state.module.set(seg || 'mail'); }); effect(() => { if (this.lock.mode() === 'unlocked') untracked(() => this.openApp()); }); this.watchModals(); enableCustomSelects(); this.boot(); }
   // dim + disable the native window buttons whenever a dialog backdrop (.overlay) is on screen
   private watchModals() { inject(NgZone).runOutsideAngular(() => { let queued = false; const check = () => { queued = false; this.theme.setModal(!!document.querySelector('.overlay')); }; new MutationObserver(() => { if (!queued) { queued = true; requestAnimationFrame(check); } }).observe(document.body, { childList: true, subtree: true }); }); }
   // settings first (theme + language for the lock screen), then the PIN; app data only loads once unlocked

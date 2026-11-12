@@ -10,12 +10,12 @@ import { log } from '../core/bus';
 // Copies every contact of one address book into another one. Nothing is ever changed or deleted in the
 // target: contacts that already exist there (same e-mail address, or same name when there is no address)
 // are skipped, and every field the target cannot hold is written into the notes so no information is lost.
-interface Row { displayName: string; firstName: string; lastName: string; emails: ContactField[]; phones: ContactField[]; company: string; title: string; notes: string; birthday: string | null; photo: string | null; }
+export interface Row { displayName: string; firstName: string; lastName: string; emails: ContactField[]; phones: ContactField[]; company: string; title: string; notes: string; birthday: string | null; photo: string | null; }
 const readRows = (sourceId: number): Row[] => all('SELECT * FROM contacts WHERE source_id = ?', sourceId).map(toRow);
-const toRow = (r: any): Row => ({ displayName: r.display_name ?? '', firstName: r.first_name ?? '', lastName: r.last_name ?? '', emails: json<ContactField[]>(r.emails, []).filter(e => e?.value), phones: json<ContactField[]>(r.phones, []).filter(p => p?.value), company: r.company ?? '', title: r.title ?? '', notes: r.notes ?? '', birthday: r.birthday || null, photo: r.photo || null });
+export const toRow = (r: any): Row => ({ displayName: r.display_name ?? '', firstName: r.first_name ?? '', lastName: r.last_name ?? '', emails: json<ContactField[]>(r.emails, []).filter(e => e?.value), phones: json<ContactField[]>(r.phones, []).filter(p => p?.value), company: r.company ?? '', title: r.title ?? '', notes: r.notes ?? '', birthday: r.birthday || null, photo: r.photo || null });
 const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, ' ');
-const nameOf = (c: Row) => c.displayName || [c.firstName, c.lastName].filter(Boolean).join(' ') || c.emails[0]?.value || '';
-const birthdayParts = (b: string | null) => { const m = b ? /^(?:(\d{4})|--)?-?(\d{2})-(\d{2})/.exec(b.trim()) : null; return m ? { year: m[1] ? Number(m[1]) : null, month: Number(m[2]), day: Number(m[3]) } : null; };
+export const nameOf = (c: Row) => c.displayName || [c.firstName, c.lastName].filter(Boolean).join(' ') || c.emails[0]?.value || '';
+export const birthdayParts = (b: string | null) => { const m = b ? /^(?:(\d{4})|--)?-?(\d{2})-(\d{2})/.exec(b.trim()) : null; return m ? { year: m[1] ? Number(m[1]) : null, month: Number(m[2]), day: Number(m[3]) } : null; };
 const withExtra = (notes: string, extra: string[]) => extra.length ? [notes.trim(), `— DHMail (gekopieerd) —\n${extra.join('\n')}`].filter(Boolean).join('\n\n') : notes;
 
 async function photoBytes(photo: string | null): Promise<{ type: string; data: Buffer } | null> {
@@ -33,7 +33,7 @@ async function toLocal(sourceId: number, c: Row) {
   run('INSERT INTO contacts(source_id, display_name, first_name, last_name, emails, phones, company, title, notes, birthday, photo, updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)', sourceId, nameOf(c), c.firstName, c.lastName, JSON.stringify(c.emails), JSON.stringify(c.phones), c.company, c.title, c.notes, c.birthday, c.photo, now());
 }
 
-function googlePerson(c: Row) {
+export function googlePerson(c: Row) {
   const b = birthdayParts(c.birthday);
   return {
     names: [{ givenName: c.firstName || undefined, familyName: c.lastName || undefined, unstructuredName: nameOf(c) }],
@@ -97,15 +97,15 @@ async function toOutlook(accountId: number, list: Row[], result: ContactCopyResu
   }
 }
 
-const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/[,;]/g, m => '\\' + m);
-const fold = (line: string) => { const out: string[] = []; let rest = line; while (rest.length > 75) { out.push(rest.slice(0, 75)); rest = ' ' + rest.slice(75); } out.push(rest); return out.join('\r\n'); };
+export const vEsc = (s: string) => s.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/[,;]/g, m => '\\' + m);
+export const fold = (line: string) => { const out: string[] = []; let rest = line; while (rest.length > 75) { out.push(rest.slice(0, 75)); rest = ' ' + rest.slice(75); } out.push(rest); return out.join('\r\n'); };
 export async function vcardOf(c: Row, uid: string) {
-  const lines = ['BEGIN:VCARD', 'VERSION:3.0', `UID:${uid}`, `FN:${esc(nameOf(c))}`, `N:${esc(c.lastName)};${esc(c.firstName)};;;`];
-  for (const e of c.emails) lines.push(`EMAIL${e.label ? `;TYPE=${esc(e.label).toUpperCase()}` : ''}:${esc(e.value)}`);
-  for (const p of c.phones) lines.push(`TEL${p.label ? `;TYPE=${esc(p.label).toUpperCase()}` : ''}:${esc(p.value)}`);
-  if (c.company) lines.push(`ORG:${esc(c.company)}`);
-  if (c.title) lines.push(`TITLE:${esc(c.title)}`);
-  if (c.notes) lines.push(`NOTE:${esc(c.notes)}`);
+  const lines = ['BEGIN:VCARD', 'VERSION:3.0', `UID:${uid}`, `FN:${vEsc(nameOf(c))}`, `N:${vEsc(c.lastName)};${vEsc(c.firstName)};;;`];
+  for (const e of c.emails) lines.push(`EMAIL${e.label ? `;TYPE=${vEsc(e.label).toUpperCase()}` : ''}:${vEsc(e.value)}`);
+  for (const p of c.phones) lines.push(`TEL${p.label ? `;TYPE=${vEsc(p.label).toUpperCase()}` : ''}:${vEsc(p.value)}`);
+  if (c.company) lines.push(`ORG:${vEsc(c.company)}`);
+  if (c.title) lines.push(`TITLE:${vEsc(c.title)}`);
+  if (c.notes) lines.push(`NOTE:${vEsc(c.notes)}`);
   const b = birthdayParts(c.birthday);
   if (b) lines.push(`BDAY:${b.year ? b.year : '-'}-${String(b.month).padStart(2, '0')}-${String(b.day).padStart(2, '0')}`);
   const photo = await photoBytes(c.photo);

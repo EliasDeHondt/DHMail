@@ -44,14 +44,7 @@
             </div>
             <div class="date-picker-time" *ngIf="mode === 'datetime' && view === 'days'">
                 <span class="date-picker-time-label">{{ 'APP.COMMON.DATE_PICKER.TIME'|translate }}</span>
-                <select class="date-picker-time-select cursor-pointer" [attr.aria-label]="'APP.COMMON.DATE_PICKER.HOURS'|translate" [value]="hours" (change)="setTime('hours', $any($event.target).value)">
-                    <option class="cursor-pointer" *ngFor="let hour of hourOptions" [value]="hour" [selected]="hour === hours">{{ pad(hour) }}</option>
-                </select>
-                <span class="date-picker-time-sep">:</span>
-                <select class="date-picker-time-select cursor-pointer" [attr.aria-label]="'APP.COMMON.DATE_PICKER.MINUTES'|translate" [value]="minutes" (change)="setTime('minutes', $any($event.target).value)">
-                    <option class="cursor-pointer" *ngFor="let minute of minuteOptions" [value]="minute" [selected]="minute === minutes">{{ pad(minute) }}</option>
-                    <option class="cursor-pointer" *ngIf="minutes % 5 !== 0" [value]="minutes" selected>{{ pad(minutes) }}</option>
-                </select>
+                <input class="date-picker-time-input" type="text" inputmode="numeric" maxlength="5" placeholder="uu:mm" autocomplete="off" spellcheck="false" [attr.aria-label]="'APP.COMMON.DATE_PICKER.TIME'|translate" [value]="timeText()" (focus)="$any($event.target).select()" (input)="onTimeInput($event)" (keydown.enter)="$event.preventDefault(); commitTimeText($event); close()" (blur)="commitTimeText($event)">
             </div>
             <div class="date-picker-footer">
                 <button class="date-picker-action cursor-pointer" type="button" (click)="pickToday()">{{ (mode === 'month' ? 'APP.COMMON.DATE_PICKER.THIS_MONTH' : 'APP.COMMON.DATE_PICKER.TODAY')|translate }}</button>

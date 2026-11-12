@@ -119,3 +119,18 @@ html.ev-drag-resize, html.ev-drag-resize * { cursor: url('assets/svg/cursor-ns-r
 html.ev-drag-move, html.ev-drag-resize { user-select: none; }
 [draggable="true"]:active { cursor: url('assets/svg/cursor-grabbing.svg') 12 12, grabbing; }
 .spinner, .is-busy { cursor: var(--cursor-wait); }
+
+/* checkboxes in the DHMail style (colour: --cb, default the primary colour) */
+input[type="checkbox"] { -webkit-appearance: none; appearance: none; display: inline-grid; place-content: center; flex: none; width: 17px; height: 17px; margin: 0; border: 1.5px solid color-mix(in srgb, var(--secondary) 65%, transparent); border-radius: 5px; background: var(--background) no-repeat center / 12px 12px; vertical-align: middle; transition: background-color 0.12s, border-color 0.12s, box-shadow 0.12s; }
+input[type="checkbox"]:hover:not(:disabled) { border-color: var(--cb, var(--primary)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--cb, var(--primary)) 16%, transparent); }
+input[type="checkbox"]:checked { border-color: var(--cb, var(--primary)); background-color: var(--cb, var(--primary)); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E"); }
+input[type="checkbox"]:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+input[type="checkbox"]:disabled { opacity: 0.5; }
+/* dropdowns: field + our own list (core/custom-select.ts) */
+select { -webkit-appearance: none; appearance: none; }
+select.cselect-open { border-color: var(--primary); }
+.cselect { display: flex; flex-direction: column; gap: 1px; overflow-y: auto; animation: pop 0.1s ease-out; }
+.cselect-item { justify-content: space-between; min-height: 32px; }
+.cselect-item.menu-item--open:not(.menu-item--active) { background: var(--hover); }
+.cselect-check { display: inline-flex; width: 15px; flex: none; color: var(--ink); }
+.cfield-select, .tool-select, .date-picker-time-select, .multi-label { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important; background-repeat: no-repeat !important; background-position: right 6px center !important; background-size: 14px !important; padding-right: 24px !important; }

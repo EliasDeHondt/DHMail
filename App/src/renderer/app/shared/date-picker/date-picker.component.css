@@ -384,3 +384,5 @@
     }
 }
 /* Date Picker */
+.date-picker-time-input { width: 76px; height: 34px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--background); color: var(--text); font: inherit; font-size: 15px; font-variant-numeric: tabular-nums; letter-spacing: 0.5px; text-align: center; outline: none; cursor: text; }
+.date-picker-time-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent); }

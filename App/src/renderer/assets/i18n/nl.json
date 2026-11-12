@@ -235,7 +235,15 @@
       "TRANSFER_BUSY": "Afspraken van {{from}} naar {{to}}… Je kan verder werken.",
       "COPY_ALL_DONE": "{{copied}} van {{total}} afspraken gekopieerd · {{failed}} mislukt",
       "MOVE_DONE": "Alle {{copied}} afspraken verplaatst",
-      "MOVE_PARTIAL": "{{copied}} van {{total}} gekopieerd, {{deleted}} uit de bron verwijderd · {{failed}} mislukt (die staan nog in de oude agenda)"
+      "MOVE_PARTIAL": "{{copied}} van {{total}} gekopieerd, {{deleted}} uit de bron verwijderd · {{failed}} mislukt (die staan nog in de oude agenda)",
+      "SHOW_AS": "Weergeven als",
+      "SHOW_BUSY": "Bezet",
+      "SHOW_FREE": "Vrij",
+      "SHOW_TENTATIVE": "Voorlopig",
+      "SHOW_OOF": "Afwezig",
+      "SHOW_ELSEWHERE": "Werkt elders",
+      "PRIVATE": "Privé",
+      "ALL_DAY_HINT": "Dubbelklik voor een afspraak van de hele dag"
     },
     "PEOPLE": {
       "NEW_CONTACT": "Nieuw contact",
@@ -266,7 +274,7 @@
       "ADD_CARDDAV": "CardDAV-adresboek toevoegen",
       "CARDDAV_HINT": "Voor iCloud, Nextcloud, Fastmail en andere servers. Google- en Microsoft-contacten komen automatisch mee met je account.",
       "SEND_MAIL": "E-mail sturen",
-      "READ_ONLY_HINT": "Dit contact wordt gesynchroniseerd en kan je enkel bij de bron zelf bewerken.",
+      "READ_ONLY_HINT": "Dit adres staat bij Google onder \"andere contacten\" en kan je daar niet aanpassen. Sleep het naar een adresboek om er een gewoon contact van te maken.",
       "SELECT": "Kies een contact",
       "SELECT_HINT": "Selecteer een persoon om de gegevens te zien.",
       "NAME_REQUIRED": "Geef minstens een naam of een e-mailadres op.",

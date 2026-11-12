@@ -107,7 +107,8 @@ button *, a *, label.check *, .row *, .crow *, .fitem *, .acct-head *, .ev *, .m
 input, textarea, [contenteditable="true"], [contenteditable="true"] * { cursor: url('assets/svg/cursor-text.svg'), text; }
 input[type="checkbox"], input[type="color"] { cursor: url('assets/svg/cursor-pointer.svg'), pointer; }
 button:disabled, button:disabled * { cursor: url('assets/svg/cursor-default.svg'), default; }
-.splitter { cursor: col-resize !important; }
+.splitter { cursor: url('assets/svg/cursor-ew-resize.svg') 12 12, col-resize !important; }
+html.pane-resizing, html.pane-resizing * { cursor: url('assets/svg/cursor-ew-resize.svg') 12 12, col-resize !important; user-select: none; }
 .ev.ev--draggable, .ev.ev--draggable * { cursor: url('assets/svg/cursor-grab.svg') 12 12, grab; }
 .ev.ev--draggable .ev-resize { cursor: url('assets/svg/cursor-ns-resize.svg') 12 12, ns-resize; }
 html.ev-drag-move, html.ev-drag-move * { cursor: url('assets/svg/cursor-grabbing.svg') 12 12, grabbing !important; }

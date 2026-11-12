@@ -162,7 +162,11 @@
       "SAVING_DRAFT": "Concept opslaan…",
       "DRAFT_SAVED": "Concept opgeslagen",
       "DISCARD_CONFIRM": "Dit bericht weggooien? Niet-opgeslagen wijzigingen gaan verloren.",
-      "DELETE_DRAFT_CONFIRM": "Het opgeslagen concept ook van de server verwijderen?"
+      "DELETE_DRAFT_CONFIRM": "Het opgeslagen concept ook van de server verwijderen?",
+      "PIN": "Vastzetten",
+      "UNPIN": "Losmaken",
+      "PINNED": "Vastgezet",
+      "GROUP_PINNED": "Vastgezet"
     },
     "CALENDAR": {
       "WEEK": "week",

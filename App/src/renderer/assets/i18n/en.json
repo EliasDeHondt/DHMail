@@ -162,7 +162,11 @@
       "SAVING_DRAFT": "Saving draft…",
       "DRAFT_SAVED": "Draft saved",
       "DISCARD_CONFIRM": "Discard this message? Unsaved changes will be lost.",
-      "DELETE_DRAFT_CONFIRM": "Also delete the saved draft from the server?"
+      "DELETE_DRAFT_CONFIRM": "Also delete the saved draft from the server?",
+      "PIN": "Pin",
+      "UNPIN": "Unpin",
+      "PINNED": "Pinned",
+      "GROUP_PINNED": "Pinned"
     },
     "CALENDAR": {
       "WEEK": "week",

@@ -1,6 +1,6 @@
 :host { display: flex; flex: 1; min-height: 0; }
 .mail { display: flex; flex: 1; min-width: 0; min-height: 0; }
-.folders { display: flex; flex-direction: column; width: 250px; flex: none; min-height: 0; padding: 10px 8px 0; border-right: 1px solid var(--line-soft); background: var(--surface-2); }
+.folders { display: flex; flex-direction: column; width: var(--folder-width, 250px); flex: none; min-height: 0; padding: 10px 8px 0; border-right: 1px solid var(--line-soft); background: var(--surface-2); }
 .new-mail { display: flex; align-items: center; justify-content: center; gap: 8px; height: 38px; margin: 0 4px 10px; border: none; border-radius: 8px; background: var(--primary); color: #fff; font-size: 14px; font-weight: 600; transition: background 0.15s; }
 .new-mail app-icon { --icon-size: 18px; }
 .new-mail:hover { background: color-mix(in srgb, var(--primary) 88%, #fff); }
@@ -40,8 +40,9 @@
 .panes { display: flex; flex: 1; min-height: 0; min-width: 0; }
 .list { display: flex; flex-direction: column; width: var(--list-width, 360px); flex: none; min-height: 0; border-right: 1px solid var(--line-soft); }
 .list--hidden { display: none; }
-.splitter { width: 5px; flex: none; margin-left: -3px; cursor: col-resize; z-index: 2; }
-.splitter:hover { background: var(--tint); }
+.splitter { position: relative; width: 8px; flex: none; margin: 0 -4px; z-index: 3; }
+.splitter::after { content: ''; position: absolute; top: 0; bottom: 0; left: 3px; width: 2px; background: var(--primary); opacity: 0; transition: opacity 0.15s; }
+.splitter:hover::after, :host-context(html.pane-resizing) .splitter:hover::after { opacity: 0.5; }
 .list-head { display: flex; flex-direction: column; flex: none; border-bottom: 1px solid var(--line-soft); }
 .list-top { display: flex; align-items: center; gap: 8px; height: 42px; padding: 0 10px 0 14px; }
 .list-title { margin: 0; font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -118,3 +119,6 @@
 .remote-banner > span { flex: 1 1 200px; }
 .msg-body { flex: 1; min-height: 0; width: 100%; border: none; background: #fff; }
 :host-context([data-theme="dark"]) .msg-body { background: #0d1016; }
+
+.row--pinned { background: color-mix(in srgb, var(--primary) 5%, transparent); }
+.row-pin { --icon-size: 13px; flex: none; color: var(--primary); }

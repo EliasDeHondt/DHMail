@@ -1,4 +1,4 @@
-<div class="mail" [style.--list-width.px]="listWidth()">
+<div class="mail" [style.--list-width.px]="listWidth()" [style.--folder-width.px]="folderWidth()">
   <aside class="folders">
     <div class="folders-scroll">
       @for (tree of trees(); track tree.account.id) {
@@ -27,6 +27,7 @@
       @if (!trees().length) {<div class="empty"><app-icon name="mail"></app-icon><strong>{{ 'APP.MAIL.NO_ACCOUNTS' | translate }}</strong><button type="button" class="btn btn--primary btn--sm" routerLink="/settings">{{ 'APP.SETTINGS.ACCOUNTS' | translate }}</button></div>}
     </div>
   </aside>
+  <div class="splitter splitter--folders" role="separator" aria-orientation="vertical" (mousedown)="startResize($event, 'folders')" (dblclick)="resetWidth('folders')"></div>
   <section class="work">
     <div class="toolbar">
       <button type="button" class="bar-btn bar-btn--primary" (click)="startCompose('new')"><app-icon name="edit"></app-icon><span>{{ 'APP.MAIL.NEW_MAIL' | translate }}</span></button>
@@ -41,6 +42,7 @@
       <button type="button" class="bar-btn bar-btn--minor" [disabled]="!open()" (click)="open() && forward(open()!)" [title]="'APP.MAIL.FORWARD' | translate"><app-icon name="forward"></app-icon><span>{{ 'APP.MAIL.FORWARD' | translate }}</span></button>
       <span class="bar-sep"></span>
       <button type="button" class="bar-btn bar-btn--minor" [disabled]="!actionTargets().length" (click)="act(actionTargets()[0]?.seen ? 'unread' : 'read')" [title]="(actionTargets()[0]?.seen ? 'APP.MAIL.MARK_UNREAD' : 'APP.MAIL.MARK_READ') | translate"><app-icon [name]="actionTargets()[0]?.seen ? 'unread' : 'mail-open'"></app-icon><span>{{ (actionTargets()[0]?.seen ? 'APP.MAIL.MARK_UNREAD' : 'APP.MAIL.MARK_READ') | translate }}</span></button>
+      <button type="button" class="bar-btn bar-btn--minor" [disabled]="!actionTargets().length" (click)="act(actionTargets()[0]?.flagged ? 'unpin' : 'pin')" [title]="(actionTargets()[0]?.flagged ? 'APP.MAIL.UNPIN' : 'APP.MAIL.PIN') | translate"><app-icon name="pin" [filled]="!!actionTargets()[0]?.flagged"></app-icon><span>{{ (actionTargets()[0]?.flagged ? 'APP.MAIL.UNPIN' : 'APP.MAIL.PIN') | translate }}</span></button>
             <button type="button" class="bar-btn" [disabled]="!actionTargets().length" (click)="openCategoryMenu($event)" [title]="'APP.MAIL.CATEGORIZE' | translate"><app-icon name="tag"></app-icon><span>{{ 'APP.MAIL.CATEGORIZE' | translate }}</span><app-icon name="chevron-down"></app-icon></button>
       <span class="toolbar-spacer"></span>
       <button type="button" class="icon-btn" (click)="refresh()" [title]="'APP.COMMON.REFRESH' | translate"><app-icon name="refresh" [class.spinning]="loading()"></app-icon></button>
@@ -75,13 +77,13 @@
           @for (group of grouped(); track group.key) {
           <div class="group-head">{{ 'APP.MAIL.GROUP_' + group.key | translate }}</div>
           @for (m of group.items; track m.uid) {
-          <div class="row" [class.row--unread]="!m.seen" [class.row--open]="open()?.uid === m.uid && open()?.folderId === m.folderId" [class.row--picked]="selected().has(m.uid)" [class.row--selecting]="selected().size > 0" draggable="true" (dragstart)="onDragStart($event, m)" (click)="rowClick(m, $event)" (dblclick)="openMessage(m)" (contextmenu)="rowMenu($event, m)" tabindex="0" (keydown.enter)="openMessage(m)">
+          <div class="row" [class.row--unread]="!m.seen" [class.row--pinned]="m.flagged" [class.row--open]="open()?.uid === m.uid && open()?.folderId === m.folderId" [class.row--picked]="selected().has(m.uid)" [class.row--selecting]="selected().size > 0" draggable="true" (dragstart)="onDragStart($event, m)" (click)="rowClick(m, $event)" (dblclick)="openMessage(m)" (contextmenu)="rowMenu($event, m)" tabindex="0" (keydown.enter)="openMessage(m)">
             <div class="row-lead" (click)="toggleCheck(m, $event)">
               <app-avatar [name]="m.from[0]?.name || ''" [address]="m.from[0]?.address || ''"></app-avatar>
               <span class="row-check"><app-icon name="check" [strokeWidth]="3"></app-icon></span>
             </div>
             <div class="row-main">
-              <div class="row-line"><span class="row-from">{{ folder()?.specialUse === 'sent' || folder()?.specialUse === 'drafts' ? addressesLabel(m.to) || ('APP.MAIL.NO_RECIPIENT' | translate) : addressLabel(m.from[0]) || ('APP.MAIL.UNKNOWN_SENDER' | translate) }}</span>@if (m.hasAttachments) {<app-icon class="row-clip" name="paperclip"></app-icon>}<span class="row-date">{{ listDate(m.date) }}</span></div>
+              <div class="row-line"><span class="row-from">{{ folder()?.specialUse === 'sent' || folder()?.specialUse === 'drafts' ? addressesLabel(m.to) || ('APP.MAIL.NO_RECIPIENT' | translate) : addressLabel(m.from[0]) || ('APP.MAIL.UNKNOWN_SENDER' | translate) }}</span>@if (m.hasAttachments) {<app-icon class="row-clip" name="paperclip"></app-icon>}@if (m.flagged) {<app-icon class="row-pin" name="pin" [filled]="true" [title]="'APP.MAIL.PINNED' | translate"></app-icon>}<span class="row-date">{{ listDate(m.date) }}</span></div>
               <div class="row-line"><span class="row-subject">{{ m.subject || ('APP.MAIL.NO_SUBJECT' | translate) }}</span>@if (m.answered) {<app-icon class="row-answered" name="reply"></app-icon>}</div>
               <div class="row-line"><span class="row-preview">{{ m.preview || ' ' }}</span>
                 @if (m.categories.length) {<span class="row-cats">@for (c of m.categories; track c) {@if (categoryOf(c); as cat) {<span class="chip" [style.background]="cat.color + '33'" [style.color]="cat.color" (click)="categoryFilter.set(cat.id); $event.stopPropagation()">{{ cat.name }}</span>}}</span>}
@@ -91,6 +93,7 @@
             <div class="row-hover">
               <button type="button" class="icon-btn icon-btn--sm" (click)="act('delete', [m]); $event.stopPropagation()" [title]="'APP.COMMON.DELETE' | translate"><app-icon name="trash"></app-icon></button>
               <button type="button" class="icon-btn icon-btn--sm" (click)="act('archive', [m]); $event.stopPropagation()" [title]="'APP.MAIL.ARCHIVE' | translate"><app-icon name="archive"></app-icon></button>
+              <button type="button" class="icon-btn icon-btn--sm" [class.icon-btn--on]="m.flagged" (click)="act(m.flagged ? 'unpin' : 'pin', [m]); $event.stopPropagation()" [title]="(m.flagged ? 'APP.MAIL.UNPIN' : 'APP.MAIL.PIN') | translate"><app-icon name="pin" [filled]="m.flagged"></app-icon></button>
               <button type="button" class="icon-btn icon-btn--sm" (click)="act(m.seen ? 'unread' : 'read', [m]); $event.stopPropagation()" [title]="(m.seen ? 'APP.MAIL.MARK_UNREAD' : 'APP.MAIL.MARK_READ') | translate"><app-icon [name]="m.seen ? 'unread' : 'mail-open'"></app-icon></button>
             </div>
           </div>}}
@@ -99,7 +102,7 @@
           }
         </div>
       </section>
-      <div class="splitter" (mousedown)="startResize($event)"></div>
+      <div class="splitter" role="separator" aria-orientation="vertical" (mousedown)="startResize($event, 'list')" (dblclick)="resetWidth('list')"></div>
       <section class="reading">
         @if (compose(); as c) {<app-compose [init]="c" (done)="composeDone($event)"></app-compose>}
         @else if (open(); as m) {
@@ -113,7 +116,7 @@
                 <div class="msg-sender-line"><span class="msg-sender-name">{{ addressLabel(m.from[0]) || ('APP.MAIL.UNKNOWN_SENDER' | translate) }}</span>@if (m.from[0]?.name) {<span class="msg-sender-address">&lt;{{ m.from[0].address }}&gt;</span>}</div>
                 <div class="msg-sender-line msg-sender-line--sub"><span>{{ 'APP.MAIL.TO' | translate }}: {{ addressesLabel(m.to) || '—' }}</span>@if (m.cc.length) {<span>{{ 'APP.MAIL.CC' | translate }}: {{ addressesLabel(m.cc) }}</span>}@if (m.bcc.length) {<span>{{ 'APP.MAIL.BCC' | translate }}: {{ addressesLabel(m.bcc) }}</span>}</div>
               </div>
-              <div class="msg-sender-right"><span class="msg-date">{{ longDate(m.date) }}</span><div class="msg-actions"><button type="button" class="icon-btn" (click)="replyTo(m, false)" [title]="'APP.MAIL.REPLY' | translate"><app-icon name="reply"></app-icon></button><button type="button" class="icon-btn" (click)="replyTo(m, true)" [title]="'APP.MAIL.REPLY_ALL' | translate"><app-icon name="reply-all"></app-icon></button><button type="button" class="icon-btn" (click)="forward(m)" [title]="'APP.MAIL.FORWARD' | translate"><app-icon name="forward"></app-icon></button><button type="button" class="icon-btn" (click)="rowMenu($event, m)" [title]="'APP.COMMON.MORE' | translate"><app-icon name="more"></app-icon></button></div></div>
+              <div class="msg-sender-right"><span class="msg-date">{{ longDate(m.date) }}</span><div class="msg-actions"><button type="button" class="icon-btn" (click)="replyTo(m, false)" [title]="'APP.MAIL.REPLY' | translate"><app-icon name="reply"></app-icon></button><button type="button" class="icon-btn" (click)="replyTo(m, true)" [title]="'APP.MAIL.REPLY_ALL' | translate"><app-icon name="reply-all"></app-icon></button><button type="button" class="icon-btn" (click)="forward(m)" [title]="'APP.MAIL.FORWARD' | translate"><app-icon name="forward"></app-icon></button><button type="button" class="icon-btn" [class.icon-btn--on]="m.flagged" (click)="act(m.flagged ? 'unpin' : 'pin', [m])" [title]="(m.flagged ? 'APP.MAIL.UNPIN' : 'APP.MAIL.PIN') | translate"><app-icon name="pin" [filled]="m.flagged"></app-icon></button><button type="button" class="icon-btn" (click)="rowMenu($event, m)" [title]="'APP.COMMON.MORE' | translate"><app-icon name="more"></app-icon></button></div></div>
             </div>
             @if (m.attachments.length) {<div class="attachments">@for (a of m.attachments; track a.index) {@if (!a.inline) {<button type="button" class="attachment" (click)="saveAttachment(a.index)" [title]="'APP.MAIL.SAVE_ATTACHMENT' | translate"><app-icon [name]="a.contentType.startsWith('image/') ? 'image' : 'file'"></app-icon><span class="attachment-name">{{ a.filename }}</span><span class="attachment-size">{{ formatBytes(a.size) }}</span><app-icon class="attachment-dl" name="download"></app-icon></button>}}</div>}
             @if (remoteBlocked()) {<div class="remote-banner"><app-icon name="eye-off"></app-icon><span>{{ 'APP.MAIL.REMOTE_BLOCKED' | translate }}</span><button type="button" class="btn btn--sm" (click)="showRemote.set(true)">{{ 'APP.MAIL.LOAD_IMAGES' | translate }}</button></div>}

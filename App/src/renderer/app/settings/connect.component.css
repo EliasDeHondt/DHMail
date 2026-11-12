@@ -39,3 +39,5 @@
 .others-toggle { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; margin-top: 4px; padding: 4px 6px; border: none; border-radius: 8px; background: none; color: var(--secondary); font-size: 13px; font-weight: 600; }
 .others-toggle:hover { background: var(--hover); color: var(--text); }
 .others-toggle app-icon { --icon-size: 16px; }
+.callout--brand { align-items: flex-start; }
+.callout-logo { width: 28px; height: 28px; border-radius: 8px; flex: none; }

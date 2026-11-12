@@ -3,7 +3,7 @@
   <button type="button" class="choice choice--brand" [disabled]="!!busy()" (click)="eliasdh()">
     <span class="choice-logo choice-logo--brand"><img src="assets/eliasdh.png" alt="" draggable="false"/></span>
     <span class="choice-text"><span class="choice-name">{{ 'APP.CONNECT.ELIASDH' | translate }}</span><span class="choice-sub">{{ 'APP.CONNECT.ELIASDH_SUB' | translate }}</span></span>
-    @if (busy() === 'eliasdh') {<span class="spinner"></span>} @else {<app-icon class="choice-chevron" name="chevron-right"></app-icon>}
+    <app-icon class="choice-chevron" name="chevron-right"></app-icon>
   </button>
   <button type="button" class="others-toggle" (click)="showOthers.set(!showOthers())" [attr.aria-expanded]="showOthers()"><app-icon [name]="showOthers() ? 'chevron-down' : 'chevron-right'"></app-icon>{{ 'APP.CONNECT.OTHER_OPTIONS' | translate }}</button>
   @if (showOthers()) {
@@ -26,13 +26,14 @@
 @if (status()) {<p class="status"><span class="spinner"></span>{{ status() }}</p>}
 @if (error()) {<p class="error">{{ error() }}</p>}
 }
-@if (mode() === 'imap' || mode() === 'gmail-app') {
+@if (mode() === 'imap' || mode() === 'gmail-app' || mode() === 'eliasdh') {
 <form class="form" (ngSubmit)="connectImap()">
   <button type="button" class="back" (click)="go('choose')"><app-icon name="back"></app-icon>{{ 'APP.CONNECT.BACK' | translate }}</button>
+  @if (mode() === 'eliasdh') {<div class="callout callout--brand"><img class="callout-logo" src="assets/eliasdh.png" alt=""/><div><p class="callout-title">{{ 'APP.CONNECT.ELIASDH' | translate }}</p><p class="hint">{{ 'APP.CONNECT.ELIASDH_HINT' | translate }}</p><button type="button" class="link" (click)="open('https://app.eliasdh.com')">{{ 'APP.CONNECT.ELIASDH_LINK' | translate }}<app-icon name="external"></app-icon></button></div></div>}
   @if (mode() === 'gmail-app') {<div class="callout"><app-icon name="key"></app-icon><div><p class="callout-title">{{ 'APP.CONNECT.GMAIL_APP_TITLE' | translate }}</p><button type="button" class="link" (click)="open('https://myaccount.google.com/apppasswords')">{{ 'APP.CONNECT.GMAIL_APP_LINK' | translate }}<app-icon name="external"></app-icon></button></div></div>}
-  <div class="field"><span class="field-label">{{ 'APP.CONNECT.EMAIL' | translate }}</span><input class="input" type="email" [(ngModel)]="email" name="email" [placeholder]="mode() === 'gmail-app' ? 'naam@gmail.com' : 'naam@domein.be'" autocomplete="email" autofocus/></div>
+  <div class="field"><span class="field-label">{{ 'APP.CONNECT.EMAIL' | translate }}</span><input class="input" type="email" [(ngModel)]="email" name="email" [placeholder]="mode() === 'gmail-app' ? 'naam@gmail.com' : mode() === 'eliasdh' ? 'naam@jouwbedrijf.be' : 'naam@domein.be'" autocomplete="email" autofocus/></div>
   <div class="field"><span class="field-label">{{ (mode() === 'gmail-app' ? 'APP.CONNECT.APP_PASSWORD' : 'APP.CONNECT.PASSWORD') | translate }}</span><input class="input" type="password" [(ngModel)]="password" name="password" autocomplete="current-password"/></div>
-  @if (suggest(); as s) {<div class="callout callout--hint"><app-icon name="info"></app-icon><div><p class="hint">{{ (s === 'google' ? 'APP.CONNECT.SUGGEST_GOOGLE' : 'APP.CONNECT.SUGGEST_MICROSOFT') | translate }}</p><button type="button" class="link" (click)="go('choose'); oauth(s)">{{ (s === 'google' ? 'APP.CONNECT.GMAIL' : 'APP.CONNECT.OUTLOOK') | translate }}<app-icon name="chevron-right"></app-icon></button></div></div>}
+  @if (suggest(); as s) {@if (mode() !== 'eliasdh') {<div class="callout callout--hint"><app-icon name="info"></app-icon><div><p class="hint">{{ (s === 'google' ? 'APP.CONNECT.SUGGEST_GOOGLE' : 'APP.CONNECT.SUGGEST_MICROSOFT') | translate }}</p><button type="button" class="link" (click)="go('choose'); oauth(s)">{{ (s === 'google' ? 'APP.CONNECT.GMAIL' : 'APP.CONNECT.OUTLOOK') | translate }}<app-icon name="chevron-right"></app-icon></button></div></div>}}
   @if (status()) {<p class="status"><span class="spinner"></span>{{ status() }}</p>}
   @if (error()) {<p class="error">{{ error() }}</p>}
   <div class="actions"><button type="button" class="btn btn--ghost btn--sm" (click)="mode.set('manual'); servers.username = servers.username || email">{{ 'APP.CONNECT.MANUAL' | translate }}</button><span class="spacer"></span><button type="submit" class="btn btn--primary" [disabled]="busy() === 'imap'">{{ 'APP.CONNECT.CONNECT' | translate }}</button></div>

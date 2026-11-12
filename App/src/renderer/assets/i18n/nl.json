@@ -358,7 +358,8 @@
       "AUTO_LOCK_HOURS": "{{count}} uur",
       "PIN": "Pincode",
       "CHANGE_PIN": "Pincode wijzigen",
-      "LOCK_NOW": "Nu vergrendelen"
+      "LOCK_NOW": "Nu vergrendelen",
+      "SOURCE_HOLIDAYS": "Feestdagen"
     },
     "CONNECT": {
       "OUTLOOK": "Verbinden met Outlook",
@@ -404,9 +405,11 @@
       "CLIENT_ID_INVALID": "Dat lijkt geen geldig client-ID (formaat 00000000-0000-0000-0000-000000000000).",
       "SAVE_AND_CONNECT": "Opslaan en verbinden",
       "ELIASDH": "EliasDH Mail",
-      "ELIASDH_SUB": "Voor bedrijven met een @eliasdh.com-adres",
+      "ELIASDH_SUB": "Voor bedrijven met een mailbox bij EliasDH",
       "OTHER_OPTIONS": "Andere mogelijkheden",
-      "ELIASDH_WRONG": "Meld je aan met je @eliasdh.com-adres."
+      "ELIASDH_HINT": "Gebruik het e-mailadres en het wachtwoord van je mailbox. Je mailboxen en wachtwoorden beheer je op app.eliasdh.com.",
+      "ELIASDH_LINK": "Naar app.eliasdh.com",
+      "AUTH_FAILED_ELIASDH": "Aanmelden lukt niet. Controleer je e-mailadres en wachtwoord, of stel een nieuw wachtwoord in op app.eliasdh.com."
     },
     "LOCK": {
       "TITLE_UNLOCK": "DHMail is vergrendeld",

@@ -358,7 +358,8 @@
       "AUTO_LOCK_HOURS": "{{count}} hours",
       "PIN": "PIN",
       "CHANGE_PIN": "Change PIN",
-      "LOCK_NOW": "Lock now"
+      "LOCK_NOW": "Lock now",
+      "SOURCE_HOLIDAYS": "Holidays"
     },
     "CONNECT": {
       "OUTLOOK": "Connect with Outlook",
@@ -404,9 +405,11 @@
       "CLIENT_ID_INVALID": "That does not look like a valid client ID (format 00000000-0000-0000-0000-000000000000).",
       "SAVE_AND_CONNECT": "Save and connect",
       "ELIASDH": "EliasDH Mail",
-      "ELIASDH_SUB": "For businesses with an @eliasdh.com address",
+      "ELIASDH_SUB": "For businesses with a mailbox at EliasDH",
       "OTHER_OPTIONS": "Other options",
-      "ELIASDH_WRONG": "Sign in with your @eliasdh.com address."
+      "ELIASDH_HINT": "Use the e-mail address and password of your mailbox. You manage your mailboxes and passwords on app.eliasdh.com.",
+      "ELIASDH_LINK": "Go to app.eliasdh.com",
+      "AUTH_FAILED_ELIASDH": "Sign-in failed. Check your e-mail address and password, or set a new password on app.eliasdh.com."
     },
     "LOCK": {
       "TITLE_UNLOCK": "DHMail is locked",

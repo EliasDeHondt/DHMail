@@ -18,7 +18,7 @@
               @if (row.hasChildren) {<span class="fitem-toggle" (click)="toggleFolder(row.folder.id); $event.stopPropagation()"><app-icon [name]="collapsedFolders().has(row.folder.id) ? 'chevron-right' : 'chevron-down'"></app-icon></span>} @else {<span class="fitem-toggle"></span>}
               <app-icon class="fitem-icon" [name]="folderIcon(row.folder)"></app-icon>
               <span class="fitem-name">{{ row.folder.specialUse ? ('APP.MAIL.FOLDER_' + row.folder.specialUse.toUpperCase() | translate) : row.folder.name }}</span>
-              @if (row.folder.unseen > 0 && row.folder.specialUse !== 'trash' && row.folder.specialUse !== 'junk') {<span class="fitem-count">{{ row.folder.unseen }}</span>}
+              @if (row.folder.unseen > 0 && row.folder.specialUse !== 'trash' && row.folder.specialUse !== 'junk' && row.folder.specialUse !== 'archive') {<span class="fitem-count">{{ row.folder.unseen }}</span>}
               @else if (row.folder.specialUse === 'drafts' && row.folder.total > 0) {<span class="fitem-count fitem-count--muted">{{ row.folder.total }}</span>}
             </button>
           </li>}

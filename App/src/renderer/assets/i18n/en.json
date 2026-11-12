@@ -215,7 +215,8 @@
       "CALDAV_HINT": "For iCloud, Nextcloud, Fastmail and other servers. DHMail discovers all calendars at the address.",
       "NAME_PLACEHOLDER": "E.g. Holidays",
       "MISSING_SOURCE": "Enter a link or choose a file.",
-      "DEFAULT_NAME": "Calendar"
+      "DEFAULT_NAME": "Calendar",
+      "CLEAR_CATEGORIES": "Clear categories"
     },
     "PEOPLE": {
       "NEW_CONTACT": "New contact",

@@ -215,7 +215,8 @@
       "CALDAV_HINT": "Voor iCloud, Nextcloud, Fastmail en andere servers. DHMail vindt zelf alle agenda's op het adres.",
       "NAME_PLACEHOLDER": "Bv. Feestdagen",
       "MISSING_SOURCE": "Vul een link in of kies een bestand.",
-      "DEFAULT_NAME": "Agenda"
+      "DEFAULT_NAME": "Agenda",
+      "CLEAR_CATEGORIES": "Categorieën wissen"
     },
     "PEOPLE": {
       "NEW_CONTACT": "Nieuw contact",

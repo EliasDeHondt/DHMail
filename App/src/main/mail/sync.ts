@@ -12,10 +12,10 @@ const rawCache = new Map<string, Buffer>();
 const QUERY = { uid: true, envelope: true, flags: true, bodyStructure: true, size: true, internalDate: true };
 const SPECIAL: Record<string, SpecialUse> = { '\\Inbox': 'inbox', '\\Sent': 'sent', '\\Drafts': 'drafts', '\\Trash': 'trash', '\\Junk': 'junk', '\\Archive': 'archive', '\\All': 'all', '\\Flagged': 'flagged', '\\Important': 'important' };
 const ORDER: Record<string, number> = { inbox: 0, drafts: 1, sent: 2, archive: 3, junk: 4, trash: 5, all: 6, flagged: 7, important: 8 };
-const NAMES: [RegExp, SpecialUse][] = [[/^(sent|sent items|sent mail|verzonden|verzonden items|envoyés|gesendet)$/i, 'sent'], [/^(drafts|draft|concepten|brouillons|entwürfe)$/i, 'drafts'], [/^(trash|deleted|deleted items|deleted messages|bin|verwijderde items|prullenbak|corbeille|papierkorb)$/i, 'trash'], [/^(junk|junk e-?mail|spam|ongewenste e-?mail|courrier indésirable)$/i, 'junk'], [/^(archive|archief|archives|archiv)$/i, 'archive']];
+const NAMES: [RegExp, SpecialUse][] = [[/^(sent|sent items|sent mail|verzonden|verzonden items|envoyés|gesendet)$/i, 'sent'], [/^(drafts|draft|concepten|brouillons|entwürfe)$/i, 'drafts'], [/^(trash|deleted|deleted items|deleted messages|bin|verwijderde items|prullenbak|corbeille|papierkorb)$/i, 'trash'], [/^(junk|junk e-?mail|spam|ongewenste e-?mail|courrier indésirable)$/i, 'junk'], [/^(archive|archief|archiveren|archives|archiv)$/i, 'archive']];
 export const session = (accountId: number): ImapSession => { const s = sessions.get(accountId); if (!s) throw Object.assign(new Error('Account is not active'), { status: 503 }); return s; };
 export const statuses = () => [...sessions.values()].map(s => s.status);
-export function startAccount(account: Account) { const old = sessions.get(account.id); if (old) old.close().catch(() => {}); const s = new ImapSession(account); let timer: NodeJS.Timeout | null = null; s.onInboxChange = () => { if (timer) clearTimeout(timer); timer = setTimeout(() => syncSpecial(account.id, 'inbox').catch(err => log('inbox sync failed', err?.message)), 800); }; sessions.set(account.id, s); if (!account.features.mail) return; syncFolders(account.id).then(() => syncSpecial(account.id, 'inbox')).then(() => syncSpecial(account.id, 'sent')).catch(err => log('initial sync failed', account.email, err?.message)); s.startWatch(); }
+export function startAccount(account: Account) { const old = sessions.get(account.id); if (old) old.close().catch(() => {}); const s = new ImapSession(account); let timer: NodeJS.Timeout | null = null; s.onInboxChange = () => { if (timer) clearTimeout(timer); timer = setTimeout(() => syncSpecial(account.id, 'inbox').catch(err => log('inbox sync failed', err?.message)), 800); }; sessions.set(account.id, s); if (!account.features.mail) return; syncFolders(account.id).then(() => ensureArchiveFolder(account.id)).then(() => syncSpecial(account.id, 'inbox')).then(() => syncSpecial(account.id, 'sent')).catch(err => log('initial sync failed', account.email, err?.message)); s.startWatch(); }
 export async function stopAccount(accountId: number) { const s = sessions.get(accountId); if (!s) return; sessions.delete(accountId); await s.close(); }
 export const reconnectAccount = (accountId: number) => { const s = sessions.get(accountId); if (s) { s.reset(); s.startWatch(); } };
 const mapFolder = (r: any): Folder => ({ id: r.id, accountId: r.account_id, path: r.path, name: r.name, parentPath: r.parent_path, delimiter: r.delimiter, specialUse: r.special_use, unseen: r.unseen, total: r.total, depth: r.depth, sortOrder: r.sort_order, selectable: !!r.selectable });
@@ -24,7 +24,26 @@ const HIDDEN_PATHS = /^\[(Gmail|Google Mail)\]\/Chats$/i;
 const SYNC_ISSUES = /^(sync issues|synchronisatieproblemen|synchronisierungsprobleme|problèmes de synchronisation|problemas de sincronización|problemi di sincronizzazione)$/i;
 const HIDDEN_NAMES = /^(notes|notities|outbox|postvak uit|archiveren)$/i;
 const isHiddenFolder = (f: Folder) => HIDDEN_PATHS.test(f.path) || !f.specialUse && !f.parentPath && HIDDEN_NAMES.test(f.name) || SYNC_ISSUES.test(f.delimiter ? f.path.split(f.delimiter)[0] : f.path);
-export const getFolders = (accountId: number) => all(`SELECT * FROM folders WHERE account_id = ? AND (special_use IS NULL OR special_use NOT IN (${HIDDEN.map(() => '?').join(',')})) ORDER BY sort_order, path`, accountId, ...HIDDEN).map(mapFolder).filter(f => !isHiddenFolder(f));
+export function getFolders(accountId: number): Folder[] {
+  const rows = all(`SELECT * FROM folders WHERE account_id = ? ORDER BY sort_order, path`, accountId).map(mapFolder);
+  // every mailbox shows an Archive: its own archive folder, or Gmail's "All Mail" (that is where Gmail archives to)
+  const gmailArchive = !rows.some(f => f.specialUse === 'archive') ? rows.find(f => f.specialUse === 'all') : undefined;
+  const seen = new Set<string>();
+  const out: Folder[] = [];
+  for (const f of rows) {
+    if (f === gmailArchive) { out.push({ ...f, specialUse: 'archive', sortOrder: ORDER.archive }); seen.add('archive'); continue; }
+    if (f.specialUse && HIDDEN.includes(f.specialUse)) continue;
+    if (isHiddenFolder(f)) continue;
+    // a second folder with the same role (e.g. "Archive" and "Archiveren"): keep one, show or hide the other by name
+    if (f.specialUse && f.specialUse !== 'inbox' && seen.has(f.specialUse)) { if (HIDDEN_NAMES.test(f.name)) continue; out.push({ ...f, specialUse: null }); continue; }
+    if (f.specialUse) seen.add(f.specialUse);
+    out.push(f);
+  }
+  return out.sort((a, b) => a.sortOrder - b.sortOrder || a.path.localeCompare(b.path));
+}
+const ensuringArchive = new Set<number>();
+/** Creates an "Archive" folder on mailboxes that have neither an archive folder nor Gmail's All Mail. */
+export async function ensureArchiveFolder(accountId: number) { if (ensuringArchive.has(accountId) || specialFolder(accountId, 'archive') || specialFolder(accountId, 'all')) return; ensuringArchive.add(accountId); try { await ensureFolder(accountId, 'archive', 'Archive'); emitCounts(accountId); } catch (err: any) { log('archive folder not created', err?.message); } finally { ensuringArchive.delete(accountId); } }
 export const folderRow = (folderId: number) => get('SELECT * FROM folders WHERE id = ?', folderId);
 export const specialFolder = (accountId: number, special: SpecialUse) => get('SELECT * FROM folders WHERE account_id = ? AND special_use = ? ORDER BY sort_order LIMIT 1', accountId, special);
 const emitCounts = (accountId: number) => bus.emitEvent('mail:counts', getFolders(accountId));

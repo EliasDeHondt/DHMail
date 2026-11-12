@@ -101,6 +101,7 @@ export interface Api {
   'calendar:events': (start: string, end: string) => CalendarEvent[];
   'calendar:saveEvent': (input: EventInput) => CalendarEvent;
   'calendar:deleteEvent': (id: number) => void;
+  'calendar:setCategories': (id: number, names: string[]) => CalendarEvent | null;
   'contacts:list': (query?: string) => Contact[];
   'contacts:sources': () => ContactSource[];
   'contacts:addSource': (input: ContactSourceInput) => ContactSource[];

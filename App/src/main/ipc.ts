@@ -83,6 +83,7 @@ export function registerIpc(getWindow: () => BrowserWindow | null) {
     'calendar:events': (start, end) => cal.eventsBetween(start, end),
     'calendar:saveEvent': input => cal.saveEvent(input),
     'calendar:deleteEvent': id => cal.deleteEvent(id),
+    'calendar:setCategories': (id, names) => cal.setEventCategories(Number(id), names),
     'contacts:list': query => contacts.listContacts(query),
     'contacts:sources': () => contacts.listSources(),
     'contacts:addSource': input => contacts.addSource(input),

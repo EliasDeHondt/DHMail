@@ -166,7 +166,8 @@
       "PIN": "Pin",
       "UNPIN": "Unpin",
       "PINNED": "Pinned",
-      "GROUP_PINNED": "Pinned"
+      "GROUP_PINNED": "Pinned",
+      "DRAG_TO_REORDER": "Click to collapse or expand, drag to reorder"
     },
     "CALENDAR": {
       "WEEK": "week",

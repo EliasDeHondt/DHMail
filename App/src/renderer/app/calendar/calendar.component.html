@@ -67,6 +67,7 @@
     <div class="pop-bar" [style.background]="p.event.color"></div>
     <div class="pop-body">
       <div class="pop-title">{{ p.event.title || ('APP.CALENDAR.NO_TITLE' | translate) }}</div>
+      @if (p.event.categories.length) {<div class="cat-chips">@for (c of p.event.categories; track c.name) {<span class="cat-chip" [style.--cat]="c.color"><span class="cat-dot"></span>{{ c.name }}</span>}</div>}
       <div class="pop-line"><app-icon name="clock"></app-icon><span>{{ eventTime(p.event) }}</span></div>
       @if (p.event.location) {<div class="pop-line"><app-icon name="map-pin"></app-icon><span>{{ p.event.location }}</span></div>}
       <div class="pop-line"><app-icon name="calendar"></app-icon><span>{{ calendarOf(p.event.calendarId)?.name }}</span></div>

@@ -7,7 +7,8 @@ import { getSettings, setSettings } from './core/settings';
 import { discover, oauthServers } from './accounts/discover';
 import { oauthReady } from './accounts/oauth-clients';
 const COLORS = ['#4f94f0', '#0f54ae', '#829ec2', '#3d587b', '#2a78d6', '#14b8a6', '#8b5cf6', '#e87ba4'];
-import { addAccount, getAccount, listAccounts, removeAccount, updateAccount } from './accounts/accounts';
+import { addAccount, getAccount, listAccounts, removeAccount, reorderAccounts, updateAccount } from './accounts/accounts';
+import { importOutlookCategories, pushOutlookCategory, usesOutlookCategories } from './mail/outlook-categories';
 import { forgetTokens, oauthFlow, OAuthError } from './accounts/oauth';
 import { setSecret } from './core/secrets';
 import { describe } from './mail/session';
@@ -19,7 +20,7 @@ import * as contacts from './contacts';
 import { bus, log } from './core/bus';
 import { suggestPlaces } from './geo';
 type Handlers = { [K in keyof Api]: (...args: Parameters<Api[K]>) => ReturnType<Api[K]> | Promise<ReturnType<Api[K]>> };
-export function activateAccount(account: Account) { mail.startAccount(account); cal.ensureAccountCalendars(account); contacts.ensureAccountSources(account); cal.syncAccountCalendars(account).catch(err => log('calendar activation failed', err?.message)); if (account.features.contacts) contacts.syncAllContacts().catch(err => log('contacts activation failed', err?.message)); }
+export function activateAccount(account: Account) { mail.startAccount(account); importOutlookCategories(account).catch(err => log('outlook categories failed', err?.message)); cal.ensureAccountCalendars(account); contacts.ensureAccountSources(account); cal.syncAccountCalendars(account).catch(err => log('calendar activation failed', err?.message)); if (account.features.contacts) contacts.syncAllContacts().catch(err => log('contacts activation failed', err?.message)); }
 export function registerIpc(getWindow: () => BrowserWindow | null) {
   const win = () => getWindow() ?? undefined;
   const handlers: Handlers = {
@@ -32,6 +33,7 @@ export function registerIpc(getWindow: () => BrowserWindow | null) {
     'settings:get': () => getSettings(),
     'settings:set': patch => setSettings(patch),
     'accounts:list': () => listAccounts(),
+    'accounts:reorder': ids => reorderAccounts(Array.isArray(ids) ? ids : []),
     'accounts:oauthReady': () => oauthReady(),
     'accounts:connect': async provider => { const r = await oauthFlow(provider); const email = r.email.trim(); if (!email) throw new Error('The provider did not return an email address'); const existing = listAccounts().find(a => a.provider === provider && a.email.toLowerCase() === email.toLowerCase()); if (existing) { setSecret(`account:${existing.id}:refresh`, r.refreshToken); forgetTokens(existing.id); await mail.stopAccount(existing.id); activateAccount(existing); return existing; } const servers = oauthServers(provider); const account = addAccount({ ...servers, name: r.name || email, email, username: email, provider, authType: 'oauth', refreshToken: r.refreshToken, color: COLORS[listAccounts().length % COLORS.length], signature: '', features: { mail: true, calendar: true, contacts: true } }); activateAccount(account); return account; },
     'accounts:discover': (email, password, username) => discover(email.trim(), password, username?.trim() || undefined),
@@ -66,7 +68,7 @@ export function registerIpc(getWindow: () => BrowserWindow | null) {
     'categories:list': () => listCategories(),
     'categories:save': c => saveCategory(c),
     'categories:remove': id => removeCategory(id),
-    'categories:assign': (refs, categoryId, assigned) => mail.assignCategory(refs, categoryId, assigned),
+    'categories:assign': (refs, categoryId, assigned) => { mail.assignCategory(refs, categoryId, assigned); for (const accountId of new Set(refs.map(r => r.accountId))) { const account = getAccount(accountId); if (usesOutlookCategories(account)) pushOutlookCategory(account!, refs.filter(r => r.accountId === accountId), categoryId, assigned).catch(err => log('outlook category push failed', err?.message)); } },
     'calendar:list': () => cal.listCalendars(),
     'calendar:add': input => cal.addCalendar(input),
     'calendar:update': (id, patch) => cal.updateCalendar(id, patch),

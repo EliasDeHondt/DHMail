@@ -1,6 +1,6 @@
 import ICAL from 'ical.js';
 import { Attendee, EventInput } from '../../shared/types';
-export interface IcsEvent { uid: string; recurrenceId: string | null; title: string; description: string; location: string; start: string; end: string; allDay: boolean; status: string; organizer: string | null; attendees: Attendee[]; recurring: boolean; }
+export interface IcsEvent { uid: string; recurrenceId: string | null; title: string; description: string; location: string; start: string; end: string; allDay: boolean; status: string; organizer: string | null; attendees: Attendee[]; recurring: boolean; categories?: { name: string; color: string }[]; }
 const pad = (n: number) => String(n).padStart(2, '0');
 export const dateOnly = (t: any) => `${t.year}-${pad(t.month)}-${pad(t.day)}`;
 const toIso = (t: any): string => { if (t.isDate) return dateOnly(t); const d = t.toJSDate(); return d.toISOString(); };

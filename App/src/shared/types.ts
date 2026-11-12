@@ -26,7 +26,8 @@ export interface DraftResult { uid: number | null; }
 export interface Category { id: number; name: string; color: string; sortOrder: number; }
 export interface Calendar { id: number; accountId: number | null; source: CalendarSource; remoteId: string | null; name: string; color: string; url: string | null; username: string | null; visible: boolean; readOnly: boolean; group: string; sortOrder: number; lastSync: string | null; error: string | null; }
 export interface Attendee { name: string; email: string; status: string; }
-export interface CalendarEvent { id: number; calendarId: number; uid: string; remoteId: string | null; title: string; description: string; location: string; start: string; end: string; allDay: boolean; status: string; organizer: string | null; attendees: Attendee[]; recurring: boolean; color: string; readOnly: boolean; }
+export interface CalendarEvent { id: number; calendarId: number; uid: string; remoteId: string | null; title: string; description: string; location: string; start: string; end: string; allDay: boolean; status: string; organizer: string | null; attendees: Attendee[]; recurring: boolean; color: string; readOnly: boolean; categories: EventCategory[]; }
+export interface EventCategory { name: string; color: string; }
 export interface EventInput { id?: number; calendarId: number; title: string; description: string; location: string; start: string; end: string; allDay: boolean; }
 export interface CalendarInput { source: CalendarSource; name: string; color: string; url?: string; username?: string; password?: string; icsData?: string; }
 export interface ContactField { value: string; label: string; }
@@ -50,6 +51,7 @@ export interface Api {
   'settings:get': () => Settings;
   'settings:set': (patch: Partial<Settings>) => Settings;
   'accounts:list': () => Account[];
+  'accounts:reorder': (ids: number[]) => Account[];
   'accounts:oauthReady': () => Record<OAuthProvider, boolean>;
   'accounts:connect': (provider: OAuthProvider) => Account;
   'accounts:discover': (email: string, password: string, username?: string) => DiscoverResult;

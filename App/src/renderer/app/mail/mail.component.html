@@ -1,12 +1,12 @@
 <div class="mail" [style.--list-width.px]="listWidth()" [style.--folder-width.px]="folderWidth()">
   <aside class="folders">
     <div class="folders-scroll">
-      @for (tree of trees(); track tree.account.id) {
-      <div class="acct">
-        <div class="acct-head" (click)="toggleAccount(tree.account.id)" (contextmenu)="accountMenu($event, tree.account.id)">
+      @for (tree of trees(); track tree.account.id; let ai = $index) {
+      <div class="acct" [class.acct--dragging]="acctDrag()?.moved && acctDrag()?.id === tree.account.id" [class.acct--drop-before]="acctDrag()?.moved && acctDrag()?.target === ai && acctDrag()?.from !== ai && acctDrag()?.from !== ai - 1" [class.acct--drop-after]="acctDrag()?.moved && ai === trees().length - 1 && acctDrag()?.target === trees().length && acctDrag()?.from !== ai">
+        <div class="acct-head" [title]="'APP.MAIL.DRAG_TO_REORDER' | translate" (pointerdown)="startAccountDrag($event, tree.account.id, ai)" (click)="accountHeadClick(tree.account.id)" (contextmenu)="accountMenu($event, tree.account.id)">
           <app-icon class="acct-chevron" [name]="collapsedAccounts().has(tree.account.id) ? 'chevron-right' : 'chevron-down'"></app-icon>
           <span class="acct-dot" [style.background]="tree.account.color"></span>
-          <span class="acct-name" [title]="tree.account.email">{{ tree.account.name || tree.account.email }}</span>
+          <span class="acct-name" [title]="tree.account.email">{{ tree.account.email }}</span>
           @if (tree.status?.state === 'error') {<app-icon class="acct-error" name="alert" [title]="tree.status?.message"></app-icon>} @else if (tree.status?.state === 'connecting' || tree.status?.state === 'syncing') {<span class="spinner acct-spin"></span>}
           <button type="button" class="icon-btn icon-btn--sm acct-more" (click)="accountMenu($event, tree.account.id); $event.stopPropagation()"><app-icon name="more"></app-icon></button>
         </div>

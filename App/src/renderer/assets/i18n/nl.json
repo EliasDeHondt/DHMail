@@ -166,7 +166,8 @@
       "PIN": "Vastzetten",
       "UNPIN": "Losmaken",
       "PINNED": "Vastgezet",
-      "GROUP_PINNED": "Vastgezet"
+      "GROUP_PINNED": "Vastgezet",
+      "DRAG_TO_REORDER": "Klik om in of uit te klappen, sleep om de volgorde te wijzigen"
     },
     "CALENDAR": {
       "WEEK": "week",

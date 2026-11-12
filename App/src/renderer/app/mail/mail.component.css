@@ -5,7 +5,11 @@
 .new-mail app-icon { --icon-size: 18px; }
 .new-mail:hover { background: color-mix(in srgb, var(--primary) 88%, #fff); }
 .folders-scroll { flex: 1; min-height: 0; overflow-y: auto; padding-bottom: 12px; }
-.acct { margin-bottom: 6px; }
+.acct { position: relative; margin-bottom: 6px; }
+.acct--dragging { opacity: 0.4; }
+.acct--drop-before::before, .acct--drop-after::after { content: ''; position: absolute; left: 4px; right: 4px; height: 3px; border-radius: 2px; background: var(--primary); z-index: 2; }
+.acct--drop-before::before { top: 0; }
+.acct--drop-after::after { bottom: 0; }
 .acct-head { display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 4px 0 2px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; user-select: none; }
 .acct-head:hover { background: var(--hover); }
 .acct-chevron { --icon-size: 15px; color: var(--secondary); }

@@ -4,7 +4,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BridgeService } from '../core/bridge.service';
 import { StoreService } from '../core/store.service';
 import { IconComponent } from '../shared/icon.component';
-import { ColorPickerComponent } from '../shared/color-picker.component';
+import { ColorPickerComponent } from '../shared/color-picker/color-picker.component';
 import { ToastService } from '../shared/toast.service';
 import { Calendar, CalendarSource } from '../../../shared/types';
 const PRESETS = [{ name: 'Belgische feestdagen', url: 'https://calendar.google.com/calendar/ical/nl.be%23holiday%40group.v.calendar.google.com/public/basic.ics', color: '#e74c3c' }, { name: 'Nederlandse feestdagen', url: 'https://calendar.google.com/calendar/ical/nl.dutch%23holiday%40group.v.calendar.google.com/public/basic.ics', color: '#eb6834' }, { name: 'Public holidays (UK)', url: 'https://calendar.google.com/calendar/ical/en.uk%23holiday%40group.v.calendar.google.com/public/basic.ics', color: '#8b5cf6' }];

@@ -1,0 +1,38 @@
+<!--Author EliasDH Team-->
+<div class="color-picker">
+    <button class="color-picker-trigger cursor-pointer" [class.color-picker-trigger--compact]="compact" [class.is-open]="open" type="button" [id]="inputId" [disabled]="disabled" aria-haspopup="dialog" [attr.aria-expanded]="open" [attr.aria-controls]="open ? dialogId : null" [attr.aria-label]="label ? label : (('APP.COMMON.COLOR_PICKER.CHOOSE_COLOR'|translate) + ': ' + value)" [attr.title]="compact && label ? label : null" (click)="toggle()">
+        <ng-content></ng-content>
+        <span class="color-picker-swatch cursor-pointer" *ngIf="!compact" [style.background]="value"></span>
+        <span class="color-picker-value cursor-pointer" *ngIf="!compact">{{ value || ('APP.COMMON.COLOR_PICKER.NO_COLOR'|translate) }}</span>
+        <svg class="color-picker-icon cursor-pointer" *ngIf="!compact" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path class="cursor-pointer" d="M12 3a9 9 0 0 0 0 18c1.1 0 1.8-.8 1.8-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle class="cursor-pointer" cx="7.5" cy="11" r="1.3" fill="currentColor"/><circle class="cursor-pointer" cx="10.5" cy="7" r="1.3" fill="currentColor"/><circle class="cursor-pointer" cx="15" cy="7.5" r="1.3" fill="currentColor"/></svg>
+    </button>
+    <ng-container *ngIf="open">
+        <div class="color-picker-backdrop" (click)="close(true, false)"></div>
+        <div class="color-picker-dialog" [class.color-picker-dialog--palette]="palette" [class.is-ready]="ready" [style.top.px]="position.top" [style.bottom.px]="position.bottom" [style.left.px]="position.left" role="dialog" aria-modal="true" [id]="dialogId" [attr.aria-label]="'APP.COMMON.COLOR_PICKER.CHOOSE_COLOR'|translate" (keydown)="onDialogKeydown($event)">
+            <div class="color-picker-wheel-wrap cursor-pointer" *ngIf="!palette" (pointerdown)="onWheelDown($event)" (pointermove)="onWheelMove($event)" (pointerup)="onWheelUp()" (pointercancel)="onWheelUp()">
+                <img class="color-picker-wheel" [src]="wheelSrc" alt="" draggable="false"/>
+                <div class="color-picker-wheel-dim" [style.opacity]="1 - hsv.v"></div>
+                <div class="color-picker-thumb" [style.left.%]="thumbLeft" [style.top.%]="thumbTop" [style.background]="value"></div>
+            </div>
+            <label class="color-picker-slider-field" *ngIf="!palette">
+                <span class="color-picker-label">{{ 'APP.COMMON.COLOR_PICKER.BRIGHTNESS'|translate }}</span>
+                <input class="color-picker-slider cursor-pointer" type="range" min="0" max="100" [value]="brightness" [style.background]="sliderBackground" (input)="setBrightness($any($event.target).value)"/>
+            </label>
+            <div class="color-picker-hex-row" *ngIf="!palette">
+                <span class="color-picker-preview" [style.background]="value"></span>
+                <label class="color-picker-hex" [class.is-invalid]="hexInvalid">
+                    <span class="color-picker-hex-prefix" aria-hidden="true">#</span>
+                    <input class="color-picker-hex-input" type="text" maxlength="7" spellcheck="false" autocomplete="off" [attr.aria-label]="'APP.COMMON.COLOR_PICKER.HEX'|translate" [value]="hexDraft" (input)="onHexInput($any($event.target).value)" (blur)="onHexBlur()" (keydown.enter)="$event.preventDefault(); onHexEnter()"/>
+                </label>
+            </div>
+            <div class="color-picker-presets" [class.color-picker-presets--palette]="palette">
+                <button class="color-picker-preset cursor-pointer" type="button" *ngFor="let preset of presetList; trackBy: trackByHex" [class.is-selected]="isSelected(preset)" [style.background]="preset" [attr.aria-label]="preset" (click)="pickPreset(preset)"></button>
+                <button class="color-picker-preset color-picker-preset--none cursor-pointer" type="button" *ngIf="palette && clearable" [class.is-selected]="!value" [attr.aria-label]="'APP.COMMON.COLOR_PICKER.NO_COLOR'|translate" [attr.title]="'APP.COMMON.COLOR_PICKER.NO_COLOR'|translate" (click)="clear()"></button>
+            </div>
+            <div class="color-picker-footer" *ngIf="!palette">
+                <button class="color-picker-action cursor-pointer" type="button" (click)="close(false)">{{ 'APP.COMMON.COLOR_PICKER.CANCEL'|translate }}</button>
+                <button class="color-picker-action color-picker-action--primary cursor-pointer" type="button" (click)="close(true)">{{ 'APP.COMMON.COLOR_PICKER.DONE'|translate }}</button>
+            </div>
+        </div>
+    </ng-container>
+</div>

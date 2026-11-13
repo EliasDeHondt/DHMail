@@ -7,7 +7,7 @@ import { BridgeService } from '../core/bridge.service';
 import { IconComponent } from '../shared/icon.component';
 import { LockService } from '../core/lock.service';
 import { LogoComponent } from '../shared/logo.component';
-import { ColorPickerComponent } from '../shared/color-picker.component';
+import { ColorPickerComponent } from '../shared/color-picker/color-picker.component';
 import { ToastService } from '../shared/toast.service';
 import { DialogsService } from '../shared/dialogs.service';
 import { AccountDialogComponent } from './account-dialog.component';
@@ -50,7 +50,13 @@ export class SettingsComponent implements OnDestroy {
   toggleMuted(id: number) { const list = this.general.notifyMutedAccounts ?? []; this.general.notifyMutedAccounts = list.includes(id) ? list.filter(x => x !== id) : [...list, id]; }
   async testNotification() { try { if (!await this.bridge.invoke('app:testNotification')) this.toast.show(this.translate.instant('APP.SETTINGS.NOTIFY_UNSUPPORTED'), 'error'); } catch (err) { this.toast.error(err); } }
   async saveGeneral() { try { await this.store.saveSettings({ ...this.general, autoLockMinutes: Math.min(480, Math.max(30, Number(this.general.autoLockMinutes ?? 30))), markReadDelaySeconds: Number(this.general.markReadDelaySeconds ?? 0), syncIntervalMinutes: Math.max(1, Number(this.general.syncIntervalMinutes ?? 2)), weekStartsOn: Number(this.general.weekStartsOn ?? 1), workDayStart: Number(this.general.workDayStart ?? 8), workDayEnd: Number(this.general.workDayEnd ?? 18), defaultAccountId: this.general.defaultAccountId ? Number(this.general.defaultAccountId) : null }); this.toast.show(this.translate.instant('APP.SETTINGS.SAVED'), 'success'); } catch (err) { this.toast.error(err); } }
-  async saveCategory(c: { id?: number; name: string; color: string }) { try { this.store.categories.set(await this.bridge.invoke('categories:save', c)); this.newCategory.set(null); this.editingCategory.set(null); } catch (err) { this.toast.error(err); } }
+  private colorTimer: ReturnType<typeof setTimeout> | null = null;
+  private editOriginalColor: string | null = null;
+  startEditCategory(c: Category) { this.editOriginalColor = c.color; this.editingCategory.set({ id: c.id, name: c.name, color: c.color, sortOrder: c.sortOrder }); }
+  cancelEditCategory() { const e = this.editingCategory(); if (e && this.editOriginalColor && e.color !== this.editOriginalColor) this.setCategoryColor(this.editOriginalColor); this.editingCategory.set(null); }
+  /** Applies a color change right away (everywhere in the app) and saves it shortly after, so dragging over the wheel does not flood the database. */
+  setCategoryColor(color: string) { const e = this.editingCategory(); if (!e?.id || !color) return; const id = e.id; e.color = color; this.store.categories.update(list => list.map(x => x.id === id ? { ...x, color } : x)); if (this.colorTimer) clearTimeout(this.colorTimer); this.colorTimer = setTimeout(async () => { this.colorTimer = null; const c = this.store.categories().find(x => x.id === id); if (!c) return; try { const list = await this.bridge.invoke('categories:save', { ...c, color }); if (!this.colorTimer) this.store.categories.set(list); } catch (err) { this.toast.error(err); } }, 250); }
+  async saveCategory(c: { id?: number; name: string; color: string }) { if (this.colorTimer) { clearTimeout(this.colorTimer); this.colorTimer = null; } try { this.store.categories.set(await this.bridge.invoke('categories:save', c)); this.newCategory.set(null); this.editingCategory.set(null); } catch (err) { this.toast.error(err); } }
   async removeCategory(c: Category) { if (!await this.dialogs.confirm(this.translate.instant('APP.SETTINGS.DELETE_CATEGORY_CONFIRM', { name: c.name }), this.translate.instant('APP.COMMON.DELETE'), true)) return; try { this.store.categories.set(await this.bridge.invoke('categories:remove', c.id)); } catch (err) { this.toast.error(err); } }
   async removeCalendar(c: Calendar) { if (!await this.dialogs.confirm(this.translate.instant('APP.CALENDAR.REMOVE_CONFIRM', { name: c.name }), this.translate.instant('APP.COMMON.REMOVE'), true)) return; try { this.store.calendars.set(await this.bridge.invoke('calendar:remove', c.id)); } catch (err) { this.toast.error(err); } }
   async syncCalendar(c: Calendar) { this.busy.set(c.id); try { this.store.calendars.set(await this.bridge.invoke('calendar:sync', c.id)); } catch (err) { this.toast.error(err); } finally { this.busy.set(null); } }

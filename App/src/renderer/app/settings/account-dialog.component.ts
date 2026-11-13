@@ -4,7 +4,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { StoreService } from '../core/store.service';
 import { BridgeService } from '../core/bridge.service';
 import { IconComponent } from '../shared/icon.component';
-import { ColorPickerComponent } from '../shared/color-picker.component';
+import { ColorPickerComponent } from '../shared/color-picker/color-picker.component';
 import { ConnectComponent } from './connect.component';
 import { Account, AccountInput } from '../../../shared/types';
 @Component({ selector: 'app-account-dialog', standalone: true, imports: [FormsModule, TranslatePipe, IconComponent, ColorPickerComponent, ConnectComponent], templateUrl: './account-dialog.component.html', styleUrl: './account-dialog.component.css' })

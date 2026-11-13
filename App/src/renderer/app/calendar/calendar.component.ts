@@ -8,7 +8,7 @@ import { addDays, contrast, dayKey, htmlToPlain, isoWeek, sameDay, startOfDay, s
 import { IconComponent } from '../shared/icon.component';
 import { ToastService } from '../shared/toast.service';
 import { DialogsService, MenuItem } from '../shared/dialogs.service';
-import { COLOR_PRESETS } from '../shared/color-picker.component';
+import { COLOR_PRESETS } from '../shared/color-picker/color-picker.component';
 import { EventDialogComponent } from './event-dialog.component';
 import { CalendarDialogComponent } from './calendar-dialog.component';
 import { Calendar, CalendarEvent, EventInput } from '../../../shared/types';

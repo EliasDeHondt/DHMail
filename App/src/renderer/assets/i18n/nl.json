@@ -43,6 +43,14 @@
         "HOURS": "Uren",
         "MINUTES": "Minuten"
       },
+      "COLOR_PICKER": {
+        "CHOOSE_COLOR": "Kies een kleur",
+        "NO_COLOR": "Geen kleur",
+        "BRIGHTNESS": "Helderheid",
+        "HEX": "Hex-kleurcode",
+        "CANCEL": "Annuleren",
+        "DONE": "Klaar"
+      },
       "DISCARD": {
         "QUESTION": "Wil je de wijzigingen verwerpen?",
         "KEEP": "Bewaren",

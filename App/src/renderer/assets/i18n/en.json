@@ -43,6 +43,14 @@
         "HOURS": "Hours",
         "MINUTES": "Minutes"
       },
+      "COLOR_PICKER": {
+        "CHOOSE_COLOR": "Choose a colour",
+        "NO_COLOR": "No colour",
+        "BRIGHTNESS": "Brightness",
+        "HEX": "Hex colour code",
+        "CANCEL": "Cancel",
+        "DONE": "Done"
+      },
       "DISCARD": {
         "QUESTION": "Discard your changes?",
         "KEEP": "Keep editing",

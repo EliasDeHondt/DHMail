@@ -23,10 +23,14 @@ win:
   icon: build/icon.png
   artifactName: ${productName}-${version}-${arch}.${ext}
 nsis:
-  oneClick: false
-  allowToChangeInstallationDirectory: true
-  createDesktopShortcut: true
+  oneClick: true
+  perMachine: false
+  runAfterFinish: true
+  deleteAppDataOnUninstall: false
+  createDesktopShortcut: always
   createStartMenuShortcut: true
   shortcutName: DHMail
+  uninstallDisplayName: DHMail
+  include: build/installer.nsh
 portable:
   artifactName: ${productName}-${version}-portable.${ext}

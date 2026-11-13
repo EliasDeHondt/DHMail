@@ -3,7 +3,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { BridgeService } from './bridge.service';
 import { ThemeService } from './theme.service';
 import { Account, AccountStatus, Calendar, Category, Folder, Settings, SpecialUse, SyncState, Signature } from '../../../shared/types';
-export const DEFAULT_SETTINGS: Settings = { theme: 'system', language: 'nl', blockRemoteImages: true, notifications: true, markReadDelaySeconds: 2, syncIntervalMinutes: 2, weekStartsOn: 1, workDayStart: 8, workDayEnd: 18, googleClientId: '', googleClientSecret: '', microsoftClientId: '', microsoftTenant: 'common', defaultAccountId: null, darkMailBodies: true, autoLockMinutes: 30 };
+export const DEFAULT_SETTINGS: Settings = { theme: 'system', language: 'nl', blockRemoteImages: true, notifications: true, markReadDelaySeconds: 2, syncIntervalMinutes: 2, weekStartsOn: 1, workDayStart: 8, workDayEnd: 18, googleClientId: '', googleClientSecret: '', microsoftClientId: '', microsoftTenant: 'common', defaultAccountId: null, darkMailBodies: true, autoLockMinutes: 30, notifyMutedAccounts: [] };
 @Injectable({ providedIn: 'root' })
 export class StoreService {
   private bridge = inject(BridgeService);

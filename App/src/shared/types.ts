@@ -43,7 +43,7 @@ export interface ContactSource { id: number; accountId: number | null; kind: Con
 export interface ContactSourceInput { name: string; url: string; username: string; password: string; }
 export interface PlaceSuggestion { label: string; title: string; detail: string; }
 export interface Suggestion { name: string; address: string; source: string; }
-export interface Settings { theme: 'light' | 'dark' | 'system'; language: 'nl' | 'en'; blockRemoteImages: boolean; notifications: boolean; markReadDelaySeconds: number; syncIntervalMinutes: number; weekStartsOn: number; workDayStart: number; workDayEnd: number; googleClientId: string; googleClientSecret: string; microsoftClientId: string; microsoftTenant: string; defaultAccountId: number | null; darkMailBodies: boolean; autoLockMinutes: number; }
+export interface Settings { theme: 'light' | 'dark' | 'system'; language: 'nl' | 'en'; blockRemoteImages: boolean; notifications: boolean; markReadDelaySeconds: number; syncIntervalMinutes: number; weekStartsOn: number; workDayStart: number; workDayEnd: number; googleClientId: string; googleClientSecret: string; microsoftClientId: string; microsoftTenant: string; defaultAccountId: number | null; darkMailBodies: boolean; autoLockMinutes: number; notifyMutedAccounts: number[]; }
 export interface LockStatus { hasPin: boolean; length: number | null; retryAfter: number; }
 export interface UnlockResult { ok: boolean; retryAfter: number; }
 export interface SavedFile { path: string; name: string; size: number; }
@@ -51,6 +51,7 @@ export interface AppInfo { version: string; dataPath: string; platform: string; 
 export interface SyncState { accountId: number | null; kind: 'mail' | 'calendar' | 'contacts'; busy: boolean; message?: string; }
 export interface Api {
   'app:info': () => AppInfo;
+  'app:testNotification': () => boolean;
   'app:openExternal': (url: string) => void;
   'geo:suggest': (query: string, lang?: string) => PlaceSuggestion[];
   'app:pickFiles': () => SavedFile[];

@@ -23,13 +23,15 @@ import { copyContactTo, copyContacts, createContactIn } from './contacts/copy';
 import { bus, log } from './core/bus';
 import { suggestPlaces } from './geo';
 import { changePin, isUnlocked, lockStatus, setupPin, unlock } from './core/lock';
+import { testNotification } from './notify';
 const OPEN_WHILE_LOCKED = new Set(['app:info', 'app:titleBar', 'settings:get', 'lock:status', 'lock:setup', 'lock:unlock']);
 type Handlers = { [K in keyof Api]: (...args: Parameters<Api[K]>) => ReturnType<Api[K]> | Promise<ReturnType<Api[K]>> };
 export function activateAccount(account: Account) { mail.startAccount(account); importOutlookCategories(account).catch(err => log('outlook categories failed', err?.message)); cal.ensureAccountCalendars(account); contacts.ensureAccountSources(account); cal.syncAccountCalendars(account).catch(err => log('calendar activation failed', err?.message)); if (account.features.contacts) contacts.syncAllContacts().catch(err => log('contacts activation failed', err?.message)); }
-export function registerIpc(getWindow: () => BrowserWindow | null) {
+export function registerIpc(getWindow: () => BrowserWindow | null, focusWindow: () => BrowserWindow | null) {
   const win = () => getWindow() ?? undefined;
   const handlers: Handlers = {
     'app:info': () => ({ version: app.getVersion(), dataPath: app.getPath('userData'), platform: process.platform }),
+    'app:testNotification': () => testNotification(focusWindow),
     'geo:suggest': (query, lang) => suggestPlaces(String(query ?? '').slice(0, 200), lang === 'en' ? 'en' : 'nl'),
     'app:openExternal': url => { if (/^(https?|mailto|tel):/i.test(url)) shell.openExternal(url); },
     'app:pickFiles': async () => { const r = await dialog.showOpenDialog(win()!, { properties: ['openFile', 'multiSelections'] }); return Promise.all(r.filePaths.map(async p => ({ path: p, name: basename(p), size: (await stat(p)).size }))); },

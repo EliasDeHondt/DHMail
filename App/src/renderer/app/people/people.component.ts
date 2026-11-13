@@ -1,5 +1,5 @@
 import { Component, HostListener, OnDestroy, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { StoreService } from '../core/store.service';
@@ -21,6 +21,9 @@ export class PeopleComponent implements OnDestroy {
   private dialogs = inject(DialogsService);
   private translate = inject(TranslateService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  /** contact to show when the page opens (link from a birthday in the calendar) */
+  private openId: number | null = null;
   readonly contacts = signal<Contact[]>([]);
   readonly sources = signal<ContactSource[]>([]);
   readonly sourceFilter = signal<number | null>(null);
@@ -67,9 +70,10 @@ export class PeopleComponent implements OnDestroy {
   readonly grouped = computed(() => { const out: { letter: string; items: Contact[] }[] = []; for (const c of this.filtered()) { const letter = (c.lastName || c.displayName).trim().charAt(0).toUpperCase() || '#'; const key = /[A-Z]/.test(letter) ? letter : '#'; const last = out[out.length - 1]; if (last && last.letter === key) last.items.push(c); else out.push({ letter: key, items: [c] }); } return out; });
   readonly sourceName = (id: number | null) => this.sources().find(s => s.id === id)?.name ?? '';
   private offs: (() => void)[] = [];
-  constructor() { this.load(); this.offs.push(this.bridge.on('contacts:changed', () => this.load())); }
+  constructor() { this.offs.push((() => { const sub = this.route.queryParamMap.subscribe(p => { const id = Number(p.get('contact')); if (id) { this.openId = id; this.showContact(); } }); return () => sub.unsubscribe(); })()); this.load(); this.offs.push(this.bridge.on('contacts:changed', () => this.load())); }
   ngOnDestroy() { this.offs.forEach(f => f()); }
-  async load() { this.loading.set(true); try { const [contacts, sources] = await Promise.all([this.bridge.invoke('contacts:list'), this.bridge.invoke('contacts:sources')]); this.contacts.set(contacts); this.sources.set(sources); const sel = this.selected(); if (sel) this.selected.set(contacts.find(c => c.id === sel.id) ?? null); } catch (err) { this.toast.error(err); } finally { this.loading.set(false); } }
+  private showContact() { const id = this.openId; if (!id) return; const c = this.contacts().find(x => x.id === id); if (!c) return; this.openId = null; this.sourceFilter.set(null); this.query.set(''); this.select(c); queueMicrotask(() => document.querySelector('.crow--active')?.scrollIntoView({ block: 'center' })); }
+  async load() { this.loading.set(true); try { const [contacts, sources] = await Promise.all([this.bridge.invoke('contacts:list'), this.bridge.invoke('contacts:sources')]); this.contacts.set(contacts); this.showContact(); this.sources.set(sources); const sel = this.selected(); if (sel) this.selected.set(contacts.find(c => c.id === sel.id) ?? null); } catch (err) { this.toast.error(err); } finally { this.loading.set(false); } }
   async sync() { this.syncing.set(true); try { this.sources.set(await this.bridge.invoke('contacts:sync')); await this.load(); } catch (err) { this.toast.error(err); } finally { this.syncing.set(false); } }
   select(c: Contact, e?: MouseEvent) {
     if (e && (e.ctrlKey || e.metaKey)) { this.picked.update(p => { const n = new Set(p); if (n.size === 0 && this.selected()) n.add(this.selected()!.id); n.has(c.id) ? n.delete(c.id) : n.add(c.id); return n; }); this.anchor = c.id; this.selected.set(c); this.editing.set(null); return; }

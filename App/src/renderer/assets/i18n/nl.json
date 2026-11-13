@@ -246,7 +246,8 @@
       "PRIVATE": "Privé",
       "ALL_DAY_HINT": "Dubbelklik voor een afspraak van de hele dag",
       "EDIT_CALENDAR": "Agenda bewerken",
-      "FILE_REPLACE_HINT": "Kies een nieuw .ics-bestand om de afspraken van deze agenda te vervangen, of laat dit leeg om alleen de naam of kleur te wijzigen."
+      "FILE_REPLACE_HINT": "Kies een nieuw .ics-bestand om de afspraken van deze agenda te vervangen, of laat dit leeg om alleen de naam of kleur te wijzigen.",
+      "OPEN_CONTACT": "Contact openen"
     },
     "PEOPLE": {
       "NEW_CONTACT": "Nieuw contact",

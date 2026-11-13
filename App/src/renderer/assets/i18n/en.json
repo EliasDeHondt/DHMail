@@ -246,7 +246,8 @@
       "PRIVATE": "Private",
       "ALL_DAY_HINT": "Double-click for an all-day event",
       "EDIT_CALENDAR": "Edit calendar",
-      "FILE_REPLACE_HINT": "Choose a new .ics file to replace the events of this calendar, or leave it empty to only change the name or colour."
+      "FILE_REPLACE_HINT": "Choose a new .ics file to replace the events of this calendar, or leave it empty to only change the name or colour.",
+      "OPEN_CONTACT": "Open contact"
     },
     "PEOPLE": {
       "NEW_CONTACT": "New contact",

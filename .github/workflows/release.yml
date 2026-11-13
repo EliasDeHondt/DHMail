@@ -41,7 +41,8 @@ jobs:
 
       - name: Write the empty oauth.json (users add their own keys in the app)
         shell: pwsh
-        run: Set-Content -Path oauth.json -Encoding utf8 -Value '{ "googleClientId": "", "googleClientSecret": "", "microsoftClientId": "", "microsoftTenant": "common" }'
+        run: |
+          Set-Content -Path oauth.json -Encoding utf8 -Value '{ "googleClientId": "", "googleClientSecret": "", "microsoftClientId": "", "microsoftTenant": "common" }'
 
       - run: npm ci
 

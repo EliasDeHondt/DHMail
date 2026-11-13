@@ -47,7 +47,8 @@
         "QUESTION": "Wil je de wijzigingen verwerpen?",
         "KEEP": "Bewaren",
         "DISCARD": "Verwerpen"
-      }
+      },
+      "UNDO": "Ongedaan maken"
     },
     "WELCOME": {
       "SUBTITLE": "Je mail, agenda en contacten op één plek. Kies hoe je wil verbinden."
@@ -243,7 +244,9 @@
       "SHOW_OOF": "Afwezig",
       "SHOW_ELSEWHERE": "Werkt elders",
       "PRIVATE": "Privé",
-      "ALL_DAY_HINT": "Dubbelklik voor een afspraak van de hele dag"
+      "ALL_DAY_HINT": "Dubbelklik voor een afspraak van de hele dag",
+      "EDIT_CALENDAR": "Agenda bewerken",
+      "FILE_REPLACE_HINT": "Kies een nieuw .ics-bestand om de afspraken van deze agenda te vervangen, of laat dit leeg om alleen de naam of kleur te wijzigen."
     },
     "PEOPLE": {
       "NEW_CONTACT": "Nieuw contact",
@@ -299,7 +302,14 @@
       "CALL": "Bellen",
       "WHATSAPP": "WhatsApp-bericht sturen",
       "BIRTHDAY_WISH": "Verjaardagswens via WhatsApp",
-      "BIRTHDAY_TEXT": "Gelukkige verjaardag {{name}}!"
+      "BIRTHDAY_TEXT": "Gelukkige verjaardag {{name}}!",
+      "DELETE_MANY_CONFIRM": "Let op: je staat op het punt {{count}} contacten te verwijderen. Ze worden ook verwijderd uit {{sources}}. Dit is gevaarlijk en kan je achteraf alleen in de eerste 30 seconden nog ongedaan maken.",
+      "DELETE_MANY": "{{count}} contacten verwijderen",
+      "DELETED_MANY": "{{count}} contacten worden verwijderd",
+      "DELETED_ONE": "\"{{name}}\" wordt verwijderd",
+      "PICKED": "{{count}} contacten geselecteerd",
+      "PICKED_HINT": "Ctrl+klik om contacten toe te voegen of weg te halen, Shift+klik voor een reeks, Ctrl+A voor de hele lijst.",
+      "CLEAR_SELECTION": "Selectie wissen"
     },
     "ACCOUNT": {
       "TITLE_ADD": "Account toevoegen",

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, OnDestroy, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -10,6 +10,7 @@ import { IconComponent } from '../shared/icon.component';
 import { AvatarComponent } from '../shared/avatar.component';
 import { ToastService } from '../shared/toast.service';
 import { DialogsService } from '../shared/dialogs.service';
+import { UndoService } from '../core/undo.service';
 import { Contact, ContactField, ContactInput, ContactSource } from '../../../shared/types';
 @Component({ selector: 'app-people', standalone: true, imports: [FormsModule, TranslatePipe, IconComponent, AvatarComponent, DatePickerComponent], templateUrl: './people.component.html', styleUrl: './people.component.css' })
 export class PeopleComponent implements OnDestroy {
@@ -25,6 +26,13 @@ export class PeopleComponent implements OnDestroy {
   readonly sourceFilter = signal<number | null>(null);
   readonly query = signal('');
   readonly selected = signal<Contact | null>(null);
+  private undo = inject(UndoService);
+  /** contacts waiting to be deleted (hidden for 30 seconds, can be undone) */
+  private pendingDelete = this.undo.hidden('contacts');
+  /** multi-selection: click = one, Ctrl+click = add/remove, Shift+click = range, Ctrl+A = everything in the list */
+  readonly picked = signal<Set<number>>(new Set());
+  private anchor: number | null = null;
+  readonly pickedContacts = computed(() => { const p = this.picked(); return this.filtered().filter(c => p.has(c.id)); });
   readonly loading = signal(false);
   readonly syncing = signal(false);
   readonly editing = signal<ContactInput | null>(null);
@@ -55,7 +63,7 @@ export class PeopleComponent implements OnDestroy {
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
   readonly sourceForm = { name: '', url: '', username: '', password: '' };
-  readonly filtered = computed(() => { const q = this.query().trim().toLowerCase(); const src = this.sourceFilter(); return this.contacts().filter(c => (!src || c.sourceId === src) && (!q || c.displayName.toLowerCase().includes(q) || c.company.toLowerCase().includes(q) || c.emails.some(e => e.value.toLowerCase().includes(q)) || c.phones.some(p => p.value.includes(q)))); });
+  readonly filtered = computed(() => { const q = this.query().trim().toLowerCase(); const src = this.sourceFilter(); const gone = this.pendingDelete(); return this.contacts().filter(c => !gone.has(c.id) && (!src || c.sourceId === src) && (!q || c.displayName.toLowerCase().includes(q) || c.company.toLowerCase().includes(q) || c.emails.some(e => e.value.toLowerCase().includes(q)) || c.phones.some(p => p.value.includes(q)))); });
   readonly grouped = computed(() => { const out: { letter: string; items: Contact[] }[] = []; for (const c of this.filtered()) { const letter = (c.lastName || c.displayName).trim().charAt(0).toUpperCase() || '#'; const key = /[A-Z]/.test(letter) ? letter : '#'; const last = out[out.length - 1]; if (last && last.letter === key) last.items.push(c); else out.push({ letter: key, items: [c] }); } return out; });
   readonly sourceName = (id: number | null) => this.sources().find(s => s.id === id)?.name ?? '';
   private offs: (() => void)[] = [];
@@ -63,7 +71,37 @@ export class PeopleComponent implements OnDestroy {
   ngOnDestroy() { this.offs.forEach(f => f()); }
   async load() { this.loading.set(true); try { const [contacts, sources] = await Promise.all([this.bridge.invoke('contacts:list'), this.bridge.invoke('contacts:sources')]); this.contacts.set(contacts); this.sources.set(sources); const sel = this.selected(); if (sel) this.selected.set(contacts.find(c => c.id === sel.id) ?? null); } catch (err) { this.toast.error(err); } finally { this.loading.set(false); } }
   async sync() { this.syncing.set(true); try { this.sources.set(await this.bridge.invoke('contacts:sync')); await this.load(); } catch (err) { this.toast.error(err); } finally { this.syncing.set(false); } }
-  select(c: Contact) { this.selected.set(c); this.editing.set(null); }
+  select(c: Contact, e?: MouseEvent) {
+    if (e && (e.ctrlKey || e.metaKey)) { this.picked.update(p => { const n = new Set(p); if (n.size === 0 && this.selected()) n.add(this.selected()!.id); n.has(c.id) ? n.delete(c.id) : n.add(c.id); return n; }); this.anchor = c.id; this.selected.set(c); this.editing.set(null); return; }
+    if (e?.shiftKey && this.anchor !== null) { const list = this.filtered(); const a = list.findIndex(x => x.id === this.anchor), b = list.findIndex(x => x.id === c.id); if (a >= 0 && b >= 0) { const [lo, hi] = a < b ? [a, b] : [b, a]; this.picked.set(new Set(list.slice(lo, hi + 1).map(x => x.id))); } this.selected.set(c); this.editing.set(null); return; }
+    this.anchor = c.id; this.picked.set(new Set([c.id])); this.selected.set(c); this.editing.set(null);
+  }
+  clearPicked() { this.picked.set(this.selected() ? new Set([this.selected()!.id]) : new Set()); }
+  @HostListener('document:keydown', ['$event']) onKey(e: KeyboardEvent) {
+    const t = e.target as HTMLElement | null;
+    if (this.editing() || this.addingSource() || document.querySelector('.overlay, app-lock-screen') || (t && (t.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName)))) return;
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') { e.preventDefault(); this.picked.set(new Set(this.filtered().map(c => c.id))); }
+    else if (e.key === 'Delete' && this.pickedContacts().length) { e.preventDefault(); this.removeMany(this.pickedContacts()); }
+    else if (e.key === 'Escape' && this.picked().size > 1) this.clearPicked();
+  }
+  /** delete one or more contacts: warning first, then 30 seconds to undo before anything is removed */
+  async removeMany(list: Contact[]) {
+    const deletable = list.filter(c => !c.readOnly);
+    if (!deletable.length) return;
+    const t = (k: string, p?: any) => this.translate.instant(k, p);
+    const many = deletable.length > 1;
+    const sources = [...new Set(deletable.map(c => this.sourceName(c.sourceId)).filter(Boolean))].join(', ');
+    const msg = many ? t('APP.PEOPLE.DELETE_MANY_CONFIRM', { count: deletable.length, sources }) : t('APP.PEOPLE.DELETE_CONFIRM', { name: deletable[0].displayName });
+    if (!await this.dialogs.confirm(msg, many ? t('APP.PEOPLE.DELETE_MANY', { count: deletable.length }) : t('APP.COMMON.DELETE'), true)) return;
+    const ids = deletable.map(c => c.id);
+    this.picked.set(new Set()); if (this.selected() && ids.includes(this.selected()!.id)) this.selected.set(null);
+    this.undo.schedule('contacts', ids, many ? t('APP.PEOPLE.DELETED_MANY', { count: ids.length }) : t('APP.PEOPLE.DELETED_ONE', { name: deletable[0].displayName }), async () => {
+      const failed: string[] = [];
+      for (const c of deletable) { try { await this.bridge.invoke('contacts:remove', c.id); } catch (err) { const e = err as ApiError; failed.push(e?.code === 'CONTACTS_WRITE_CONSENT' ? t('APP.PEOPLE.COPY_CONSENT') : `${c.displayName}: ${e?.message ?? err}`); } }
+      if (failed.length) this.toast.error(failed[0] + (failed.length > 1 ? ` (+${failed.length - 1})` : ''));
+      await this.load();
+    });
+  }
   mailTo(address: string) { this.state.composeTo.set(address); this.router.navigate(['/mail']); }
   openExternal(url: string) { this.bridge.invoke('app:openExternal', url).catch(() => {}); }
   newContact() { this.saveTarget = -1; this.editing.set({ displayName: '', firstName: '', lastName: '', emails: [{ value: '', label: '' }], phones: [{ value: '', label: '' }], company: '', title: '', notes: '', birthday: null }); this.error.set(null); }
@@ -79,7 +117,7 @@ export class PeopleComponent implements OnDestroy {
   call(tel: string) { this.bridge.invoke('app:openExternal', 'tel:' + tel.replace(/[^\d+]/g, '')).catch(() => {}); }
   whatsapp(tel: string, text = '') { this.bridge.invoke('app:openExternal', `https://wa.me/${this.intl(tel)}${text ? '?text=' + encodeURIComponent(text) : ''}`).catch(() => {}); }
   birthdayWish(c: Contact, tel: string) { const first = c.firstName?.trim() || c.displayName.split(' ')[0] || ''; this.whatsapp(tel, this.translate.instant('APP.PEOPLE.BIRTHDAY_TEXT', { name: first })); }
-  async remove(c: Contact) { if (!await this.dialogs.confirm(this.translate.instant('APP.PEOPLE.DELETE_CONFIRM', { name: c.displayName }), this.translate.instant('APP.COMMON.DELETE'), true)) return; try { await this.bridge.invoke('contacts:remove', c.id); this.selected.set(null); await this.load(); } catch (err) { const e = err as ApiError; this.toast.error(e?.code === 'CONTACTS_WRITE_CONSENT' ? this.translate.instant('APP.PEOPLE.COPY_CONSENT') : err); } }
+  remove(c: Contact) { this.removeMany([c]); }
   async importVcf() { try { const f = await this.bridge.invoke('app:pickFile', [{ name: 'vCard', extensions: ['vcf', 'vcard'] }]); if (!f) return; const n = await this.bridge.invoke('contacts:importVcf', f.content); this.toast.show(this.translate.instant('APP.PEOPLE.IMPORTED', { count: n }), 'success'); await this.load(); } catch (err) { this.toast.error(err); } }
   async addSource() { this.error.set(null); if (!this.sourceForm.url.trim()) { this.error.set(this.translate.instant('APP.PEOPLE.SOURCE_URL_REQUIRED')); return; } this.saving.set(true); try { this.sources.set(await this.bridge.invoke('contacts:addSource', { name: this.sourceForm.name.trim(), url: this.sourceForm.url.trim(), username: this.sourceForm.username, password: this.sourceForm.password })); this.addingSource.set(false); Object.assign(this.sourceForm, { name: '', url: '', username: '', password: '' }); } catch (err) { this.error.set(err instanceof Error ? err.message : String(err)); } finally { this.saving.set(false); } }
   async removeSource(s: ContactSource) { if (s.kind === 'local' || s.kind === 'google' || s.kind === 'microsoft') return; if (!await this.dialogs.confirm(this.translate.instant('APP.PEOPLE.REMOVE_SOURCE_CONFIRM', { name: s.name }), this.translate.instant('APP.COMMON.REMOVE'), true)) return; try { this.sources.set(await this.bridge.invoke('contacts:removeSource', s.id)); if (this.sourceFilter() === s.id) this.sourceFilter.set(null); await this.load(); } catch (err) { this.toast.error(err); } }

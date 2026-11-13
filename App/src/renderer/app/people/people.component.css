@@ -59,3 +59,7 @@
 .card-act { color: var(--ink); }
 .card-act--wa { color: #1faa53; }
 .card-act--bday { color: #e87ba4; }
+.crow--picked { background: var(--tint); box-shadow: inset 3px 0 0 var(--primary); }
+.bulk { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; height: 100%; padding: 40px 24px; text-align: center; }
+.bulk > app-icon { --icon-size: 44px; color: var(--accent); }
+.bulk-actions { display: flex; gap: 8px; margin-top: 6px; }

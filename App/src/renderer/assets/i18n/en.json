@@ -47,7 +47,8 @@
         "QUESTION": "Discard your changes?",
         "KEEP": "Keep editing",
         "DISCARD": "Discard"
-      }
+      },
+      "UNDO": "Undo"
     },
     "WELCOME": {
       "SUBTITLE": "Your mail, calendar and contacts in one place. Choose how you want to connect."
@@ -243,7 +244,9 @@
       "SHOW_OOF": "Away",
       "SHOW_ELSEWHERE": "Working elsewhere",
       "PRIVATE": "Private",
-      "ALL_DAY_HINT": "Double-click for an all-day event"
+      "ALL_DAY_HINT": "Double-click for an all-day event",
+      "EDIT_CALENDAR": "Edit calendar",
+      "FILE_REPLACE_HINT": "Choose a new .ics file to replace the events of this calendar, or leave it empty to only change the name or colour."
     },
     "PEOPLE": {
       "NEW_CONTACT": "New contact",
@@ -299,7 +302,14 @@
       "CALL": "Call",
       "WHATSAPP": "Send a WhatsApp message",
       "BIRTHDAY_WISH": "Birthday wish via WhatsApp",
-      "BIRTHDAY_TEXT": "Happy birthday {{name}}!"
+      "BIRTHDAY_TEXT": "Happy birthday {{name}}!",
+      "DELETE_MANY_CONFIRM": "Careful: you are about to delete {{count}} contacts. They are also deleted from {{sources}}. This is dangerous and can only be undone during the first 30 seconds.",
+      "DELETE_MANY": "Delete {{count}} contacts",
+      "DELETED_MANY": "{{count}} contacts are being deleted",
+      "DELETED_ONE": "\"{{name}}\" is being deleted",
+      "PICKED": "{{count}} contacts selected",
+      "PICKED_HINT": "Ctrl+click to add or remove contacts, Shift+click for a range, Ctrl+A for the whole list.",
+      "CLEAR_SELECTION": "Clear selection"
     },
     "ACCOUNT": {
       "TITLE_ADD": "Add account",

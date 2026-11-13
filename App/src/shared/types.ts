@@ -102,7 +102,8 @@ export interface Api {
   'categories:assign': (refs: MessageRef[], categoryId: number, assigned: boolean) => void;
   'calendar:list': () => Calendar[];
   'calendar:add': (input: CalendarInput) => Calendar[];
-  'calendar:update': (id: number, patch: Partial<Calendar>) => Calendar[];
+  /** name, colour, visibility, and for ICS / CalDAV calendars the link, a new file or the login */
+  'calendar:update': (id: number, patch: Partial<Calendar> & { password?: string; icsData?: string }) => Calendar[];
   'calendar:remove': (id: number) => Calendar[];
   'calendar:sync': (id?: number | null) => Calendar[];
   'calendar:events': (start: string, end: string) => CalendarEvent[];

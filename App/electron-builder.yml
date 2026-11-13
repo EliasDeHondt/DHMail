@@ -1,5 +1,5 @@
 appId: com.eliasdehondt.dhmail
-productName: DHMail
+productName: DHDMail
 copyright: Copyright © Elias De Hondt
 directories:
   output: release
@@ -27,8 +27,8 @@ nsis:
   deleteAppDataOnUninstall: false
   createDesktopShortcut: always
   createStartMenuShortcut: true
-  shortcutName: DHMail
-  uninstallDisplayName: DHMail
+  shortcutName: DHDMail
+  uninstallDisplayName: DHDMail
   include: build/installer.nsh
   differentialPackage: false
   # the installer always speaks English

@@ -8,13 +8,14 @@ import { discover, oauthServers } from './accounts/discover';
 import { oauthReady } from './accounts/oauth-clients';
 const COLORS = ['#4f94f0', '#0f54ae', '#829ec2', '#3d587b', '#2a78d6', '#14b8a6', '#8b5cf6', '#e87ba4'];
 import { addAccount, getAccount, listAccounts, removeAccount, reorderAccounts, updateAccount } from './accounts/accounts';
-import { importOutlookCategories, pushOutlookCategory, usesOutlookCategories } from './mail/outlook-categories';
+import { importOutlookCategories } from './mail/outlook-categories';
 import { forgetTokens, oauthFlow, OAuthError } from './accounts/oauth';
 import { setSecret } from './core/secrets';
 import { describe } from './mail/session';
 import * as mail from './mail/sync';
 import { saveDraft, sendMail } from './mail/smtp';
-import { listCategories, removeCategory, saveCategory } from './mail/categories';
+import { categorize, listCategories, removeCategory, saveCategory } from './mail/categories';
+import { listRules, removeRule, reorderRules, runRules, saveRule } from './mail/rules';
 import * as cal from './calendar';
 import { transferCalendar } from './calendar/transfer';
 import { forkSignature, listSignatures, removeSignature, saveSignature } from './mail/signatures';
@@ -80,7 +81,12 @@ export function registerIpc(getWindow: () => BrowserWindow | null, focusWindow: 
     'categories:list': () => listCategories(),
     'categories:save': c => saveCategory(c),
     'categories:remove': id => removeCategory(id),
-    'categories:assign': (refs, categoryId, assigned) => { mail.assignCategory(refs, categoryId, assigned); for (const accountId of new Set(refs.map(r => r.accountId))) { const account = getAccount(accountId); if (usesOutlookCategories(account)) pushOutlookCategory(account!, refs.filter(r => r.accountId === accountId), categoryId, assigned).catch(err => log('outlook category push failed', err?.message)); } },
+    'categories:assign': (refs, categoryId, assigned) => categorize(refs, categoryId, assigned),
+    'rules:list': () => listRules(),
+    'rules:save': rule => saveRule(rule),
+    'rules:remove': id => removeRule(Number(id)),
+    'rules:reorder': ids => reorderRules(Array.isArray(ids) ? ids.map(Number) : []),
+    'rules:run': id => runRules(id == null ? null : Number(id)),
     'calendar:list': () => cal.listCalendars(),
     'calendar:add': input => cal.addCalendar(input),
     'calendar:update': (id, patch) => cal.updateCalendar(id, patch),
@@ -108,5 +114,5 @@ export function registerIpc(getWindow: () => BrowserWindow | null, focusWindow: 
     'contacts:remove': id => contacts.removeContact(id),
     'contacts:importVcf': text => contacts.importVcf(text)
   };
-  for (const [channel, fn] of Object.entries(handlers)) ipcMain.handle(channel, async (_event, ...args: any[]) => { try { if (!isUnlocked() && !OPEN_WHILE_LOCKED.has(channel)) throw Object.assign(new Error('DHMail is locked'), { status: 423 }); return await (fn as any)(...args); } catch (err: any) { log('ipc failed', channel, err?.message); throw new Error(JSON.stringify({ message: describe(err), code: err instanceof OAuthError ? err.code : err?.code ?? null, status: err?.status ?? null })); } });
+  for (const [channel, fn] of Object.entries(handlers)) ipcMain.handle(channel, async (_event, ...args: any[]) => { try { if (!isUnlocked() && !OPEN_WHILE_LOCKED.has(channel)) throw Object.assign(new Error('DHDMail is locked'), { status: 423 }); return await (fn as any)(...args); } catch (err: any) { log('ipc failed', channel, err?.message); throw new Error(JSON.stringify({ message: describe(err), code: err instanceof OAuthError ? err.code : err?.code ?? null, status: err?.status ?? null })); } });
 }

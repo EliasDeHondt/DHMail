@@ -5,9 +5,9 @@ import { graph } from '../calendar/microsoft';
 import { Row, birthdayParts, fold, googlePerson, nameOf, outlookContact, toRow, vEsc } from './copy';
 
 // Changes and deletions of contacts that live in an account (Google, Outlook, CardDAV). Only the fields
-// DHMail edits are replaced; everything else on the contact (photo, addresses, ...) stays as it is.
+// DHDMail edits are replaced; everything else on the contact (photo, addresses, ...) stays as it is.
 
-const consent = (err: any) => (err?.code === 'OAUTH_REAUTH' || err?.status === 403) ? Object.assign(new Error('DHMail may not change contacts in this Outlook account yet. Sign in to the account again to grant access.'), { code: 'CONTACTS_WRITE_CONSENT' }) : err;
+const consent = (err: any) => (err?.code === 'OAUTH_REAUTH' || err?.status === 403) ? Object.assign(new Error('DHDMail may not change contacts in this Outlook account yet. Sign in to the account again to grant access.'), { code: 'CONTACTS_WRITE_CONSENT' }) : err;
 
 function contactRow(id: number) {
   const r = get('SELECT c.*, s.kind, s.account_id, s.url AS source_url, s.username AS source_username, s.id AS sid FROM contacts c JOIN contact_sources s ON s.id = c.source_id WHERE c.id = ?', id);
@@ -36,7 +36,7 @@ async function patchedVCard(r: any, c: Row) {
   if (c.notes) lines.push(`NOTE:${vEsc(c.notes)}`);
   const b = birthdayParts(c.birthday);
   if (b) lines.push(`BDAY:${b.year ?? '-'}-${String(b.month).padStart(2, '0')}-${String(b.day).padStart(2, '0')}`);
-  // text level: drop the properties DHMail edits (also grouped ones like item1.EMAIL) and keep every other line as it was
+  // text level: drop the properties DHDMail edits (also grouped ones like item1.EMAIL) and keep every other line as it was
   const managed = /^([\w-]+\.)?(FN|N|EMAIL|TEL|ORG|TITLE|NOTE|BDAY)[;:]/i;
   const kept = original.replace(/\r?\n[ \t]/g, '').split(/\r?\n/).filter(l => l.trim() && !managed.test(l) && !/^END:VCARD/i.test(l));
   return [...kept, ...lines, 'END:VCARD'].map(fold).join('\r\n') + '\r\n';

@@ -3,7 +3,7 @@ import { getSettings } from './core/settings';
 import { getAccount } from './accounts/accounts';
 import { Account, MessageSummary } from '../shared/types';
 export const APP_ID = 'com.eliasdehondt.dhmail';
-const TEXT = { nl: { noSubject: '(geen onderwerp)', inbox: 'Postvak IN', many: (n: number) => `${n} nieuwe e-mails`, testTitle: 'Meldingen staan aan', testBody: 'Zo ziet een melding van DHMail eruit.' }, en: { noSubject: '(no subject)', inbox: 'Inbox', many: (n: number) => `${n} new emails`, testTitle: 'Notifications are on', testBody: 'This is what a DHMail notification looks like.' } };
+const TEXT = { nl: { noSubject: '(geen onderwerp)', inbox: 'Postvak IN', many: (n: number) => `${n} nieuwe e-mails`, testTitle: 'Meldingen staan aan', testBody: 'Zo ziet een melding van DHDMail eruit.' }, en: { noSubject: '(no subject)', inbox: 'Inbox', many: (n: number) => `${n} new emails`, testTitle: 'Notifications are on', testBody: 'This is what a DHDMail notification looks like.' } };
 const text = () => TEXT[getSettings().language === 'en' ? 'en' : 'nl'];
 // Windows only shows toasts for an app with an AppUserModelID that matches its Start menu shortcut (electron-builder uses the appId)
 export function initNotifications() { if (process.platform === 'win32') app.setAppUserModelId(app.isPackaged ? APP_ID : process.execPath); }
@@ -11,7 +11,7 @@ export function initNotifications() { if (process.platform === 'win32') app.setA
 const live: Notification[] = [];
 function show(options: Electron.NotificationConstructorOptions, onClick: () => void) { const n = new Notification({ silent: false, ...options }); n.on('click', onClick); n.on('close', () => { const i = live.indexOf(n); if (i >= 0) live.splice(i, 1); }); live.push(n); while (live.length > 20) live.shift(); n.show(); }
 const mailbox = (a: Account | null) => !a ? text().inbox : a.name && a.name.toLowerCase() !== a.email.toLowerCase() ? `${a.name} · ${a.email}` : a.email;
-const sender = (m: MessageSummary) => { const f = m.from[0]; return f?.name || f?.address || 'DHMail'; };
+const sender = (m: MessageSummary) => { const f = m.from[0]; return f?.name || f?.address || 'DHDMail'; };
 export function notifyNewMail(payload: { accountId: number; messages: MessageSummary[] }, focus: () => BrowserWindow | null) {
   const s = getSettings(); if (!s.notifications || !Notification.isSupported() || (s.notifyMutedAccounts ?? []).includes(payload.accountId) || !payload.messages.length) return;
   const t = text(), where = `${t.inbox} · ${mailbox(getAccount(payload.accountId) ?? null)}`;

@@ -1,10 +1,10 @@
-<img src="App/build/icon.png" width="96" alt="DHMail">
+<img src="App/build/icon.png" width="96" alt="DHDMail">
 
 # 💙🤍SECURITY🤍💙
 
 ## Reporting a Vulnerability
 
-Your assistance in maintaining the security of our project is highly appreciated. If you uncover any security vulnerabilities within our system, we urge you to immediately report them privately through [GitHub Security Advisories](https://github.com/EliasDeHondt/DHMail/security/advisories/new).
+Your assistance in maintaining the security of our project is highly appreciated. If you uncover any security vulnerabilities within our system, we urge you to immediately report them privately through [GitHub Security Advisories](https://github.com/EliasDeHondt/DHDMail/security/advisories/new).
 
 We kindly request that you follow these guidelines:
 

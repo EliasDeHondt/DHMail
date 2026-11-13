@@ -24,6 +24,14 @@ export interface OutgoingAttachment { filename: string; path?: string; contentBa
 export interface OutgoingMail { /** calendar invitation (iMIP) sent along with the mail */ icalEvent?: { method: string; content: string }; accountId: number; from?: string; to: string[]; cc: string[]; bcc: string[]; subject: string; html: string; text?: string; attachments: OutgoingAttachment[]; inReplyTo?: string | null; references?: string[]; answered?: MessageRef | null; forwardOf?: MessageRef | null; draftUid?: number | null; }
 export interface DraftResult { uid: number | null; }
 export interface Category { id: number; name: string; color: string; sortOrder: number; }
+export type RuleField = 'from' | 'to' | 'subject';
+/** value: one or more texts separated by commas; the condition holds when the field contains one of them */
+export interface RuleCondition { field: RuleField; value: string; }
+export type RuleDestination = 'none' | 'folder' | 'archive' | 'junk' | 'trash';
+export interface RuleActions { destination: RuleDestination; /** folder path in the rule's mailbox (destination 'folder') */ folderPath: string | null; categoryIds: number[]; markRead: boolean; flag: boolean; }
+/** a mail rule: new mail in the inbox that matches the conditions gets the actions; accountId null = every mailbox */
+export interface MailRule { id: number; name: string; accountId: number | null; enabled: boolean; matchAll: boolean; conditions: RuleCondition[]; actions: RuleActions; /** do not apply later rules to a mail this rule matched */ stop: boolean; sortOrder: number; }
+export interface RuleRunResult { checked: number; matched: number; }
 export interface Calendar { id: number; accountId: number | null; source: CalendarSource; remoteId: string | null; name: string; color: string; url: string | null; username: string | null; visible: boolean; readOnly: boolean; group: string; sortOrder: number; lastSync: string | null; error: string | null; }
 export interface Attendee { name: string; email: string; status: string; }
 /** how an event shows in the free/busy view (Outlook: showAs, Google: transparency / event type, iCalendar: TRANSP / BUSYSTATUS) */
@@ -102,6 +110,12 @@ export interface Api {
   'categories:save': (category: Partial<Category>) => Category[];
   'categories:remove': (id: number) => Category[];
   'categories:assign': (refs: MessageRef[], categoryId: number, assigned: boolean) => void;
+  'rules:list': () => MailRule[];
+  'rules:save': (rule: Partial<MailRule>) => MailRule[];
+  'rules:remove': (id: number) => MailRule[];
+  'rules:reorder': (ids: number[]) => MailRule[];
+  /** apply the rules (or one rule) to the mail that is in the inbox now */
+  'rules:run': (id?: number | null) => RuleRunResult;
   'calendar:list': () => Calendar[];
   'calendar:add': (input: CalendarInput) => Calendar[];
   /** name, colour, visibility, and for ICS / CalDAV calendars the link, a new file or the login */
@@ -122,7 +136,7 @@ export interface Api {
   'contacts:list': (query?: string) => Contact[];
   'contacts:sources': () => ContactSource[];
   'contacts:photos': () => Record<string, string>;
-  /** toId -1 = the local DHMail address book */
+  /** toId -1 = the local DHDMail address book */
   'contacts:copy': (fromId: number, toId: number) => ContactCopyResult;
   'contacts:copyOne': (contactId: number, toId: number) => ContactCopyResult;
   /** new contact in an account's address book (Google, Outlook or CardDAV) */

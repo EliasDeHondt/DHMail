@@ -53,16 +53,16 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          name: DHMail ${{ github.ref_name }}
+          name: DHDMail ${{ github.ref_name }}
           generate_release_notes: true
-          files: App/release/DHMail-Setup-*.exe
+          files: App/release/DHDMail-Setup-*.exe
           body: |
-            **Install or update:** download `DHMail-Setup-${{ github.ref_name }}.exe` below and double-click it.
-            If DHMail is already installed, it is closed and updated in place. Your accounts, mail, settings and PIN are kept.
+            **Install or update:** download `DHDMail-Setup-${{ github.ref_name }}.exe` below and double-click it.
+            If DHDMail is already installed, it is closed and updated in place. Your accounts, mail, settings and PIN are kept.
 
       - name: Keep the files (manual run)
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         uses: actions/upload-artifact@v4
         with:
-          name: DHMail-windows
-          path: App/release/DHMail-Setup-*.exe
+          name: DHDMail-windows
+          path: App/release/DHDMail-Setup-*.exe

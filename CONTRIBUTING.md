@@ -1,4 +1,4 @@
-<img src="App/build/icon.png" width="96" alt="DHMail">
+<img src="App/build/icon.png" width="96" alt="DHDMail">
 
 # 💙🤍CONTRIBUTING🤍💙
 

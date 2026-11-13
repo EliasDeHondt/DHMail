@@ -1,0 +1,37 @@
+:host { display: flex; flex-direction: column; gap: 14px; }
+.shead { display: flex; align-items: center; gap: 8px; }
+.stitle { flex: 1; margin: 0; font-size: 20px; font-weight: 700; }
+.intro { max-width: 720px; margin-top: -6px; }
+.rule-edit { display: flex; flex-direction: column; gap: 16px; max-width: 720px; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.rule-group { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 12px 14px 14px; border: 1px solid var(--line-soft); border-radius: 10px; min-width: 0; }
+.rule-group legend { padding: 0 6px; }
+.rule-match { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13.5px; }
+.select--inline { width: auto; height: 32px; }
+.rule-cond { display: flex; align-items: center; gap: 8px; }
+.rule-field { width: 150px; flex: none; }
+.rule-contains { flex: none; font-size: 13px; color: var(--secondary); }
+.rule-cats { display: flex; flex-wrap: wrap; gap: 6px; }
+.rule-cat { --cat: var(--primary); border: 1px solid color-mix(in srgb, var(--cat) 45%, transparent); background: transparent; color: var(--cat); font-size: 12.5px; padding: 3px 10px; }
+.rule-cat app-icon { --icon-size: 12px; }
+.rule-cat:hover { background: color-mix(in srgb, var(--cat) 12%, transparent); }
+.rule-cat--on, .rule-cat--on:hover { background: color-mix(in srgb, var(--cat) 22%, transparent); border-color: var(--cat); }
+.rule-cat:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.rule-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.spacer { flex: 1; }
+.cards { display: flex; flex-direction: column; gap: 8px; max-width: 720px; }
+.card { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.rule-card--open { border-color: var(--primary); }
+.rule-card--off .card-text { opacity: 0.6; }
+.rule-switch { display: inline-flex; flex: none; }
+.rule-switch input { width: 16px; height: 16px; margin: 0; accent-color: var(--primary); }
+.card-text { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.card-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.card-name { font-size: 14px; font-weight: 600; }
+.card-sub { font-size: 12.5px; color: var(--secondary); overflow-wrap: anywhere; }
+.rule-do { display: flex; align-items: center; gap: 4px; color: var(--text); }
+.rule-do app-icon { --icon-size: 13px; flex: none; color: var(--secondary); }
+.card-actions { display: flex; align-items: center; gap: 2px; flex: none; }
+.chip--prov { background: var(--tint); color: var(--ink); }
+.chip--muted { background: var(--hover); color: var(--secondary); }
+.spinning { animation: spin 0.9s linear infinite; }
+@media (max-width: 720px) { .field-row { flex-direction: column; } .rule-cond { flex-wrap: wrap; } .rule-field { width: 100%; } }

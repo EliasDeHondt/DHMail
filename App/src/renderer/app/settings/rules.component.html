@@ -1,0 +1,65 @@
+<div class="shead"><h2 class="stitle">{{ 'APP.SETTINGS.TAB_RULES' | translate }}</h2>@if (rules().length) {<button type="button" class="btn btn--sm" [disabled]="running() !== null" (click)="run(null)"><app-icon name="filter"></app-icon>{{ 'APP.RULES.RUN_ALL' | translate }}</button>}<button type="button" class="btn btn--primary btn--sm" (click)="create()"><app-icon name="plus"></app-icon>{{ 'APP.RULES.NEW' | translate }}</button></div>
+<p class="hint intro">{{ 'APP.RULES.INTRO' | translate }}</p>
+@if (draft(); as d) {
+<form class="rule-edit" (ngSubmit)="save()">
+  <div class="field-row">
+    <div class="field"><span class="field-label">{{ 'APP.RULES.NAME' | translate }}</span><input class="input" type="text" [(ngModel)]="d.name" name="ruleName" [placeholder]="'APP.RULES.NAME_PLACEHOLDER' | translate"/></div>
+    <div class="field"><span class="field-label">{{ 'APP.RULES.MAILBOX' | translate }}</span><select class="select" [(ngModel)]="d.accountId" name="ruleAccount" (ngModelChange)="accountChanged()"><option [ngValue]="null">{{ 'APP.RULES.ALL_MAILBOXES' | translate }}</option>@for (a of mailAccounts(); track a.id) {<option [ngValue]="a.id">{{ a.email }}</option>}</select></div>
+  </div>
+
+  <fieldset class="rule-group">
+    <legend class="field-label">{{ 'APP.RULES.CONDITIONS' | translate }}</legend>
+    @if (d.conditions.length > 1) {<div class="rule-match"><span>{{ 'APP.RULES.MATCH_PREFIX' | translate }}</span><select class="select select--inline" [(ngModel)]="d.matchAll" name="matchAll"><option [ngValue]="true">{{ 'APP.RULES.MATCH_ALL' | translate }}</option><option [ngValue]="false">{{ 'APP.RULES.MATCH_ANY' | translate }}</option></select><span>{{ 'APP.RULES.MATCH_SUFFIX' | translate }}</span></div>}
+    @for (c of d.conditions; track $index; let i = $index) {
+    <div class="rule-cond">
+      <select class="select rule-field" [(ngModel)]="c.field" [name]="'field' + i" [attr.aria-label]="'APP.RULES.FIELD' | translate">@for (f of fields; track f) {<option [ngValue]="f">{{ ('APP.RULES.FIELD_' + f.toUpperCase()) | translate }}</option>}</select>
+      <span class="rule-contains">{{ 'APP.RULES.CONTAINS' | translate }}</span>
+      <input class="input" type="text" [(ngModel)]="c.value" [name]="'value' + i" [placeholder]="(c.field === 'subject' ? 'APP.RULES.VALUE_SUBJECT' : 'APP.RULES.VALUE_ADDRESS') | translate" [attr.aria-label]="'APP.RULES.VALUE' | translate"/>
+      <button type="button" class="icon-btn icon-btn--sm" [disabled]="d.conditions.length < 2" (click)="removeCondition(i)" [title]="'APP.COMMON.REMOVE' | translate" [attr.aria-label]="'APP.COMMON.REMOVE' | translate"><app-icon name="close"></app-icon></button>
+    </div>}
+    <div><button type="button" class="btn btn--ghost btn--sm" (click)="addCondition()"><app-icon name="plus"></app-icon>{{ 'APP.RULES.ADD_CONDITION' | translate }}</button></div>
+    <p class="hint">{{ 'APP.RULES.VALUE_HINT' | translate }}</p>
+  </fieldset>
+
+  <fieldset class="rule-group">
+    <legend class="field-label">{{ 'APP.RULES.ACTIONS' | translate }}</legend>
+    <div class="field"><span class="field-label">{{ 'APP.RULES.DESTINATION' | translate }}</span>
+      <select class="select" [ngModel]="destinationValue(d)" (ngModelChange)="setDestination(d, $event)" name="destination">
+        <option value="none">{{ 'APP.RULES.DEST_NONE' | translate }}</option>
+        <option value="junk">{{ 'APP.RULES.DEST_JUNK' | translate }}</option>
+        <option value="archive">{{ 'APP.RULES.DEST_ARCHIVE' | translate }}</option>
+        <option value="trash">{{ 'APP.RULES.DEST_TRASH' | translate }}</option>
+        @for (f of folders(d.accountId); track f.id) {<option [value]="'folder:' + f.path">{{ folderIndent(f) }}</option>}
+      </select>
+      @if (!d.accountId) {<p class="hint">{{ 'APP.RULES.FOLDER_HINT' | translate }}</p>}
+    </div>
+    <div class="field"><span class="field-label">{{ 'APP.RULES.CATEGORIES' | translate }}</span>
+      <div class="rule-cats" role="group" [attr.aria-label]="'APP.RULES.CATEGORIES' | translate">@for (c of store.categories(); track c.id) {<button type="button" class="chip chip--cat rule-cat" [class.rule-cat--on]="d.actions.categoryIds.includes(c.id)" [style.--cat]="c.color" [attr.aria-pressed]="d.actions.categoryIds.includes(c.id)" (click)="toggleCategory(c.id)">@if (d.actions.categoryIds.includes(c.id)) {<app-icon name="check"></app-icon>}{{ c.name }}</button>} @empty {<span class="hint">{{ 'APP.RULES.NO_CATEGORIES' | translate }}</span>}</div>
+    </div>
+    <label class="check"><input type="checkbox" [(ngModel)]="d.actions.markRead" name="markRead"/>{{ 'APP.RULES.MARK_READ' | translate }}</label>
+    <label class="check"><input type="checkbox" [(ngModel)]="d.actions.flag" name="flag"/>{{ 'APP.RULES.FLAG' | translate }}</label>
+    <label class="check"><input type="checkbox" [(ngModel)]="d.stop" name="stop"/>{{ 'APP.RULES.STOP' | translate }}</label>
+  </fieldset>
+
+  <div class="rule-actions"><label class="check"><input type="checkbox" [(ngModel)]="d.enabled" name="enabled"/>{{ 'APP.RULES.ENABLED' | translate }}</label><span class="spacer"></span><button type="button" class="btn btn--ghost" (click)="cancel()">{{ 'APP.COMMON.CANCEL' | translate }}</button><button type="button" class="btn" [disabled]="saving()" (click)="save(true)">{{ 'APP.RULES.SAVE_AND_RUN' | translate }}</button><button type="submit" class="btn btn--primary" [disabled]="saving()">{{ 'APP.COMMON.SAVE' | translate }}</button></div>
+</form>
+}
+@if (!rules().length && !draft()) {<div class="empty"><app-icon name="filter"></app-icon><strong>{{ 'APP.RULES.EMPTY' | translate }}</strong><span>{{ 'APP.RULES.EMPTY_HINT' | translate }}</span></div>}
+<div class="cards">
+  @for (r of rules(); track r.id; let first = $first; let last = $last) {
+  <div class="card rule-card" [class.rule-card--open]="draft()?.id === r.id" [class.rule-card--off]="!r.enabled">
+    <label class="rule-switch" [title]="(r.enabled ? 'APP.RULES.TURN_OFF' : 'APP.RULES.TURN_ON') | translate"><input type="checkbox" [checked]="r.enabled" (change)="toggle(r)" [attr.aria-label]="'APP.RULES.ENABLED' | translate"/></label>
+    <div class="card-text">
+      <div class="card-line"><span class="card-name">{{ r.name }}</span><span class="chip chip--prov">{{ mailbox(r.accountId) }}</span>@if (!r.enabled) {<span class="chip chip--muted">{{ 'APP.RULES.OFF' | translate }}</span>}</div>
+      <div class="card-sub">{{ conditionText(r) }}</div>
+      <div class="card-sub rule-do"><app-icon name="chevron-right"></app-icon>{{ actionText(r) }}</div>
+    </div>
+    <div class="card-actions">
+      <button type="button" class="icon-btn icon-btn--sm" [disabled]="first" (click)="move(r, -1)" [title]="'APP.RULES.UP' | translate" [attr.aria-label]="'APP.RULES.UP' | translate"><app-icon name="chevron-up"></app-icon></button>
+      <button type="button" class="icon-btn icon-btn--sm" [disabled]="last" (click)="move(r, 1)" [title]="'APP.RULES.DOWN' | translate" [attr.aria-label]="'APP.RULES.DOWN' | translate"><app-icon name="chevron-down"></app-icon></button>
+      <button type="button" class="icon-btn icon-btn--sm" [disabled]="running() !== null" (click)="run(r.id)" [title]="'APP.RULES.RUN_ONE' | translate" [attr.aria-label]="'APP.RULES.RUN_ONE' | translate"><app-icon name="refresh" [class.spinning]="running() === r.id"></app-icon></button>
+      <button type="button" class="icon-btn icon-btn--sm" (click)="edit(r)" [title]="'APP.COMMON.EDIT' | translate" [attr.aria-label]="'APP.COMMON.EDIT' | translate"><app-icon name="edit"></app-icon></button>
+      <button type="button" class="icon-btn icon-btn--sm icon-btn--danger" (click)="remove(r)" [title]="'APP.COMMON.REMOVE' | translate" [attr.aria-label]="'APP.COMMON.REMOVE' | translate"><app-icon name="trash"></app-icon></button>
+    </div>
+  </div>}
+</div>

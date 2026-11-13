@@ -1,7 +1,7 @@
 <div class="settings">
   <aside class="snav">
     <h1 class="snav-title">{{ 'APP.SETTINGS.TITLE' | translate }}</h1>
-    @for (t of tabs; track t) {<button type="button" class="snav-item" [class.snav-item--active]="tab() === t" (click)="setTab(t)"><app-icon [name]="t === 'accounts' ? 'user' : t === 'signatures' ? 'edit' : t === 'calendars' ? 'calendar' : t === 'categories' ? 'tag' : t === 'general' ? 'settings' : 'info'"></app-icon>{{ ('APP.SETTINGS.TAB_' + t.toUpperCase()) | translate }}</button>}
+    @for (t of tabs; track t) {<button type="button" class="snav-item" [class.snav-item--active]="tab() === t" (click)="setTab(t)"><app-icon [name]="t === 'accounts' ? 'user' : t === 'signatures' ? 'edit' : t === 'rules' ? 'filter' : t === 'calendars' ? 'calendar' : t === 'categories' ? 'tag' : t === 'general' ? 'settings' : 'info'"></app-icon>{{ ('APP.SETTINGS.TAB_' + t.toUpperCase()) | translate }}</button>}
   </aside>
   <section class="spane">
     @if (tab() === 'accounts') {
@@ -17,6 +17,7 @@
     </div>
     }
     @if (tab() === 'signatures') {<app-signatures></app-signatures>}
+    @if (tab() === 'rules') {<app-rules></app-rules>}
     @if (tab() === 'calendars') {
     <div class="shead"><h2 class="stitle">{{ 'APP.SETTINGS.CALENDARS' | translate }}</h2><button type="button" class="btn btn--primary btn--sm" (click)="addingCalendar.set(true)"><app-icon name="plus"></app-icon>{{ 'APP.CALENDAR.ADD_CALENDAR' | translate }}</button></div>
     <div class="cards">
@@ -47,7 +48,7 @@
       <div class="block-actions"><span class="spacer"></span><button type="submit" class="btn btn--primary">{{ 'APP.COMMON.SAVE' | translate }}</button></div>
     </form>}
     @if (tab() === 'about') {
-    <div class="about"><app-logo class="about-logo" [wordmark]="false"></app-logo><h2 class="about-title">DHMail</h2><p class="about-by">{{ 'APP.SETTINGS.MADE_BY' | translate }} <b class="by">Elias De Hondt</b></p>@if (info(); as i) {<dl class="about-meta"><dt>{{ 'APP.SETTINGS.VERSION' | translate }}</dt><dd>{{ i.version }}</dd><dt>{{ 'APP.SETTINGS.DATA_PATH' | translate }}</dt><dd>{{ i.dataPath }}</dd></dl>}</div>}
+    <div class="about"><app-logo class="about-logo" [wordmark]="false"></app-logo><h2 class="about-title">DHDMail</h2><p class="about-by">{{ 'APP.SETTINGS.MADE_BY' | translate }} <b class="by">Elias De Hondt</b></p>@if (info(); as i) {<dl class="about-meta"><dt>{{ 'APP.SETTINGS.VERSION' | translate }}</dt><dd>{{ i.version }}</dd><dt>{{ 'APP.SETTINGS.DATA_PATH' | translate }}</dt><dd>{{ i.dataPath }}</dd></dl>}</div>}
   </section>
   @if (editing(); as e) {<app-account-dialog [account]="e === 'new' ? null : e" (closed)="editing.set(null)" (saved)="editing.set(null)"></app-account-dialog>}
   @if (addingCalendar()) {<app-calendar-dialog (closed)="addingCalendar.set(false)" (saved)="addingCalendar.set(false)"></app-calendar-dialog>}

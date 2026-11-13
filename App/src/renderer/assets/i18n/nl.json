@@ -54,6 +54,9 @@
       "SUBTITLE": "Je mail, agenda en contacten op één plek. Kies hoe je wil verbinden."
     },
     "MAIL": {
+      "COPY_ADDRESS": "E-mailadres kopiëren",
+      "COPY_NAME_ADDRESS": "Naam en e-mailadres kopiëren",
+      "COPY_ALL_ADDRESSES": "Alle e-mailadressen kopiëren",
       "NEW_MAIL": "Nieuwe e-mail",
       "FOLDER_INBOX": "Postvak IN",
       "FOLDER_SENT": "Verzonden items",
@@ -250,6 +253,18 @@
       "OPEN_CONTACT": "Contact openen"
     },
     "PEOPLE": {
+      "EMAIL": "E-mail",
+      "PHONE": "Telefoon",
+      "COPY_VALUE": "Kopiëren",
+      "COPY_CONTACT": "Contact kopiëren",
+      "COPY_CONTACTS": "Contacten kopiëren",
+      "COPY_NAME": "Naam kopiëren",
+      "COPY_EMAILS": "E-mailadressen kopiëren",
+      "COPIED": "Gekopieerd: {{value}}",
+      "COPIED_CONTACT": "Contactgegevens gekopieerd",
+      "COPIED_CONTACTS": "Contactgegevens gekopieerd",
+      "COPIED_EMAILS": "E-mailadressen gekopieerd",
+      "NO_EMAILS": "Deze contacten hebben geen e-mailadres",
       "NEW_CONTACT": "Nieuw contact",
       "SOURCES": "Bronnen",
       "SYNC": "Contacten synchroniseren",

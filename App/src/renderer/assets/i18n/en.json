@@ -54,6 +54,9 @@
       "SUBTITLE": "Your mail, calendar and contacts in one place. Choose how you want to connect."
     },
     "MAIL": {
+      "COPY_ADDRESS": "Copy email address",
+      "COPY_NAME_ADDRESS": "Copy name and email address",
+      "COPY_ALL_ADDRESSES": "Copy all email addresses",
       "NEW_MAIL": "New mail",
       "FOLDER_INBOX": "Inbox",
       "FOLDER_SENT": "Sent Items",
@@ -250,6 +253,18 @@
       "OPEN_CONTACT": "Open contact"
     },
     "PEOPLE": {
+      "EMAIL": "Email",
+      "PHONE": "Phone",
+      "COPY_VALUE": "Copy",
+      "COPY_CONTACT": "Copy contact",
+      "COPY_CONTACTS": "Copy contacts",
+      "COPY_NAME": "Copy name",
+      "COPY_EMAILS": "Copy email addresses",
+      "COPIED": "Copied: {{value}}",
+      "COPIED_CONTACT": "Contact details copied",
+      "COPIED_CONTACTS": "Contact details copied",
+      "COPIED_EMAILS": "Email addresses copied",
+      "NO_EMAILS": "These contacts have no email address",
       "NEW_CONTACT": "New contact",
       "SOURCES": "Sources",
       "SYNC": "Sync contacts",

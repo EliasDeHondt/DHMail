@@ -52,6 +52,7 @@ export interface SyncState { accountId: number | null; kind: 'mail' | 'calendar'
 export interface Api {
   'app:info': () => AppInfo;
   'app:testNotification': () => boolean;
+  'app:copyText': (text: string) => void;
   'app:openExternal': (url: string) => void;
   'geo:suggest': (query: string, lang?: string) => PlaceSuggestion[];
   'app:pickFiles': () => SavedFile[];

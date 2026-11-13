@@ -136,3 +136,9 @@
 .row--child .row-from { font-weight: 500; }
 .row--child.row--unread .row-from { font-weight: 700; }
 .chip--folder { flex: none; margin-left: 6px; background: var(--tint); color: var(--ink); }
+
+.msg-copy { align-self: center; width: 22px; height: 22px; margin: -2px 0; opacity: 0; transition: opacity 0.15s; }
+.msg-copy app-icon { --icon-size: 13px; color: var(--secondary); }
+.msg-sender-line:hover .msg-copy, .msg-copy:focus-visible { opacity: 1; }
+.msg-copy:hover app-icon { color: var(--ink); }
+.msg-sender-text { user-select: text; }

@@ -43,7 +43,7 @@
 .card-body { display: flex; flex-direction: column; gap: 12px; padding-top: 20px; }
 .kv { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; }
 .kv app-icon { --icon-size: 18px; color: var(--ink); flex: none; margin-top: 1px; }
-.kv-text { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
+.kv-text { display: flex; flex-direction: column; flex: 1; min-width: 0; overflow-wrap: anywhere; user-select: text; }
 .kv-text small { color: var(--secondary); text-transform: capitalize; }
 .kv-notes { white-space: pre-wrap; }
 .edit { display: flex; flex-direction: column; gap: 14px; max-width: 640px; width: 100%; margin: 0 auto; padding: 24px 32px; animation: fade 0.15s ease-out; }
@@ -63,3 +63,10 @@
 .bulk { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; height: 100%; padding: 40px 24px; text-align: center; }
 .bulk > app-icon { --icon-size: 44px; color: var(--accent); }
 .bulk-actions { display: flex; gap: 8px; margin-top: 6px; }
+
+.kv-copy { flex: none; margin: -4px 0; opacity: 0; transition: opacity 0.15s; }
+.kv-copy app-icon { --icon-size: 15px; color: var(--secondary); margin: 0; }
+.kv:hover .kv-copy, .kv-copy:focus-visible { opacity: 1; }
+.kv-copy:hover app-icon { color: var(--ink); }
+.card-name, .card-sub { user-select: text; }
+@media (hover: none) { .kv-copy { opacity: 1; } }

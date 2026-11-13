@@ -77,6 +77,10 @@ export class MailComponent implements OnDestroy {
   longDate = (iso: string | null) => longDate(iso, this.store.locale());
   addressesLabel = addressesLabel;
   addressLabel = addressLabel;
+  async copyText(text: string) { const value = (text ?? '').trim(); if (!value) return; try { await this.bridge.invoke('app:copyText', value); this.toast.show(this.translate.instant('APP.PEOPLE.COPIED', { value: value.length > 60 ? value.slice(0, 57) + '…' : value }), 'success'); } catch (err) { this.toast.error(err); } }
+  /** every address of a message (sender, to, cc), without duplicates */
+  allAddresses(m: MessageBody) { const seen = new Set<string>(); return [...m.from, ...m.to, ...m.cc].map(a => a.address?.trim()).filter((a): a is string => !!a && !seen.has(a.toLowerCase()) && !!seen.add(a.toLowerCase())); }
+  addressMenu(e: MouseEvent, a: Address) { const t = (k: string) => this.translate.instant(k); const items: MenuItem[] = [{ label: t('APP.MAIL.COPY_ADDRESS'), icon: 'copy', action: () => this.copyText(a.address) }]; if (a.name) items.push({ label: t('APP.MAIL.COPY_NAME_ADDRESS'), icon: 'copy', action: () => this.copyText(`${a.name} <${a.address}>`) }); this.dialogs.openMenu(e, items); }
   addressFull = addressFull;
   formatBytes = formatBytes;
   folderIcon = (f: Folder) => FOLDER_ICONS[f.specialUse ?? ''] ?? 'folder';

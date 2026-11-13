@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell, clipboard } from 'electron';
 import { readFile, writeFile, stat } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import { ImapFlow } from 'imapflow';
@@ -32,6 +32,7 @@ export function registerIpc(getWindow: () => BrowserWindow | null, focusWindow: 
   const handlers: Handlers = {
     'app:info': () => ({ version: app.getVersion(), dataPath: app.getPath('userData'), platform: process.platform }),
     'app:testNotification': () => testNotification(focusWindow),
+    'app:copyText': text => { clipboard.writeText(String(text ?? '')); },
     'geo:suggest': (query, lang) => suggestPlaces(String(query ?? '').slice(0, 200), lang === 'en' ? 'en' : 'nl'),
     'app:openExternal': url => { if (/^(https?|mailto|tel):/i.test(url)) shell.openExternal(url); },
     'app:pickFiles': async () => { const r = await dialog.showOpenDialog(win()!, { properties: ['openFile', 'multiSelections'] }); return Promise.all(r.filePaths.map(async p => ({ path: p, name: basename(p), size: (await stat(p)).size }))); },

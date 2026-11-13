@@ -6,7 +6,7 @@
 # Builds the Windows installer and the portable exe and publishes them as a GitHub Release.
 # Start it by pushing a version tag that matches App/package.json, e.g.:
 #   git tag v1.26.0 && git push origin v1.26.0
-# Needs one repository secret, OAUTH_JSON, with the contents of App/oauth.json (that file is not in git).
+# No secrets needed: oauth.json ships empty, users set up their own Google/Microsoft keys.
 name: Release
 
 on:
@@ -39,13 +39,9 @@ jobs:
           $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
           if ("v$version" -ne "${{ github.ref_name }}") { throw "Tag ${{ github.ref_name }} does not match package.json version $version" }
 
-      - name: Write oauth.json from the repository secret
+      - name: Write the empty oauth.json (users add their own keys in the app)
         shell: pwsh
-        env:
-          OAUTH_JSON: ${{ secrets.OAUTH_JSON }}
-        run: |
-          if ($env:OAUTH_JSON) { Set-Content -Path oauth.json -Value $env:OAUTH_JSON -NoNewline -Encoding utf8 }
-          else { Write-Warning 'OAUTH_JSON secret is missing: the build has no built-in Google/Microsoft keys'; Set-Content -Path oauth.json -Value '{}' -Encoding utf8 }
+        run: Set-Content -Path oauth.json -Encoding utf8 -Value '{ "googleClientId": "", "googleClientSecret": "", "microsoftClientId": "", "microsoftTenant": "common" }'
 
       - run: npm ci
 

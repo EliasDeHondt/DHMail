@@ -16,7 +16,7 @@ export const toRow = (r: any): Row => ({ displayName: r.display_name ?? '', firs
 const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, ' ');
 export const nameOf = (c: Row) => c.displayName || [c.firstName, c.lastName].filter(Boolean).join(' ') || c.emails[0]?.value || '';
 export const birthdayParts = (b: string | null) => { const m = b ? /^(?:(\d{4})|--)?-?(\d{2})-(\d{2})/.exec(b.trim()) : null; return m ? { year: m[1] ? Number(m[1]) : null, month: Number(m[2]), day: Number(m[3]) } : null; };
-const withExtra = (notes: string, extra: string[]) => extra.length ? [notes.trim(), `— DHDMail (gekopieerd) —\n${extra.join('\n')}`].filter(Boolean).join('\n\n') : notes;
+const withExtra = (notes: string, extra: string[]) => extra.length ? [notes.trim(), `— DHMail (gekopieerd) —\n${extra.join('\n')}`].filter(Boolean).join('\n\n') : notes;
 
 async function photoBytes(photo: string | null): Promise<{ type: string; data: Buffer } | null> {
   if (!photo) return null;
@@ -91,7 +91,7 @@ async function toOutlook(accountId: number, list: Row[], result: ContactCopyResu
       const photo = created?.id ? await photoBytes(c.photo) : null;
       if (photo) await graph(accountId, `/me/contacts/${encodeURIComponent(created.id)}/photo/$value`, { method: 'PUT', body: new Uint8Array(photo.data), headers: { 'Content-Type': photo.type } }, true, 'contactswrite').catch(err => log('outlook contact photo failed', err?.message));
     } catch (err: any) {
-      if (err?.code === 'OAUTH_REAUTH' || err?.code === 'OAUTH_FAILED' || err?.status === 403) throw Object.assign(new Error('DHDMail may not write contacts to this Outlook account yet. Add the Outlook account again to grant access, then retry.'), { code: 'CONTACTS_WRITE_CONSENT' });
+      if (err?.code === 'OAUTH_REAUTH' || err?.code === 'OAUTH_FAILED' || err?.status === 403) throw Object.assign(new Error('DHMail may not write contacts to this Outlook account yet. Add the Outlook account again to grant access, then retry.'), { code: 'CONTACTS_WRITE_CONSENT' });
       result.failed++; result.errors.push(`${nameOf(c)}: ${err?.message ?? err}`);
     }
   }

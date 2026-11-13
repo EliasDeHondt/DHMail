@@ -39,7 +39,7 @@ export class PeopleComponent implements OnDestroy {
   readonly loading = signal(false);
   readonly syncing = signal(false);
   readonly editing = signal<ContactInput | null>(null);
-  /** where a new contact is saved: -1 = DHDMail (this computer), otherwise an account's address book */
+  /** where a new contact is saved: -1 = DHMail (this computer), otherwise an account's address book */
   saveTarget = -1;
   writableSources() { return this.sources().filter(s => s.kind !== 'local'); }
   readonly addingSource = signal(false);

@@ -24,7 +24,7 @@ test('vcard keeps every detail', async () => {
 test('copy skips contacts that already exist and keeps all fields', async () => {
   openDb(':memory:');
   try {
-    run("INSERT INTO contact_sources(id, kind, name) VALUES (1, 'carddav', 'Bron'), (2, 'local', 'DHDMail')");
+    run("INSERT INTO contact_sources(id, kind, name) VALUES (1, 'carddav', 'Bron'), (2, 'local', 'DHMail')");
     const add = (source, name, emails, extra = {}) => run('INSERT INTO contacts(source_id, display_name, first_name, last_name, emails, phones, company, title, notes, birthday, photo, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', source, name, extra.first ?? '', extra.last ?? '', JSON.stringify(emails.map(value => ({ value, label: '' }))), JSON.stringify(extra.phones ?? []), extra.company ?? '', '', extra.notes ?? '', extra.birthday ?? null, extra.photo ?? null, '2026-01-01');
     add(1, 'Tina', ['tina@x.be'], { phones: [{ value: '0470', label: 'mobile' }], company: 'UA', notes: 'n', birthday: '--05-12', photo: 'data:image/png;base64,AAAA' });
     add(1, 'Casper', ['casper@x.be']);

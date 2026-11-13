@@ -136,7 +136,7 @@ export interface Api {
   'contacts:list': (query?: string) => Contact[];
   'contacts:sources': () => ContactSource[];
   'contacts:photos': () => Record<string, string>;
-  /** toId -1 = the local DHDMail address book */
+  /** toId -1 = the local DHMail address book */
   'contacts:copy': (fromId: number, toId: number) => ContactCopyResult;
   'contacts:copyOne': (contactId: number, toId: number) => ContactCopyResult;
   /** new contact in an account's address book (Google, Outlook or CardDAV) */

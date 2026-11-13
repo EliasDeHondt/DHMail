@@ -3,15 +3,15 @@ import { cpSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, rmdirSy
 import { join } from 'node:path';
 import { log } from './bus';
 /** names the app had before; their data folder in %APPDATA% is taken over once */
-const OLD_NAMES = ['DHMail'];
+const OLD_NAMES = ['DHDMail'];
 const DB = 'dhmail.db';
 function moveEntry(from: string, to: string) {
   if (existsSync(to)) rmSync(to, { recursive: true, force: true });
   try { renameSync(from, to); } catch { cpSync(from, to, { recursive: true }); }
 }
 /**
- * The app was renamed (DHMail → DHDMail), so Electron now looks in %APPDATA%\DHDMail. Move the mail,
- * settings, PIN and the key that unlocks the saved passwords ("Local State") over from the old folder.
+ * A 1.29.0 test build was called DHDMail and kept its data in %APPDATA%\DHDMail. If that build was used,
+ * move the mail, settings, PIN and the key that unlocks the saved passwords ("Local State") back to %APPDATA%\DHMail.
  * Runs before anything else touches the data folder, and only while the new folder has no database yet.
  */
 export function moveOldUserData() {

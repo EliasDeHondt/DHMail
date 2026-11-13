@@ -1,4 +1,4 @@
-<img src="App/build/icon.png" width="96" alt="DHDMail">
+<img src="App/build/icon.png" width="96" alt="DHMail">
 
 # 💙🤍README🤍💙
 
@@ -11,7 +11,7 @@
 
 ## 🖖Introduction
 
-DHDMail is a desktop mail, calendar and contacts client for Windows by Elias De Hondt. It connects to Outlook and Google with one click, or to any other mailbox over IMAP and SMTP, and keeps everything on your own computer.
+DHMail is a desktop mail, calendar and contacts client for Windows by Elias De Hondt. It connects to Outlook and Google with one click, or to any other mailbox over IMAP and SMTP, and keeps everything on your own computer.
 
 Please also see following documents:
 - [LICENSE](LICENSE.md)

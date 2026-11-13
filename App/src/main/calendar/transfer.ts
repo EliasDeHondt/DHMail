@@ -115,7 +115,7 @@ export function expand(item: Item, from: Date, to: Date): Date[] {
 // ---------------------------------------------------------------- iCalendar text
 const esc = (s: string) => (s ?? '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
 export function itemToIcs(item: Item, uid: string): string {
-  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Elias De Hondt//DHDMail//EN', 'BEGIN:VEVENT', `UID:${uid}`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '')}`];
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Elias De Hondt//DHMail//EN', 'BEGIN:VEVENT', `UID:${uid}`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '')}`];
   if (item.allDay) lines.push(`DTSTART;VALUE=DATE:${icsDate(item.start)}`, `DTEND;VALUE=DATE:${icsDate(item.end)}`);
   else lines.push(`DTSTART;TZID=${TZ}:${icsLocal(item.start)}`, `DTEND;TZID=${TZ}:${icsLocal(item.end)}`);
   if (item.rrule) lines.push(`RRULE:${item.rrule}`);

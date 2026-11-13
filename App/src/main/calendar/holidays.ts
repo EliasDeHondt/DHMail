@@ -33,7 +33,7 @@ export function belgianHolidays(start: Date, end: Date, language: 'nl' | 'en' = 
   return out;
 }
 
-/** Birthday and holiday calendars that mail providers add on their own; DHDMail shows its own shared ones instead. */
+/** Birthday and holiday calendars that mail providers add on their own; DHMail shows its own shared ones instead. */
 const BUILT_IN_ID = /#(contacts|holiday)@group\.v\.calendar\.google\.com/i;
 const BUILT_IN_NAME = /^(birthdays?|verjaardagen|geburtstage|anniversaires|compleanni|cumpleaños|contacts?|contactpersonen)$|\b(holidays|feestdagen|feiertage|jours fériés|días festivos)\b/i;
 export const isBuiltInExtraCalendar = (id: string, name: string) => BUILT_IN_ID.test(decodeURIComponent(id)) || BUILT_IN_NAME.test(name.trim());

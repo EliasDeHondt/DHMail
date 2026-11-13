@@ -114,5 +114,5 @@ export function registerIpc(getWindow: () => BrowserWindow | null, focusWindow: 
     'contacts:remove': id => contacts.removeContact(id),
     'contacts:importVcf': text => contacts.importVcf(text)
   };
-  for (const [channel, fn] of Object.entries(handlers)) ipcMain.handle(channel, async (_event, ...args: any[]) => { try { if (!isUnlocked() && !OPEN_WHILE_LOCKED.has(channel)) throw Object.assign(new Error('DHDMail is locked'), { status: 423 }); return await (fn as any)(...args); } catch (err: any) { log('ipc failed', channel, err?.message); throw new Error(JSON.stringify({ message: describe(err), code: err instanceof OAuthError ? err.code : err?.code ?? null, status: err?.status ?? null })); } });
+  for (const [channel, fn] of Object.entries(handlers)) ipcMain.handle(channel, async (_event, ...args: any[]) => { try { if (!isUnlocked() && !OPEN_WHILE_LOCKED.has(channel)) throw Object.assign(new Error('DHMail is locked'), { status: 423 }); return await (fn as any)(...args); } catch (err: any) { log('ipc failed', channel, err?.message); throw new Error(JSON.stringify({ message: describe(err), code: err instanceof OAuthError ? err.code : err?.code ?? null, status: err?.status ?? null })); } });
 }

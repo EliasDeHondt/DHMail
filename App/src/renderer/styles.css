@@ -120,7 +120,7 @@ html.ev-drag-move, html.ev-drag-resize { user-select: none; }
 [draggable="true"]:active { cursor: url('assets/svg/cursor-grabbing.svg') 12 12, grabbing; }
 .spinner, .is-busy { cursor: var(--cursor-wait); }
 
-/* checkboxes in the DHDMail style (colour: --cb, default the primary colour) */
+/* checkboxes in the DHMail style (colour: --cb, default the primary colour) */
 input[type="checkbox"] { -webkit-appearance: none; appearance: none; display: inline-grid; place-content: center; flex: none; width: 17px; height: 17px; margin: 0; border: 1.5px solid color-mix(in srgb, var(--secondary) 65%, transparent); border-radius: 5px; background: var(--background) no-repeat center / 12px 12px; vertical-align: middle; transition: background-color 0.12s, border-color 0.12s, box-shadow 0.12s; }
 input[type="checkbox"]:hover:not(:disabled) { border-color: var(--cb, var(--primary)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--cb, var(--primary)) 16%, transparent); }
 input[type="checkbox"]:checked { border-color: var(--cb, var(--primary)); background-color: var(--cb, var(--primary)); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E"); }

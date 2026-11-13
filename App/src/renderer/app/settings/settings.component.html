@@ -48,7 +48,7 @@
       <div class="block-actions"><span class="spacer"></span><button type="submit" class="btn btn--primary">{{ 'APP.COMMON.SAVE' | translate }}</button></div>
     </form>}
     @if (tab() === 'about') {
-    <div class="about"><app-logo class="about-logo" [wordmark]="false"></app-logo><h2 class="about-title">DHDMail</h2><p class="about-by">{{ 'APP.SETTINGS.MADE_BY' | translate }} <b class="by">Elias De Hondt</b></p>@if (info(); as i) {<dl class="about-meta"><dt>{{ 'APP.SETTINGS.VERSION' | translate }}</dt><dd>{{ i.version }}</dd><dt>{{ 'APP.SETTINGS.DATA_PATH' | translate }}</dt><dd>{{ i.dataPath }}</dd></dl>}</div>}
+    <div class="about"><app-logo class="about-logo" [wordmark]="false"></app-logo><h2 class="about-title">DHMail</h2><p class="about-by">{{ 'APP.SETTINGS.MADE_BY' | translate }} <b class="by">Elias De Hondt</b></p>@if (info(); as i) {<dl class="about-meta"><dt>{{ 'APP.SETTINGS.VERSION' | translate }}</dt><dd>{{ i.version }}</dd><dt>{{ 'APP.SETTINGS.DATA_PATH' | translate }}</dt><dd>{{ i.dataPath }}</dd></dl>}</div>}
   </section>
   @if (editing(); as e) {<app-account-dialog [account]="e === 'new' ? null : e" (closed)="editing.set(null)" (saved)="editing.set(null)"></app-account-dialog>}
   @if (addingCalendar()) {<app-calendar-dialog (closed)="addingCalendar.set(false)" (saved)="addingCalendar.set(false)"></app-calendar-dialog>}

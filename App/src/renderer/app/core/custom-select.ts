@@ -1,4 +1,4 @@
-// Replaces the operating-system dropdown of every <select> with a list in the DHDMail style.
+// Replaces the operating-system dropdown of every <select> with a list in the DHMail style.
 // The <select> stays in the page (and keeps working with ngModel, forms and the keyboard); only the
 // popup is ours: picking an item sets selectedIndex and fires the same input/change events.
 

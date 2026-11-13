@@ -2,7 +2,7 @@ import { BrowserWindow, clipboard, Menu, MenuItemConstructorOptions } from 'elec
 import { getSettings } from './core/settings';
 const TEXT = { nl: { cut: 'Knippen', copy: 'Kopiëren', paste: 'Plakken', selectAll: 'Alles selecteren', copyLink: 'Linkadres kopiëren', copyEmail: 'E-mailadres kopiëren', addWord: 'Toevoegen aan woordenboek' }, en: { cut: 'Cut', copy: 'Copy', paste: 'Paste', selectAll: 'Select all', copyLink: 'Copy link address', copyEmail: 'Copy email address', addWord: 'Add to dictionary' } };
 // Electron has no right-click menu of its own: give selected text, links and input fields the usual Copy / Paste menu.
-// Places that open their own DHDMail menu (mail rows, contacts, …) cancel the event, so this only appears where nothing else does.
+// Places that open their own DHMail menu (mail rows, contacts, …) cancel the event, so this only appears where nothing else does.
 export function attachContextMenu(win: BrowserWindow) {
   win.webContents.on('context-menu', (_e, p) => {
     const t = TEXT[getSettings().language === 'en' ? 'en' : 'nl'];

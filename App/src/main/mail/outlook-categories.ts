@@ -7,7 +7,7 @@ export const usesOutlookCategories = (a: Account | null | undefined) => !!a && a
 const odataString = (s: string) => `'${s.replace(/'/g, "''")}'`;
 function upsertCategory(name: string, color: string): number { const existing = get<{ id: number; color: string }>('SELECT id, color FROM categories WHERE lower(name) = lower(?)', name); if (existing) { if (existing.color !== color) run('UPDATE categories SET color = ? WHERE id = ?', color, existing.id); return existing.id; } const order = (get<{ m: number }>('SELECT COALESCE(MAX(sort_order), 0) AS m FROM categories')?.m ?? 0) + 1; return lastId(run('INSERT INTO categories(name, color, sort_order) VALUES(?,?,?)', name, color, order)); }
 async function messagesWithCategory(accountId: number, name: string): Promise<string[]> { const out: string[] = []; let next: string | null = `/me/messages?$filter=${encodeURIComponent(`categories/any(c:c eq ${odataString(name)})`)}&$select=internetMessageId&$top=250`; while (next) { const data: any = await graph(accountId, next, {}, true, 'mailapi'); for (const m of data?.value ?? []) if (m.internetMessageId) out.push(m.internetMessageId); next = data?.['@odata.nextLink'] ?? null; } return out; }
-// Pull the Outlook category list and every categorized mail, and mirror them into DHDMail's categories.
+// Pull the Outlook category list and every categorized mail, and mirror them into DHMail's categories.
 export async function importOutlookCategories(account: Account) {
   if (!usesOutlookCategories(account) || syncing.has(account.id)) return;
   syncing.add(account.id);
@@ -22,7 +22,7 @@ export async function importOutlookCategories(account: Account) {
   } catch (err: any) { log('outlook categories failed', account.email, err?.message); }
   finally { syncing.delete(account.id); }
 }
-// Send a category change made in DHDMail back to Outlook so both stay the same.
+// Send a category change made in DHMail back to Outlook so both stay the same.
 export async function pushOutlookCategory(account: Account, refs: MessageRef[], categoryId: number, assigned: boolean) {
   const cat = get<{ name: string }>('SELECT name FROM categories WHERE id = ?', categoryId); if (!cat) return;
   for (const r of refs) {

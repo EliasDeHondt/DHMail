@@ -13,15 +13,13 @@ extraResources:
     to: oauth.json
 asar: true
 win:
+  # one file for users: the installer (it also updates an existing installation)
   target:
     - target: nsis
       arch:
         - x64
-    - target: portable
-      arch:
-        - x64
   icon: build/icon.png
-  artifactName: ${productName}-${version}-${arch}.${ext}
+  artifactName: ${productName}-Setup-v${version}.${ext}
 nsis:
   oneClick: true
   perMachine: false
@@ -32,5 +30,9 @@ nsis:
   shortcutName: DHMail
   uninstallDisplayName: DHMail
   include: build/installer.nsh
-portable:
-  artifactName: ${productName}-${version}-portable.${ext}
+  differentialPackage: false
+  # the installer always speaks English
+  installerLanguages:
+    - en_US
+  language: '1033'
+  multiLanguageInstaller: false

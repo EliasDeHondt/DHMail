@@ -1,6 +1,6 @@
 <div class="shell">
   <header class="titlebar">
-    <a class="titlebar-brand" routerLink="/mail"><app-logo [wordmark]="true"></app-logo></a>
+    <button type="button" class="titlebar-brand" (click)="openAbout()" [title]="'APP.SETTINGS.TAB_ABOUT' | translate" [attr.aria-label]="'APP.SETTINGS.TAB_ABOUT' | translate"><app-logo [wordmark]="true"></app-logo></button>
     <div class="titlebar-search" [class.titlebar-search--hidden]="state.module() === 'welcome'">
       <app-icon name="search"></app-icon>
       <input type="search" [ngModel]="state.search()" (ngModelChange)="state.search.set($event)" (keydown.enter)="submitSearch()" (keydown.escape)="clearSearch()" [placeholder]="'APP.COMMON.SEARCH_PLACEHOLDER' | translate" spellcheck="false"/>
@@ -29,6 +29,17 @@
     </main>
   </div>
 </div>
+@if (aboutOpen()) {
+<div class="overlay" (mousedown)="aboutOpen.set(false)">
+  <div class="about-dialog" role="dialog" aria-modal="true" [attr.aria-label]="'APP.SETTINGS.TAB_ABOUT' | translate" (mousedown)="$event.stopPropagation()">
+    <app-logo class="about-dialog-logo" [wordmark]="false"></app-logo>
+    <h2 class="about-dialog-title">DHMail</h2>
+    <p class="about-dialog-by">{{ 'APP.SETTINGS.MADE_BY' | translate }} <b>Elias De Hondt</b></p>
+    <p class="about-dialog-version">{{ 'APP.SETTINGS.VERSION' | translate }} {{ aboutInfo()?.version ?? '' }}</p>
+    <p class="about-dialog-link"><a href="#" (click)="$event.preventDefault(); openSite()">eliasdh.com</a></p>
+    <div class="about-dialog-actions"><button type="button" class="btn btn--primary" (click)="aboutOpen.set(false)" autofocus>{{ 'APP.COMMON.CLOSE' | translate }}</button></div>
+  </div>
+</div>}
 <app-overlays></app-overlays>
 <app-undo-bar></app-undo-bar>
 @if (lock.mode() !== 'unlocked' && lock.mode() !== 'checking') {<app-lock-screen></app-lock-screen>}

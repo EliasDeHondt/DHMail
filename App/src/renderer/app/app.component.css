@@ -1,7 +1,17 @@
 .shell { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: var(--background); }
 .titlebar { display: flex; align-items: center; gap: 16px; height: 40px; flex: none; padding: 0 0 0 12px; -webkit-app-region: drag; user-select: none; }
 .titlebar button, .titlebar input, .titlebar a { -webkit-app-region: no-drag; }
-.titlebar-brand { display: inline-flex; text-decoration: none; --logo-size: 24px; }
+.titlebar-brand { display: inline-flex; align-items: center; padding: 3px 6px; margin-left: -6px; border: none; border-radius: 8px; background: none; text-decoration: none; cursor: pointer; transition: background 0.15s; --logo-size: 24px; }
+.titlebar-brand:hover { background: var(--hover); }
+.about-dialog { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; max-width: 400px; padding: 26px 24px 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--background); color: var(--text); box-shadow: var(--shadow); text-align: center; animation: pop 0.16s ease-out; }
+.about-dialog-logo { --logo-size: 72px; }
+.about-dialog-title { margin: 2px 0 0; color: var(--primary); font-size: 30px; letter-spacing: 0.04em; }
+.about-dialog-by { margin: 0; font-size: 15px; }
+.about-dialog-by b { color: var(--primary); }
+.about-dialog-version { margin: 0; color: var(--secondary); font-size: 13.5px; }
+.about-dialog-link { margin: 0; font-size: 13.5px; }
+.about-dialog-link a { color: var(--primary); }
+.about-dialog-actions { display: flex; justify-content: center; margin-top: 8px; }
 .titlebar-search { display: flex; align-items: center; gap: 8px; width: min(520px, 42vw); height: 30px; margin: 0 auto; padding: 0 4px 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--secondary); transition: border-color 0.15s; -webkit-app-region: no-drag; }
 .titlebar-search:focus-within { border-color: var(--primary); }
 .titlebar-search app-icon { --icon-size: 16px; }

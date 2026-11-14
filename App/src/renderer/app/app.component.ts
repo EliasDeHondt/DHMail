@@ -15,6 +15,7 @@ import { LockService } from './core/lock.service';
 import { LockScreenComponent } from './shared/lock-screen.component';
 import { UndoBarComponent } from './shared/undo-bar.component';
 import { enableCustomSelects } from './core/custom-select';
+import { AppInfo } from '../../shared/types';
 @Component({ selector: 'app-root', standalone: true, imports: [RouterModule, FormsModule, TranslatePipe, IconComponent, LogoComponent, OverlaysComponent, LockScreenComponent, UndoBarComponent], templateUrl: './app.component.html', styleUrl: './app.component.css' })
 export class AppComponent {
   readonly store = inject(StoreService);
@@ -27,6 +28,8 @@ export class AppComponent {
   private toast = inject(ToastService);
   readonly failed = signal<string | null>(null);
   readonly busy = computed(() => Object.values(this.store.statuses()).some(s => s.state === 'syncing' || s.state === 'connecting') || !!this.store.syncState());
+  readonly aboutOpen = signal(false);
+  readonly aboutInfo = signal<AppInfo | null>(null);
   readonly errors = computed(() => Object.values(this.store.statuses()).filter(s => s.state === 'error').length);
   constructor() { this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(e => { const seg = (e as NavigationEnd).urlAfterRedirects.split(/[/?#]/).filter(Boolean)[0] as any; this.state.module.set(seg || 'mail'); }); effect(() => { if (this.lock.mode() === 'unlocked') untracked(() => this.openApp()); }); this.watchModals(); enableCustomSelects(); this.boot(); }
   // dim + disable the native window buttons whenever a dialog backdrop (.overlay) is on screen
@@ -34,9 +37,11 @@ export class AppComponent {
   // settings first (theme + language for the lock screen), then the PIN; app data only loads once unlocked
   private async boot() { try { this.store.applySettings(await this.bridge.invoke('settings:get')); await this.lock.start(); } catch (err) { this.failed.set(err instanceof Error ? err.message : String(err)); } }
   private async openApp() { if (this.initializing || this.store.ready()) return; this.initializing = true; try { await this.store.init(); if (!this.store.accounts().length) this.router.navigate(['/welcome']); this.bridge.on('notification:open', ref => { this.state.pendingOpen.set(ref); this.router.navigate(['/mail']); }); } catch (err) { this.failed.set(err instanceof Error ? err.message : String(err)); } finally { this.initializing = false; } }
+  openAbout() { this.aboutOpen.set(true); if (!this.aboutInfo()) this.bridge.invoke('app:info').then(i => this.aboutInfo.set(i)).catch(() => {}); }
+  openSite() { this.bridge.invoke('app:openExternal', 'https://eliasdh.com').catch(() => {}); }
   setLanguage(language: 'nl' | 'en') { this.store.saveSettings({ language }).catch(e => this.toast.error(e)); }
   toggleTheme() { const next = this.theme.dark() ? 'light' : 'dark'; this.store.saveSettings({ theme: next }).catch(e => this.toast.error(e)); }
   submitSearch() { if (this.state.module() !== 'mail') this.router.navigate(['/mail']); this.state.searchSubmit.update(n => n + 1); }
   clearSearch() { this.state.search.set(''); this.state.searchSubmit.update(n => n + 1); }
-  @HostListener('document:keydown', ['$event']) onKey(e: KeyboardEvent) { if (e.ctrlKey && !e.shiftKey && !e.altKey) { const k = e.key.toLowerCase(); if (k === 'l') { e.preventDefault(); this.lock.lock(); } else if (k === '1') { e.preventDefault(); this.router.navigate(['/mail']); } else if (k === '2') { e.preventDefault(); this.router.navigate(['/calendar']); } else if (k === '3') { e.preventDefault(); this.router.navigate(['/people']); } else if (k === 'e' || k === 'f') { e.preventDefault(); (document.querySelector('.titlebar-search input') as HTMLInputElement | null)?.focus(); } } }
+  @HostListener('document:keydown', ['$event']) onKey(e: KeyboardEvent) { if (e.key === 'Escape' && this.aboutOpen()) { e.preventDefault(); this.aboutOpen.set(false); return; } if (e.ctrlKey && !e.shiftKey && !e.altKey) { const k = e.key.toLowerCase(); if (k === 'l') { e.preventDefault(); this.lock.lock(); } else if (k === '1') { e.preventDefault(); this.router.navigate(['/mail']); } else if (k === '2') { e.preventDefault(); this.router.navigate(['/calendar']); } else if (k === '3') { e.preventDefault(); this.router.navigate(['/people']); } else if (k === 'e' || k === 'f') { e.preventDefault(); (document.querySelector('.titlebar-search input') as HTMLInputElement | null)?.focus(); } } }
 }

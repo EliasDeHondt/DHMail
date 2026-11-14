@@ -19,7 +19,7 @@
 .tool-sep { width: 1px; height: 18px; margin: 0 6px; background: var(--line); }
 .tool-select { height: 32px; padding: 0 8px; border: none; border-radius: 8px; background: none; color: var(--secondary); font-size: 13px; }
 .tool-select option { background: var(--surface); color: var(--text); }
-.compose-body { flex: 1; min-height: 160px; padding: 16px 20px; overflow-y: auto; outline: none; font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+.compose-body { flex: 1; min-height: 160px; padding: 16px 20px; overflow-y: auto; outline: none; font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
 .compose-body:empty::before { content: attr(data-placeholder); color: var(--secondary); pointer-events: none; }
 .compose-body img { max-width: 100%; height: auto; }
 .compose-body blockquote { border-left: 2px solid #c9d2df; margin: 8px 0; padding-left: 12px; }

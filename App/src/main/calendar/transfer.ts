@@ -127,9 +127,11 @@ export function itemToIcs(item: Item, uid: string): string {
   if (item.rrule) lines.push(`RRULE:${item.rrule}`);
   for (const x of item.exdates) lines.push(item.allDay ? `EXDATE;VALUE=DATE:${icsDate(x)}` : `EXDATE;TZID=${TZ}:${icsLocal(x)}`);
   lines.push(`SUMMARY:${esc(item.title)}`);
-  if (item.description) lines.push(`DESCRIPTION:${esc(item.description)}`);
+  // guests go into the text, not as ATTENDEE: Google (CalDAV) e-mails every attendee an invitation, and when the
+  // event is later removed a cancellation — which made Outlook delete its own copy of the event
+  const guests = item.attendees.length ? `${item.description ? '\n\n' : ''}Deelnemers: ${item.attendees.join(', ')}` : '';
+  if (item.description || guests) lines.push(`DESCRIPTION:${esc((item.description ?? '') + guests)}`);
   if (item.location) lines.push(`LOCATION:${esc(item.location)}`);
-  for (const a of item.attendees) lines.push(`ATTENDEE;PARTSTAT=NEEDS-ACTION:mailto:${a}`);
   if (item.categories?.length) lines.push(`CATEGORIES:${item.categories.map(esc).join(',')}`);
   const show = item.showAs ?? 'busy'; lines.push(`TRANSP:${show === 'free' ? 'TRANSPARENT' : 'OPAQUE'}`, `X-MICROSOFT-CDO-BUSYSTATUS:${({ busy: 'BUSY', free: 'FREE', tentative: 'TENTATIVE', oof: 'OOF', elsewhere: 'WORKINGELSEWHERE' } as any)[show] ?? 'BUSY'}`); if (item.isPrivate) lines.push('CLASS:PRIVATE');
   lines.push('END:VEVENT', 'END:VCALENDAR');
@@ -305,7 +307,10 @@ async function readItems(cal: any): Promise<Item[]> {
 
 /** the same event in two calendars: same title and same start */
 export const matchKey = (it: { title: string; allDay: boolean; start: Date }) => `${it.allDay ? 'd' : 't'}|${(it.title ?? '').trim().toLowerCase()}|${it.allDay ? ymd(it.start) : Math.round(it.start.getTime() / 60000)}`;
-const byKey = (items: Item[]) => { const m = new Map<string, Item[]>(); for (const it of items) { const k = matchKey(it); m.set(k, [...(m.get(k) ?? []), it]); } return m; };
+/** for "is it already there": a repeating series only matches a series, a single event only a single event
+ *  (a series that matched just its first occurrence was removed as a "double" while the rest existed nowhere else) */
+const sameKey = (it: Item) => `${matchKey(it)}|${it.rrule ? 'series' : 'single'}`;
+const byKey = (items: Item[]) => { const m = new Map<string, Item[]>(); for (const it of items) { const k = sameKey(it); m.set(k, [...(m.get(k) ?? []), it]); } return m; };
 
 /**
  * Where an event in the target finds its labels:
@@ -411,7 +416,7 @@ export async function transferCalendar(from: any, to: any, mode: 'copy' | 'move'
     for (const it of items) {
       n++; if (n % 10 === 0) progress(`${from.name} → ${to.name} · ${n}/${items.length}`);
       if (it.partOfRaw && from.source === 'caldav' && to.source === 'caldav') { result.copied++; continue; }
-      if (present.has(matchKey(it))) { result.skipped++; continue; }
+      if (present.has(sameKey(it))) { result.skipped++; continue; }
       try {
         // labels the event has, else the ones the other events tell (written along: Outlook keeps them on the event, Google gets a colour)
         const names = it.categories?.length ? it.categories : labels.find(it) ?? [];
@@ -426,8 +431,8 @@ export async function transferCalendar(from: any, to: any, mode: 'copy' | 'move'
     }
     // events that were already there (earlier copy / half-finished move) get their labels now
     progress(`${to.name} · labels`);
-    const copiedKeys = new Set(items.map(matchKey));
-    result.labelled += await applyLabels(to, existing.filter(t => copiedKeys.has(matchKey(t))), labels.find, result.errors);
+    const copiedKeys = new Set(items.map(sameKey));
+    result.labelled += await applyLabels(to, existing.filter(t => copiedKeys.has(sameKey(t))), labels.find, result.errors);
     if (canDelete) for (const it of items) {
       if (!it.source || failedSources.has(it.source.id)) continue;
       if (result.deleted % 10 === 0) progress(`${from.name} · ${result.deleted} verwijderd`);
@@ -471,7 +476,7 @@ export async function copyCalendarLabels(from: any, to: any, syncCalendar: (id: 
 export async function previewTransfer(from: any, to: any) {
   const items = await readItems(from); const existing = await readItems(to); const present = byKey(existing);
   const labels = await labelSources([{ cal: from, items }, { cal: to, items: existing }]);
-  const todo = items.filter(it => !present.has(matchKey(it)));
+  const todo = items.filter(it => !present.has(sameKey(it)));
   const withLabels = todo.filter(it => (it.categories?.length ? it.categories : labels.find(it))?.length);
   const titles = new Map<string, string>(); for (const it of todo) if (!titles.has(it.title)) titles.set(it.title, (it.categories?.length ? it.categories : labels.find(it) ?? []).join(', ') || '-');
   return { source: items.length, target: existing.length, alreadyThere: items.length - todo.length, toCopy: todo.length, toCopyWithLabels: withLabels.length, series: todo.filter(it => it.rrule).length, titles: [...titles] };

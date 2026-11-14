@@ -8,7 +8,7 @@ import { discover, oauthServers } from './accounts/discover';
 import { oauthReady } from './accounts/oauth-clients';
 const COLORS = ['#4f94f0', '#0f54ae', '#829ec2', '#3d587b', '#2a78d6', '#14b8a6', '#8b5cf6', '#e87ba4'];
 import { addAccount, getAccount, listAccounts, removeAccount, reorderAccounts, updateAccount } from './accounts/accounts';
-import { importOutlookCategories } from './mail/outlook-categories';
+import { importOutlookCategories, pushPendingCategoryColors } from './mail/outlook-categories';
 import { forgetTokens, oauthFlow, OAuthError } from './accounts/oauth';
 import { setSecret } from './core/secrets';
 import { describe } from './mail/session';
@@ -54,7 +54,7 @@ export function registerIpc(getWindow: () => BrowserWindow | null, focusWindow: 
     'accounts:update': async (id, patch) => { await mail.stopAccount(id); forgetTokens(id); const account = updateAccount(id, patch); activateAccount(account); return account; },
     'accounts:remove': async id => { await mail.stopAccount(id); forgetTokens(id); removeAccount(id); bus.emitEvent('calendar:changed', { calendarId: null }); bus.emitEvent('contacts:changed', { sourceId: null }); },
     'accounts:test': async input => { if (input.authType === 'oauth') return { ok: true }; const client = new ImapFlow({ host: input.imapHost, port: input.imapPort, secure: input.imapSecure, auth: { user: input.username || input.email, pass: input.password ?? '' }, logger: false, connectionTimeout: 20000, greetingTimeout: 15000 }); client.on('error', () => {}); try { await client.connect(); await client.logout(); return { ok: true }; } catch (err) { return { ok: false, error: describe(err) }; } },
-    'accounts:reauth': async id => { const account = getAccount(id); if (!account) throw Object.assign(new Error('Account not found'), { status: 404 }); const result = await oauthFlow(account.provider, account.email); setSecret(`account:${id}:refresh`, result.refreshToken); forgetTokens(id); await mail.stopAccount(id); activateAccount(account); return result; },
+    'accounts:reauth': async id => { const account = getAccount(id); if (!account) throw Object.assign(new Error('Account not found'), { status: 404 }); const result = await oauthFlow(account.provider, account.email); setSecret(`account:${id}:refresh`, result.refreshToken); forgetTokens(id); await mail.stopAccount(id); activateAccount(account); if (account.provider === 'microsoft') pushPendingCategoryColors(); return result; },
     'accounts:status': () => mail.statuses(),
     'accounts:reconnect': id => mail.reconnectAccount(id),
     'mail:folders': accountId => mail.getFolders(accountId),

@@ -162,6 +162,8 @@ export interface Events {
   'sync:state': SyncState;
   'notification:open': MessageRef;
   'theme:system': { dark: boolean };
+  /** a message for the user that comes from background work */
+  'app:notice': { message: string; kind: 'info' | 'success' | 'error' };
 }
 export type EventChannel = keyof Events;
 export interface Bridge {

@@ -101,6 +101,7 @@ export function registerIpc(getWindow: () => BrowserWindow | null, focusWindow: 
     'signatures:remove': id => removeSignature(Number(id)),
     'calendar:transfer': (fromId, toId, mode) => transferCalendar(cal.calendarRow(Number(fromId)), cal.calendarRow(Number(toId)), mode === 'move' ? 'move' : 'copy', cal.syncCalendar),
     'calendar:setCategories': (id, names) => cal.setEventCategories(Number(id), names),
+    'calendar:labels': () => cal.calendarLabels(),
     'calendar:copyLabels': (fromId, toId) => copyCalendarLabels(cal.calendarRow(Number(fromId)), cal.calendarRow(Number(toId)), cal.syncCalendar),
     'contacts:list': query => contacts.listContacts(query),
     'contacts:sources': () => contacts.listSources(),

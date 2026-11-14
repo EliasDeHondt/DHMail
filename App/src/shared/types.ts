@@ -38,6 +38,8 @@ export interface Attendee { name: string; email: string; status: string; }
 export type ShowAs = 'busy' | 'free' | 'tentative' | 'oof' | 'elsewhere';
 export interface CalendarEvent { showAs: ShowAs; isPrivate: boolean; id: number; calendarId: number; uid: string; remoteId: string | null; title: string; description: string; location: string; start: string; end: string; allDay: boolean; status: string; organizer: string | null; attendees: Attendee[]; recurring: boolean; color: string; readOnly: boolean; categories: EventCategory[]; }
 export interface EventCategory { name: string; color: string; }
+/** the labels that occur in one calendar (all its events, not only the ones on screen) */
+export interface CalendarLabels { calendarId: number; labels: string[]; /** some events have no label */ unlabeled: boolean; }
 export interface Signature { id: number; name: string; html: string; /** mailboxes that use this signature by default */ accountIds: number[]; }
 export interface SignatureInput { id?: number; name: string; html: string; accountIds: number[]; }
 export interface CalendarLabelsResult { /** source events with labels */ total: number; updated: number; /** not found in the target */ unmatched: number; failed: number; errors: string[]; }
@@ -52,7 +54,7 @@ export interface ContactSource { id: number; accountId: number | null; kind: Con
 export interface ContactSourceInput { name: string; url: string; username: string; password: string; }
 export interface PlaceSuggestion { label: string; title: string; detail: string; }
 export interface Suggestion { name: string; address: string; source: string; }
-export interface Settings { theme: 'light' | 'dark' | 'system'; language: 'nl' | 'en'; blockRemoteImages: boolean; notifications: boolean; markReadDelaySeconds: number; syncIntervalMinutes: number; weekStartsOn: number; workDayStart: number; workDayEnd: number; googleClientId: string; googleClientSecret: string; microsoftClientId: string; microsoftTenant: string; defaultAccountId: number | null; darkMailBodies: boolean; autoLockMinutes: number; notifyMutedAccounts: number[]; }
+export interface Settings { theme: 'light' | 'dark' | 'system'; language: 'nl' | 'en'; blockRemoteImages: boolean; notifications: boolean; markReadDelaySeconds: number; syncIntervalMinutes: number; weekStartsOn: number; workDayStart: number; workDayEnd: number; googleClientId: string; googleClientSecret: string; microsoftClientId: string; microsoftTenant: string; defaultAccountId: number | null; darkMailBodies: boolean; autoLockMinutes: number; notifyMutedAccounts: number[]; /** calendar id → labels (lower case, '' = events without a label) whose events are hidden */ calendarHiddenLabels: Record<string, string[]>; }
 export interface LockStatus { hasPin: boolean; length: number | null; retryAfter: number; }
 export interface UnlockResult { ok: boolean; retryAfter: number; }
 export interface SavedFile { path: string; name: string; size: number; }
@@ -135,6 +137,7 @@ export interface Api {
   'calendar:transfer': (fromId: number, toId: number, mode: 'copy' | 'move') => CalendarTransferResult;
   'calendar:setCategories': (id: number, names: string[]) => CalendarEvent | null;
   /** put the labels of one calendar's events onto the same events in another calendar */
+  'calendar:labels': () => CalendarLabels[];
   'calendar:copyLabels': (fromId: number, toId: number) => CalendarLabelsResult;
   'contacts:list': (query?: string) => Contact[];
   'contacts:sources': () => ContactSource[];

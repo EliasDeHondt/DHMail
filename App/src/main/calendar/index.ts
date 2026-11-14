@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { all, get, json, lastId, now, run, tx } from '../core/db';
-import { Account, Calendar, CalendarEvent, CalendarInput, EventInput } from '../../shared/types';
+import { Account, Calendar, CalendarEvent, CalendarInput, CalendarLabels, EventInput } from '../../shared/types';
 import { getSecret, setSecret, deleteSecret } from '../core/secrets';
 import { listAccounts, getAccount, isGooglePassword, GOOGLE_CALDAV } from '../accounts/accounts';
 import { bus, log } from '../core/bus';
@@ -54,6 +54,17 @@ const EVENT_SQL = 'SELECT e.*, c.color, c.read_only, c.source, ec.names AS local
 const categoryColors = () => new Map(all<{ name: string; color: string }>('SELECT name, color FROM categories').map(c => [c.name.trim().toLowerCase(), c.color]));
 // a category's colour is always looked up at read time, so changing a label's colour recolours every event that has it (also Outlook events, whose categories are stored on the event)
 const withLocalCategories = (r: any, colors: Map<string, string>) => { if (!r.local_categories) { const stored = json<{ name: string; color: string }[]>(r.categories, []); return stored.length ? { ...r, categories: JSON.stringify(stored.map(c => ({ ...c, color: colors.get(String(c.name ?? '').trim().toLowerCase()) ?? c.color }))) } : r; } const names = json<string[]>(r.local_categories, []); return { ...r, categories: JSON.stringify(names.map(n => ({ name: n, color: colors.get(n.trim().toLowerCase()) ?? r.color }))) }; };
+/** per calendar: every label used by its events (DHMail labels override the event's own, as in withLocalCategories) */
+export function calendarLabels(): CalendarLabels[] {
+  const out = new Map<number, { labels: Map<string, string>; unlabeled: boolean }>();
+  for (const r of all<{ calendar_id: number; categories: string | null; local_categories: string | null }>('SELECT e.calendar_id, e.categories, ec.names AS local_categories FROM events e LEFT JOIN event_categories ec ON ec.calendar_id = e.calendar_id AND ec.uid = e.uid')) {
+    const names = (r.local_categories ? json<string[]>(r.local_categories, []) : json<{ name?: string }[]>(r.categories, []).map(c => String(c?.name ?? ''))).map(n => n.trim()).filter(Boolean);
+    let entry = out.get(r.calendar_id); if (!entry) { entry = { labels: new Map(), unlabeled: false }; out.set(r.calendar_id, entry); }
+    if (!names.length) entry.unlabeled = true;
+    for (const n of names) if (!entry.labels.has(n.toLowerCase())) entry.labels.set(n.toLowerCase(), n);
+  }
+  return [...out].map(([calendarId, e]) => ({ calendarId, labels: [...e.labels.values()].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })), unlabeled: e.unlabeled }));
+}
 export const eventsBetween = (start: string, end: string): CalendarEvent[] => { const colors = categoryColors(); return all(`${EVENT_SQL} WHERE c.visible = 1 AND e.start < ? AND e.end > ? ORDER BY e.all_day DESC, e.start`, end, start).map(r => mapEvent(withLocalCategories(r, colors))); };
 export const eventById = (id: number) => { const r = get(`${EVENT_SQL} WHERE e.id = ?`, id); return r ? mapEvent(withLocalCategories(r, categoryColors())) : null; };
 export async function setEventCategories(id: number, names: string[]): Promise<CalendarEvent | null> {

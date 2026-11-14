@@ -33,6 +33,17 @@
     </div>
   </div>
 </div>}
+@if (dialogs.promptState(); as p) {
+<div class="overlay overlay--top" (mousedown)="$event.target === $event.currentTarget && dialogs.answerPrompt(null)">
+  <form class="confirm prompt" role="dialog" aria-modal="true" (submit)="$event.preventDefault(); dialogs.answerPrompt(pi.value)">
+    <label class="confirm-msg" for="dialog-prompt-input">{{ p.message }}</label>
+    <input #promptInput #pi id="dialog-prompt-input" class="input" type="text" maxlength="250" autocomplete="off" spellcheck="false" [value]="p.value"/>
+    <div class="confirm-actions">
+      <button type="button" class="btn btn--ghost" (click)="dialogs.answerPrompt(null)">{{ 'APP.COMMON.CANCEL' | translate }}</button>
+      <button type="submit" class="btn btn--primary">{{ p.confirmLabel }}</button>
+    </div>
+  </form>
+</div>}
 <div class="toasts" aria-live="polite">
   @for (t of toasts.toasts(); track t.id) {
   <div class="toast" [class.toast--error]="t.kind === 'error'" [class.toast--success]="t.kind === 'success'">

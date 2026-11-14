@@ -40,7 +40,7 @@ export class SignaturesComponent {
   currentOf(accountId: number) { const d = this.draft(); const s = this.store.signatures().find(x => x.accountIds.includes(accountId)); return s && s.id !== d?.id ? s.name : null; }
 
   exec(cmd: string, value?: string) { this.editor?.focus(); document.execCommand(cmd, false, value); }
-  link() { const url = window.prompt(this.translate.instant('APP.SIGNATURES.LINK_PROMPT'), 'https://'); if (url && /^(https?:|mailto:|tel:)/i.test(url)) this.exec('createLink', url); }
+  async link() { const sel = window.getSelection(); const range = sel?.rangeCount ? sel.getRangeAt(0).cloneRange() : null; const url = (await this.dialogs.prompt(this.translate.instant('APP.SIGNATURES.LINK_PROMPT'), 'https://', this.translate.instant('APP.COMMON.ADD')))?.trim(); if (!url || !/^(https?:|mailto:|tel:)/i.test(url)) return; this.editor?.focus(); if (range) { sel?.removeAllRanges(); sel?.addRange(range); } this.exec('createLink', url); }
   async image() { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = () => { const f = input.files?.[0]; if (f) this.insertImage(f); }; input.click(); }
   private insertImage(file: File) { if (file.size > 1_500_000) { this.toast.show(this.translate.instant('APP.SIGNATURES.IMAGE_TOO_BIG'), 'error'); return; } const r = new FileReader(); r.onload = () => this.exec('insertHTML', `<img src="${r.result}" alt="" style="max-width:240px;height:auto">`); r.readAsDataURL(file); }
   onPaste(e: ClipboardEvent) { const file = [...(e.clipboardData?.files ?? [])].find(f => f.type.startsWith('image/')); if (file) { e.preventDefault(); this.insertImage(file); } }

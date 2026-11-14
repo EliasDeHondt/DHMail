@@ -32,12 +32,12 @@
 @if (aboutOpen()) {
 <div class="overlay" (mousedown)="aboutOpen.set(false)">
   <div class="about-dialog" role="dialog" aria-modal="true" [attr.aria-label]="'APP.SETTINGS.TAB_ABOUT' | translate" (mousedown)="$event.stopPropagation()">
-    <app-logo class="about-dialog-logo" [wordmark]="false"></app-logo>
+    <img src="assets/logo.svg" alt="" width="72" height="72" draggable="false">
     <h2 class="about-dialog-title">DHMail</h2>
     <p class="about-dialog-by">{{ 'APP.SETTINGS.MADE_BY' | translate }} <b>Elias De Hondt</b></p>
     <p class="about-dialog-version">{{ 'APP.SETTINGS.VERSION' | translate }} {{ aboutInfo()?.version ?? '' }}</p>
     <p class="about-dialog-link"><a href="#" (click)="$event.preventDefault(); openSite()">eliasdh.com</a></p>
-    <div class="about-dialog-actions"><button type="button" class="btn btn--primary" (click)="aboutOpen.set(false)" autofocus>{{ 'APP.COMMON.CLOSE' | translate }}</button></div>
+    <div class="about-dialog-actions"><button type="button" class="btn btn--primary about-dialog-close" (click)="aboutOpen.set(false)" autofocus>{{ 'APP.COMMON.CLOSE' | translate }}</button></div>
   </div>
 </div>}
 <app-overlays></app-overlays>

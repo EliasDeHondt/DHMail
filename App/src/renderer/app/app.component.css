@@ -3,15 +3,17 @@
 .titlebar button, .titlebar input, .titlebar a { -webkit-app-region: no-drag; }
 .titlebar-brand { display: inline-flex; align-items: center; padding: 3px 6px; margin-left: -6px; border: none; border-radius: 8px; background: none; text-decoration: none; cursor: pointer; transition: background 0.15s; --logo-size: 24px; }
 .titlebar-brand:hover { background: var(--hover); }
-.about-dialog { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; max-width: 400px; padding: 26px 24px 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--background); color: var(--text); box-shadow: var(--shadow); text-align: center; animation: pop 0.16s ease-out; }
-.about-dialog-logo { --logo-size: 72px; }
-.about-dialog-title { margin: 2px 0 0; color: var(--primary); font-size: 30px; letter-spacing: 0.04em; }
+.about-dialog { --about-bg: #f6f7f9; --about-title: #4f94f0; --about-muted: #4f5a66; --about-link: #0f54ae; position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; max-width: 400px; padding: 26px 24px 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--about-bg); color: var(--text); box-shadow: var(--shadow); text-align: center; overflow: hidden; animation: pop 0.16s ease-out; }
+:host-context([data-theme="dark"]) .about-dialog { --about-bg: #0d1016; --about-title: #86b6ff; --about-muted: #a3adb8; --about-link: #86b6ff; }
+.about-dialog::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--primary); }
+.about-dialog-title { margin: 0; color: var(--about-title); font-size: 30px; font-weight: 700; letter-spacing: 0.04em; }
 .about-dialog-by { margin: 0; font-size: 15px; }
-.about-dialog-by b { color: var(--primary); }
-.about-dialog-version { margin: 0; color: var(--secondary); font-size: 13.5px; }
-.about-dialog-link { margin: 0; font-size: 13.5px; }
-.about-dialog-link a { color: var(--primary); }
-.about-dialog-actions { display: flex; justify-content: center; margin-top: 8px; }
+.about-dialog-by b { color: var(--about-title); }
+.about-dialog-version { margin: 0; color: var(--about-muted); }
+.about-dialog-link { margin: 0; }
+.about-dialog-link a { color: var(--about-link); }
+.about-dialog-actions { display: flex; justify-content: center; gap: 8px; margin-top: 8px; align-self: stretch; }
+.about-dialog-close { height: 34px; padding: 0 14px; }
 .titlebar-search { display: flex; align-items: center; gap: 8px; width: min(520px, 42vw); height: 30px; margin: 0 auto; padding: 0 4px 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--secondary); transition: border-color 0.15s; -webkit-app-region: no-drag; }
 .titlebar-search:focus-within { border-color: var(--primary); }
 .titlebar-search app-icon { --icon-size: 16px; }

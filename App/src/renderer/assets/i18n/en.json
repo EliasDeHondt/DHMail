@@ -183,7 +183,10 @@
       "CONVERSATION_COUNT": "{{count}} messages in this conversation",
       "GROUP_PINNED": "Pinned",
       "DRAG_TO_REORDER": "Click to collapse or expand, drag to reorder",
-      "RULE_FROM_SENDER": "Create rule for this sender…"
+      "RULE_FROM_SENDER": "Create rule for this sender…",
+      "EMPTY_TRASH": "Empty trash",
+      "EMPTY_JUNK": "Empty junk",
+      "EMPTIED": "\"{{folder}}\" has been emptied"
     },
     "CALENDAR": {
       "WEEK": "week",
@@ -241,14 +244,14 @@
       "SHOW_ALL": "Show all calendars",
       "COPY_ALL_TO": "Copy all events to",
       "MOVE_ALL_TO": "Move all events to",
-      "COPY_CONFIRM": "Copy all events of \"{{from}}\" to \"{{to}}\"? Repeating events stay repeating.",
-      "MOVE_CONFIRM": "Move all events of \"{{from}}\" to \"{{to}}\"? Each event is only removed from \"{{from}}\" once it is in \"{{to}}\". A large calendar can take a few minutes.",
+      "COPY_CONFIRM": "Copy all events of \"{{from}}\" to \"{{to}}\"? Repeating events stay repeating, labels come along and events that are already there are not added twice.",
+      "MOVE_CONFIRM": "Move all events of \"{{from}}\" to \"{{to}}\"? Events already in \"{{to}}\" are not added again but get their labels; each event is only removed from \"{{from}}\" once it is in \"{{to}}\". A large calendar can take a while.",
       "COPY_START": "Copy",
       "MOVE_START": "Move",
       "TRANSFER_BUSY": "Events from {{from}} to {{to}}… You can keep working.",
-      "COPY_ALL_DONE": "{{copied}} of {{total}} events copied · {{failed}} failed",
-      "MOVE_DONE": "All {{copied}} events moved",
-      "MOVE_PARTIAL": "{{copied}} of {{total}} copied, {{deleted}} removed from the source · {{failed}} failed (still in the old calendar)",
+      "COPY_ALL_DONE": "{{copied}} events copied, {{skipped}} were already there · {{labelled}} with labels · {{failed}} failed",
+      "MOVE_DONE": "{{copied}} events moved, {{skipped}} were already there (the doubles are gone) · {{labelled}} with labels",
+      "MOVE_PARTIAL": "{{copied}} copied, {{skipped}} already there, {{deleted}} removed from the source · {{failed}} failed (still in the old calendar, try again)",
       "SHOW_AS": "Show as",
       "SHOW_BUSY": "Busy",
       "SHOW_FREE": "Free",
@@ -259,7 +262,12 @@
       "ALL_DAY_HINT": "Double-click for an all-day event",
       "EDIT_CALENDAR": "Edit calendar",
       "FILE_REPLACE_HINT": "Choose a new .ics file to replace the events of this calendar, or leave it empty to only change the name or colour.",
-      "OPEN_CONTACT": "Open contact"
+      "OPEN_CONTACT": "Open contact",
+      "COPY_LABELS_TO": "Copy labels to",
+      "LABELS_CONFIRM": "Copy the labels of the events in \"{{from}}\" onto the same events in \"{{to}}\"? Events are matched on title and start time; nothing is copied or deleted.",
+      "LABELS_START": "Copy labels",
+      "LABELS_BUSY": "Labels from {{from}} to {{to}}…",
+      "LABELS_DONE": "{{updated}} events got their labels back"
     },
     "PEOPLE": {
       "EMAIL": "Email",

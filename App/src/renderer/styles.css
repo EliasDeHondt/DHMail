@@ -52,6 +52,8 @@ a { color: var(--ink); }
 .bar-btn--primary { background: var(--primary); color: #fff; font-weight: 600; padding: 0 14px; }
 .bar-btn--primary app-icon { color: #fff; }
 .bar-btn--primary:hover:not(:disabled) { background: color-mix(in srgb, var(--primary) 88%, #fff); }
+.bar-btn--danger app-icon { color: var(--danger); }
+.bar-btn--danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
 .bar-sep { flex: none; width: 1px; height: 20px; margin: 0 4px; background: var(--line); }
 .input, .select, .textarea { width: 100%; min-width: 0; height: 38px; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); font-size: 14px; transition: border-color 0.15s; }
 .textarea { height: auto; min-height: 90px; padding: 10px 12px; resize: vertical; }

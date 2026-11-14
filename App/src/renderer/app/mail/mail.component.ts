@@ -139,7 +139,17 @@ export class MailComponent implements OnDestroy {
   async createFolder(parent: Folder | null, accountId = parent?.accountId ?? this.accountId()) { if (!accountId) return; const name = window.prompt(this.translate.instant('APP.MAIL.FOLDER_NAME_PROMPT')); if (!name?.trim()) return; const path = parent ? `${parent.path}${parent.delimiter}${name.trim()}` : name.trim(); try { const folders = await this.bridge.invoke('mail:createFolder', accountId, path); this.store.folders.update(f => ({ ...f, [accountId]: folders })); } catch (err) { this.toast.error(err); } }
   async renameFolder(f: Folder) { const name = window.prompt(this.translate.instant('APP.MAIL.FOLDER_NAME_PROMPT'), f.name); if (!name?.trim() || name.trim() === f.name) return; try { const folders = await this.bridge.invoke('mail:renameFolder', f.accountId, f.id, name.trim()); this.store.folders.update(x => ({ ...x, [f.accountId]: folders })); } catch (err) { this.toast.error(err); } }
   async deleteFolder(f: Folder) { if (!await this.dialogs.confirm(this.translate.instant('APP.MAIL.DELETE_FOLDER_CONFIRM', { folder: f.name }), this.translate.instant('APP.COMMON.DELETE'), true)) return; try { const folders = await this.bridge.invoke('mail:deleteFolder', f.accountId, f.id); this.store.folders.update(x => ({ ...x, [f.accountId]: folders })); if (this.folderId() === f.id) this.folderId.set(null); } catch (err) { this.toast.error(err); } }
-  async emptyFolder(f: Folder) { if (!await this.dialogs.confirm(this.translate.instant('APP.MAIL.EMPTY_FOLDER_CONFIRM', { folder: f.name }), this.translate.instant('APP.MAIL.EMPTY_FOLDER'), true)) return; try { await this.bridge.invoke('mail:emptyFolder', f.accountId, f.id); if (this.folderId() === f.id) { this.messages.set([]); this.open.set(null); } } catch (err) { this.toast.error(err); } }
+  readonly emptying = signal(false);
+  /** permanently removes every message of a folder (trash / junk), after a confirmation */
+  async emptyFolder(f: Folder) {
+    const t = (k: string, p?: any) => this.translate.instant(k, p);
+    const action = f.specialUse === 'trash' ? 'APP.MAIL.EMPTY_TRASH' : f.specialUse === 'junk' ? 'APP.MAIL.EMPTY_JUNK' : 'APP.MAIL.EMPTY_FOLDER';
+    if (!await this.dialogs.confirm(t('APP.MAIL.EMPTY_FOLDER_CONFIRM', { folder: this.folderLabel(f.id) || f.name }), t(action), true)) return;
+    this.emptying.set(true);
+    try { await this.bridge.invoke('mail:emptyFolder', f.accountId, f.id); if (this.folderId() === f.id) { this.messages.set([]); this.open.set(null); this.selected.set(new Set()); } this.toast.show(t('APP.MAIL.EMPTIED', { folder: this.folderLabel(f.id) || f.name }), 'success'); }
+    catch (err) { this.toast.error(err); }
+    finally { this.emptying.set(false); }
+  }
   onDragStart(e: DragEvent, m: MessageSummary) { const targets = this.selected().has(m.uid) ? this.selectedList() : [m]; e.dataTransfer?.setData('application/x-dhmail-messages', JSON.stringify(this.refs(targets).map(r => r.uid))); e.dataTransfer!.effectAllowed = 'move'; }
   onDragOver(e: DragEvent, f: Folder) { if (!f.selectable || !e.dataTransfer?.types.includes('application/x-dhmail-messages')) return; e.preventDefault(); e.dataTransfer.dropEffect = 'move'; this.dragOver.set(f.id); }
   onDrop(e: DragEvent, f: Folder) { e.preventDefault(); this.dragOver.set(null); const raw = e.dataTransfer?.getData('application/x-dhmail-messages'); if (!raw) return; const uids = new Set<number>(JSON.parse(raw)); const targets = (this.serverResults() ?? this.messages()).filter(m => uids.has(m.uid)); this.moveTo(f, targets); }

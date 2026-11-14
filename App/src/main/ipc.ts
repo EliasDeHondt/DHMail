@@ -17,7 +17,7 @@ import { saveDraft, sendMail } from './mail/smtp';
 import { categorize, listCategories, removeCategory, saveCategory } from './mail/categories';
 import { listRules, removeRule, reorderRules, runRules, saveRule } from './mail/rules';
 import * as cal from './calendar';
-import { transferCalendar } from './calendar/transfer';
+import { copyCalendarLabels, transferCalendar } from './calendar/transfer';
 import { forkSignature, listSignatures, removeSignature, saveSignature } from './mail/signatures';
 import * as contacts from './contacts';
 import { copyContactTo, copyContacts, createContactIn } from './contacts/copy';
@@ -101,6 +101,7 @@ export function registerIpc(getWindow: () => BrowserWindow | null, focusWindow: 
     'signatures:remove': id => removeSignature(Number(id)),
     'calendar:transfer': (fromId, toId, mode) => transferCalendar(cal.calendarRow(Number(fromId)), cal.calendarRow(Number(toId)), mode === 'move' ? 'move' : 'copy', cal.syncCalendar),
     'calendar:setCategories': (id, names) => cal.setEventCategories(Number(id), names),
+    'calendar:copyLabels': (fromId, toId) => copyCalendarLabels(cal.calendarRow(Number(fromId)), cal.calendarRow(Number(toId)), cal.syncCalendar),
     'contacts:list': query => contacts.listContacts(query),
     'contacts:sources': () => contacts.listSources(),
     'contacts:photos': () => contacts.contactPhotos(),

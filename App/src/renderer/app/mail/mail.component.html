@@ -44,6 +44,10 @@
       <button type="button" class="bar-btn bar-btn--minor" [disabled]="!actionTargets().length" (click)="act(actionTargets()[0]?.seen ? 'unread' : 'read')" [title]="(actionTargets()[0]?.seen ? 'APP.MAIL.MARK_UNREAD' : 'APP.MAIL.MARK_READ') | translate"><app-icon [name]="actionTargets()[0]?.seen ? 'unread' : 'mail-open'"></app-icon><span>{{ (actionTargets()[0]?.seen ? 'APP.MAIL.MARK_UNREAD' : 'APP.MAIL.MARK_READ') | translate }}</span></button>
       <button type="button" class="bar-btn bar-btn--minor" [disabled]="!actionTargets().length" (click)="act(actionTargets()[0]?.flagged ? 'unpin' : 'pin')" [title]="(actionTargets()[0]?.flagged ? 'APP.MAIL.UNPIN' : 'APP.MAIL.PIN') | translate"><app-icon name="pin" [filled]="!!actionTargets()[0]?.flagged"></app-icon><span>{{ (actionTargets()[0]?.flagged ? 'APP.MAIL.UNPIN' : 'APP.MAIL.PIN') | translate }}</span></button>
             <button type="button" class="bar-btn" [disabled]="!actionTargets().length" (click)="openCategoryMenu($event)" [title]="'APP.MAIL.CATEGORIZE' | translate"><app-icon name="tag"></app-icon><span>{{ 'APP.MAIL.CATEGORIZE' | translate }}</span><app-icon name="chevron-down"></app-icon></button>
+      @if (folder()?.specialUse === 'trash' || folder()?.specialUse === 'junk') {
+        <span class="bar-sep"></span>
+        <button type="button" class="bar-btn bar-btn--danger" [disabled]="emptying() || !folder()!.total && !visible().length" (click)="emptyFolder(folder()!)" [title]="(folder()!.specialUse === 'trash' ? 'APP.MAIL.EMPTY_TRASH' : 'APP.MAIL.EMPTY_JUNK') | translate"><app-icon name="trash"></app-icon><span>{{ (folder()!.specialUse === 'trash' ? 'APP.MAIL.EMPTY_TRASH' : 'APP.MAIL.EMPTY_JUNK') | translate }}</span></button>
+      }
       <span class="toolbar-spacer"></span>
       <button type="button" class="icon-btn" (click)="refresh()" [title]="'APP.COMMON.REFRESH' | translate"><app-icon name="refresh" [class.spinning]="loading()"></app-icon></button>
     </div>

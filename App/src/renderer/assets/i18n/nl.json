@@ -183,7 +183,10 @@
       "CONVERSATION_COUNT": "{{count}} berichten in deze conversatie",
       "GROUP_PINNED": "Vastgezet",
       "DRAG_TO_REORDER": "Klik om in of uit te klappen, sleep om de volgorde te wijzigen",
-      "RULE_FROM_SENDER": "Regel maken voor deze afzender…"
+      "RULE_FROM_SENDER": "Regel maken voor deze afzender…",
+      "EMPTY_TRASH": "Prullenbak leegmaken",
+      "EMPTY_JUNK": "Ongewenst leegmaken",
+      "EMPTIED": "\"{{folder}}\" is leeggemaakt"
     },
     "CALENDAR": {
       "WEEK": "week",
@@ -241,14 +244,14 @@
       "SHOW_ALL": "Alle agenda's tonen",
       "COPY_ALL_TO": "Alle afspraken kopiëren naar",
       "MOVE_ALL_TO": "Alle afspraken verplaatsen naar",
-      "COPY_CONFIRM": "Alle afspraken van \"{{from}}\" kopiëren naar \"{{to}}\"? Herhalende afspraken blijven herhalend.",
-      "MOVE_CONFIRM": "Alle afspraken van \"{{from}}\" verplaatsen naar \"{{to}}\"? Elke afspraak wordt pas uit \"{{from}}\" verwijderd nadat ze in \"{{to}}\" staat. Dit kan bij een grote agenda enkele minuten duren.",
+      "COPY_CONFIRM": "Alle afspraken van \"{{from}}\" kopiëren naar \"{{to}}\"? Herhalende afspraken blijven herhalend, labels gaan mee en afspraken die er al staan worden niet dubbel gezet.",
+      "MOVE_CONFIRM": "Alle afspraken van \"{{from}}\" verplaatsen naar \"{{to}}\"? Afspraken die al in \"{{to}}\" staan worden niet opnieuw gezet maar krijgen hun labels; elke afspraak wordt pas uit \"{{from}}\" verwijderd als ze in \"{{to}}\" staat. Bij een grote agenda kan dit een tijd duren.",
       "COPY_START": "Kopiëren",
       "MOVE_START": "Verplaatsen",
       "TRANSFER_BUSY": "Afspraken van {{from}} naar {{to}}… Je kan verder werken.",
-      "COPY_ALL_DONE": "{{copied}} van {{total}} afspraken gekopieerd · {{failed}} mislukt",
-      "MOVE_DONE": "Alle {{copied}} afspraken verplaatst",
-      "MOVE_PARTIAL": "{{copied}} van {{total}} gekopieerd, {{deleted}} uit de bron verwijderd · {{failed}} mislukt (die staan nog in de oude agenda)",
+      "COPY_ALL_DONE": "{{copied}} afspraken gekopieerd, {{skipped}} stonden er al · {{labelled}} met labels · {{failed}} mislukt",
+      "MOVE_DONE": "{{copied}} afspraken verplaatst, {{skipped}} stonden er al (de dubbele zijn weg) · {{labelled}} met labels",
+      "MOVE_PARTIAL": "{{copied}} gekopieerd, {{skipped}} stonden er al, {{deleted}} uit de bron verwijderd · {{failed}} mislukt (die staan nog in de oude agenda, probeer opnieuw)",
       "SHOW_AS": "Weergeven als",
       "SHOW_BUSY": "Bezet",
       "SHOW_FREE": "Vrij",
@@ -259,7 +262,12 @@
       "ALL_DAY_HINT": "Dubbelklik voor een afspraak van de hele dag",
       "EDIT_CALENDAR": "Agenda bewerken",
       "FILE_REPLACE_HINT": "Kies een nieuw .ics-bestand om de afspraken van deze agenda te vervangen, of laat dit leeg om alleen de naam of kleur te wijzigen.",
-      "OPEN_CONTACT": "Contact openen"
+      "OPEN_CONTACT": "Contact openen",
+      "COPY_LABELS_TO": "Labels overnemen naar",
+      "LABELS_CONFIRM": "De labels van de afspraken in \"{{from}}\" overnemen op dezelfde afspraken in \"{{to}}\"? Afspraken worden gekoppeld op titel en starttijd; er wordt niets gekopieerd of verwijderd.",
+      "LABELS_START": "Labels overnemen",
+      "LABELS_BUSY": "Labels van {{from}} naar {{to}}…",
+      "LABELS_DONE": "{{updated}} afspraken kregen hun labels terug"
     },
     "PEOPLE": {
       "EMAIL": "E-mail",

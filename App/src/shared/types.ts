@@ -40,7 +40,8 @@ export interface CalendarEvent { showAs: ShowAs; isPrivate: boolean; id: number;
 export interface EventCategory { name: string; color: string; }
 export interface Signature { id: number; name: string; html: string; /** mailboxes that use this signature by default */ accountIds: number[]; }
 export interface SignatureInput { id?: number; name: string; html: string; accountIds: number[]; }
-export interface CalendarTransferResult { total: number; copied: number; failed: number; deleted: number; errors: string[]; /** move: everything was copied and removed from the source */ movedAll: boolean; }
+export interface CalendarLabelsResult { /** source events with labels */ total: number; updated: number; /** not found in the target */ unmatched: number; failed: number; errors: string[]; }
+export interface CalendarTransferResult { total: number; copied: number; /** already in the target (not written again) */ skipped: number; /** events that got labels */ labelled: number; failed: number; deleted: number; errors: string[]; /** move: everything was copied and removed from the source */ movedAll: boolean; }
 export interface EventInput { id?: number; calendarId: number; title: string; description: string; location: string; start: string; end: string; allDay: boolean; /** e-mail addresses to invite; undefined = leave the guest list as it is */ attendees?: string[]; showAs?: ShowAs; isPrivate?: boolean; }
 export interface CalendarInput { source: CalendarSource; name: string; color: string; url?: string; username?: string; password?: string; icsData?: string; }
 export interface ContactField { value: string; label: string; }
@@ -133,6 +134,8 @@ export interface Api {
   /** copy or move every event of one calendar to another (any provider) */
   'calendar:transfer': (fromId: number, toId: number, mode: 'copy' | 'move') => CalendarTransferResult;
   'calendar:setCategories': (id: number, names: string[]) => CalendarEvent | null;
+  /** put the labels of one calendar's events onto the same events in another calendar */
+  'calendar:copyLabels': (fromId: number, toId: number) => CalendarLabelsResult;
   'contacts:list': (query?: string) => Contact[];
   'contacts:sources': () => ContactSource[];
   'contacts:photos': () => Record<string, string>;

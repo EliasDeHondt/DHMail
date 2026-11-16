@@ -1,6 +1,6 @@
 appId: com.eliasdehondt.dhmail
 productName: DHMail
-copyright: Copyright © Elias De Hondt
+copyright: Copyright © Group DH
 directories:
   output: release
   buildResources: build

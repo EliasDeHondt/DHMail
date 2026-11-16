@@ -1,4 +1,4 @@
-<!--Author EliasDH Team-->
+<!--Author Group DH Team-->
 <div class="color-picker">
     <button class="color-picker-trigger cursor-pointer" [class.color-picker-trigger--compact]="compact" [class.is-open]="open" type="button" [id]="inputId" [disabled]="disabled" aria-haspopup="dialog" [attr.aria-expanded]="open" [attr.aria-controls]="open ? dialogId : null" [attr.aria-label]="label ? label : (('APP.COMMON.COLOR_PICKER.CHOOSE_COLOR'|translate) + ': ' + value)" [attr.title]="compact && label ? label : null" (click)="toggle()">
         <ng-content></ng-content>

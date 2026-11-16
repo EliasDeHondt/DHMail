@@ -1,6 +1,6 @@
 /**
-    * @author EliasDH Team
-    * @see https://eliasdh.com
+    * @author Group DH Team
+    * @see https://group-dh.com
     * @since 29/10/2026
 **/
 

@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { all, get, lastId, run } from '../core/db';
 import { Category, MessageRef } from '../../shared/types';
 import { assignCategory } from './sync';

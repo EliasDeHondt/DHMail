@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { randomUUID } from 'node:crypto';
 import { all, get, json, now, run } from '../core/db';
 import { ContactCopyResult, ContactField, ContactInput } from '../../shared/types';

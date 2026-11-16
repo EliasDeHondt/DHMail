@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { app, BrowserWindow, nativeTheme, net, protocol, shell } from 'electron';
 import { existsSync } from 'node:fs';
 import { join, normalize } from 'node:path';

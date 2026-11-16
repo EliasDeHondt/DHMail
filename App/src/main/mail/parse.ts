@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { simpleParser, ParsedMail, AddressObject } from 'mailparser';
 import { MessageStructureObject, MessageAddressObject } from 'imapflow';
 import { Address, AttachmentInfo } from '../../shared/types';

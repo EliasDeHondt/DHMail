@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { safeStorage } from 'electron';
 import { get, run } from './db';
 const canEncrypt = () => safeStorage.isEncryptionAvailable();

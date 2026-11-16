@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { all, get } from '../core/db';
 
 // Groups an account's messages into conversations (Outlook-style): replies are linked to their
@@ -40,4 +46,3 @@ export function threadIndex(accountId: number): Index {
   cache.set(accountId, index);
   return index;
 }
-

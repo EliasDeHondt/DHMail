@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
 import { StoreService } from '../core/store.service';
 import { colorFor, initials } from '../core/format';

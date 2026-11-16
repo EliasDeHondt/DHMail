@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { all, run } from './db';
 import { Settings } from '../../shared/types';
 export const DEFAULTS: Settings = { theme: 'system', language: 'nl', blockRemoteImages: true, notifications: true, markReadDelaySeconds: 2, syncIntervalMinutes: 2, weekStartsOn: 1, workDayStart: 8, workDayEnd: 18, googleClientId: '', googleClientSecret: '', microsoftClientId: '', microsoftTenant: 'common', defaultAccountId: null, darkMailBodies: true, autoLockMinutes: 30, notifyMutedAccounts: [], calendarHiddenLabels: {} };

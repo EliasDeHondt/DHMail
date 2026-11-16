@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 :host { display: flex; flex: 1; min-height: 0; }
 .mail { display: flex; flex: 1; min-width: 0; min-height: 0; }
 .folders { display: flex; flex-direction: column; width: var(--folder-width, 250px); flex: none; min-height: 0; padding: 10px 8px 0; border-right: 1px solid var(--line-soft); background: var(--surface-2); }

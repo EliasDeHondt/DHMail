@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { Routes } from '@angular/router';
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'mail' },

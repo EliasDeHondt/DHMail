@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import ICAL from 'ical.js';
 import { ContactField, ContactInput } from '../../shared/types';
 export interface ParsedContact extends ContactInput { remoteId: string | null; photo: string | null; }

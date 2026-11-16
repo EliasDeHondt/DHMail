@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 :root[data-theme="dark"] { --text: #edeff2; --background: #060709; --primary: #0f54ae; --secondary: #818a92; --accent: #3d587b; --success: #199e70; --surface: #0d1016; --surface-2: #141924; --line: rgba(128, 128, 128, 0.22); --line-soft: rgba(128, 128, 128, 0.13); --hover: rgba(128, 128, 128, 0.12); --tint: color-mix(in srgb, var(--primary) 22%, transparent); --ink: #86b6ff; --danger: #f87171; --warn-bg: rgba(251, 191, 36, 0.14); --warn-ink: #fcd34d; --shadow: 0 8px 24px rgba(0, 0, 0, 0.55); --chart-1: #3987e5; --chart-2: #d95926; --chart-3: #199e70; --chart-4: #c98500; --chart-5: #d55181; }
 :root[data-theme="light"], :root { --text: #0c0e11; --background: #f6f7f9; --primary: #4f94f0; --secondary: #6c757d; --accent: #829ec2; --success: #1baf7a; --surface: #ffffff; --surface-2: #eef1f5; --line: rgba(128, 128, 128, 0.2); --line-soft: rgba(128, 128, 128, 0.13); --hover: rgba(128, 128, 128, 0.09); --tint: color-mix(in srgb, var(--primary) 12%, transparent); --ink: color-mix(in srgb, var(--primary) 78%, var(--text)); --danger: #e74c3c; --warn-bg: #fef3c7; --warn-ink: #92400e; --shadow: 0 8px 24px rgba(0, 0, 0, 0.14); --chart-1: #2a78d6; --chart-2: #eb6834; --chart-3: #1baf7a; --chart-4: #eda100; --chart-5: #e87ba4; }
 @font-face { font-family: 'Roboto'; font-style: normal; font-weight: 400; src: url(assets/fonts/roboto-cyrillic-ext.woff2) format('woff2'); unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }

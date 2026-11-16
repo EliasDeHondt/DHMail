@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { EventEmitter } from 'node:events';
 import { Events } from '../../shared/types';
 class Bus extends EventEmitter { emitEvent<K extends keyof Events>(channel: K, payload: Events[K]) { this.emit('event', channel, payload); } }

@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 const test = require('node:test');
 const assert = require('node:assert');
 const { easterSunday, belgianHolidays, isBuiltInExtraCalendar } = require('../dist/main/main/calendar/holidays.js');

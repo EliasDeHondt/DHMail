@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { app, BrowserWindow, dialog, ipcMain, shell, clipboard } from 'electron';
 import { readFile, writeFile, stat } from 'node:fs/promises';
 import { basename, join } from 'node:path';

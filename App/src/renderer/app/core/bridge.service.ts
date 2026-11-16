@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { Injectable, NgZone, inject } from '@angular/core';
 import { Api, ApiChannel, Bridge, EventChannel, Events } from '../../../shared/types';
 declare global { interface Window { dhmail: Bridge; } }

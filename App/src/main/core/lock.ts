@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import { LockStatus, UnlockResult } from '../../shared/types';
 import { getSecret, setSecret } from './secrets';

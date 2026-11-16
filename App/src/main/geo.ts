@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { PlaceSuggestion } from '../shared/types';
 import { log } from './core/bus';
 const PHOTON = 'https://photon.komoot.io/api/';

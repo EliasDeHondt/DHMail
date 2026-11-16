@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { Address, MailRule, MessageRef, MessageSummary, RuleActions, RuleCondition, RuleDestination, RuleField, RuleRunResult } from '../../shared/types';
 import { all, get, json, lastId, run, tx } from '../core/db';
 import { log } from '../core/bus';

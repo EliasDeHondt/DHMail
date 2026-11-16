@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 :host { display: block; width: 100%; }
 .choices { display: flex; flex-direction: column; gap: 10px; }
 .choice { display: flex; align-items: center; gap: 14px; width: 100%; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--text); text-align: left; transition: border-color 0.15s, background 0.15s, transform 0.1s; }

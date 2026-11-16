@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 :host { position: relative; display: block; flex: 1; min-width: 0; }
 .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 38px; padding: 4px 0; cursor: var(--cursor-text); }
 .rchip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 2px 4px 2px 2px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; background: var(--surface); }

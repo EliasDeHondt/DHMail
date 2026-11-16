@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 const hoodiecrow = require('hoodiecrow-imap');
 const { SMTPServer } = require('smtp-server');
 const day = n => new Date(Date.now() - n * 86400000);

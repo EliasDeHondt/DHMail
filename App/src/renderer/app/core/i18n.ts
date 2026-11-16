@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { TranslateLoader, TranslationObject } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import nl from '../../assets/i18n/nl.json';

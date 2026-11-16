@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { Injectable, signal } from '@angular/core';
 import { MessageRef } from '../../../shared/types';
 @Injectable({ providedIn: 'root' })

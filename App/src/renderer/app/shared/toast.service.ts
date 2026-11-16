@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { Injectable, signal } from '@angular/core';
 export interface Toast { id: number; message: string; kind: 'info' | 'success' | 'error'; action?: { label: string; run: () => void }; }
 @Injectable({ providedIn: 'root' })

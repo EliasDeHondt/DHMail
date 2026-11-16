@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { all, get, lastId, run, tx } from '../core/db';
 import { Signature, SignatureInput } from '../../shared/types';
 

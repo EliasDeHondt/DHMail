@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { gapi } from '../calendar/google';
 import { ParsedContact } from './vcard';
 const FIELDS = 'names,emailAddresses,phoneNumbers,organizations,birthdays,photos,biographies';

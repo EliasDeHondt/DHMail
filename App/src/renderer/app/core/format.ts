@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { Address } from '../../../shared/types';
 const PALETTE = ['#4f94f0', '#1baf7a', '#eb6834', '#eda100', '#e87ba4', '#8b5cf6', '#14b8a6', '#0f54ae', '#199e70', '#d95926'];
 export const initials = (name: string, address = ''): string => { const base = (name || address.split('@')[0] || '?').trim(); const parts = base.split(/[\s._-]+/).filter(Boolean); return ((parts[0]?.[0] ?? '') + (parts.length > 1 ? parts[parts.length - 1][0] : parts[0]?.[1] ?? '')).toUpperCase(); };

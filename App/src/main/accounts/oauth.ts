@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { createHash, randomBytes } from 'node:crypto';
 import { createServer } from 'node:http';
 import { shell } from 'electron';

@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { all, get, json, lastId, now, run, tx } from '../core/db';
 import { Account, Contact, ContactInput, ContactSource, ContactSourceInput, Suggestion } from '../../shared/types';
 import { getSecret, setSecret, deleteSecret } from '../core/secrets';

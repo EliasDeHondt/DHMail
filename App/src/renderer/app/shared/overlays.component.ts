@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { Component, ElementRef, HostListener, inject, signal, ViewChild, effect } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { IconComponent } from './icon.component';

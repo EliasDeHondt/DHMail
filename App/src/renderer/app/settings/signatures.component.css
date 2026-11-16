@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 :host { display: flex; flex-direction: column; gap: 14px; }
 .sig-edit { display: flex; flex-direction: column; gap: 14px; max-width: 720px; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
 .sig-boxes { display: flex; flex-direction: column; gap: 6px; }

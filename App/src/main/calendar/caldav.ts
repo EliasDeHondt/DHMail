@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { createDAVClient } from 'tsdav';
 const name = (v: any): string => typeof v === 'string' ? v : v && typeof v === 'object' ? String(v['_text'] ?? v['#text'] ?? Object.values(v)[0] ?? '') : '';
 async function client(url: string, username: string, password: string, type: 'caldav' | 'carddav') { return createDAVClient({ serverUrl: url, credentials: { username, password }, authMethod: 'Basic', defaultAccountType: type }); }

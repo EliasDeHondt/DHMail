@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { BrowserWindow, clipboard, Menu, MenuItemConstructorOptions } from 'electron';
 import { getSettings } from './core/settings';
 const TEXT = { nl: { cut: 'Knippen', copy: 'Kopiëren', paste: 'Plakken', selectAll: 'Alles selecteren', copyLink: 'Linkadres kopiëren', copyEmail: 'E-mailadres kopiëren', addWord: 'Toevoegen aan woordenboek' }, en: { cut: 'Cut', copy: 'Copy', paste: 'Paste', selectAll: 'Select all', copyLink: 'Copy link address', copyEmail: 'Copy email address', addWord: 'Add to dictionary' } };

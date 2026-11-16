@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { ImapFlow } from 'imapflow';
 import { Account, AccountState, AccountStatus } from '../../shared/types';
 import { getSecret } from '../core/secrets';

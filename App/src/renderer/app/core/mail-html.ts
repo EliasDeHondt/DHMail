@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import DOMPurify from 'dompurify';
 const REMOTE_URL = /^(https?:)?\/\//i;
 const REMOTE_SRCSET = /(^|,)\s*(https?:)?\/\//i;

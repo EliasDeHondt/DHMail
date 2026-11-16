@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { ImapFlow, FetchMessageObject } from 'imapflow';
 import { Account, Folder, ListQuery, ListResult, MessageBody, MessageRef, MessageSummary, SpecialUse } from '../../shared/types';
 import { all, get, json, now, run, tx } from '../core/db';

@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { app } from 'electron';
 import { cpSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, rmdirSync } from 'node:fs';
 import { join } from 'node:path';

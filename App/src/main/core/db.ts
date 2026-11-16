@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { DatabaseSync } from 'node:sqlite';
 export type Row = Record<string, any>;
 let db: DatabaseSync;

@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 :host { display: flex; flex-direction: column; gap: 14px; }
 .shead { display: flex; align-items: center; gap: 8px; }
 .stitle { flex: 1; margin: 0; font-size: 20px; font-weight: 700; }

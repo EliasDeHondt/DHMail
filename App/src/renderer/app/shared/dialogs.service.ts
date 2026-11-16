@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { Injectable, signal } from '@angular/core';
 export interface ConfirmState { message: string; confirmLabel: string; danger: boolean; resolve: (ok: boolean) => void; }
 export interface PromptState { message: string; value: string; confirmLabel: string; resolve: (value: string | null) => void; }

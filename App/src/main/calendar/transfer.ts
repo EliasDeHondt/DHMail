@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import ICAL from 'ical.js';
 import { randomUUID } from 'node:crypto';
 import { all, get, now, run } from '../core/db';

@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { app, BrowserWindow, Notification } from 'electron';
 import { getSettings } from './core/settings';
 import { getAccount } from './accounts/accounts';

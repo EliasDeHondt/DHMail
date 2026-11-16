@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { IcsEvent } from './ics';
 
 // Belgian public holidays (the ten legal holidays plus Easter and Whit Sunday), computed locally

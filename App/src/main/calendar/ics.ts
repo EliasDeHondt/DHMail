@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import ICAL from 'ical.js';
 import { Attendee, EventInput } from '../../shared/types';
 export interface IcsEvent { showAs?: string; isPrivate?: boolean; uid: string; recurrenceId: string | null; title: string; description: string; location: string; start: string; end: string; allDay: boolean; status: string; organizer: string | null; attendees: Attendee[]; recurring: boolean; categories?: { name: string; color: string }[]; }

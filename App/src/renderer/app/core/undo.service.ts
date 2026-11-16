@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { Injectable, computed, signal } from '@angular/core';
 
 export interface PendingAction { id: number; kind: string; ids: number[]; message: string; deadline: number; }

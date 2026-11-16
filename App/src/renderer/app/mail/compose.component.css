@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 :host { display: flex; flex: 1; min-height: 0; }
 .compose { display: flex; flex-direction: column; flex: 1; min-height: 0; animation: fade 0.15s ease-out; }
 .compose-head { display: flex; align-items: center; gap: 8px; flex: none; padding: 8px 12px 8px 20px; border-bottom: 1px solid var(--line-soft); }

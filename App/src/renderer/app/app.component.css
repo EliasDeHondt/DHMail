@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 .shell { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: var(--background); }
 .titlebar { display: flex; align-items: center; gap: 16px; height: 40px; flex: none; padding: 0 0 0 12px; -webkit-app-region: drag; user-select: none; }
 .titlebar button, .titlebar input, .titlebar a { -webkit-app-region: no-drag; }

@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import { randomUUID } from 'node:crypto';
 import { all, get, json, lastId, now, run, tx } from '../core/db';
 import { Account, Calendar, CalendarEvent, CalendarInput, CalendarLabels, EventInput } from '../../shared/types';

@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 const test = require('node:test');
 const assert = require('node:assert');
 const { parseIcs, buildIcs } = require('../dist/main/main/calendar/ics.js');

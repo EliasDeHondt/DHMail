@@ -1,3 +1,4 @@
+<!--Author Group DH Team-->
 <div class="shead"><h2 class="stitle">{{ 'APP.SETTINGS.TAB_RULES' | translate }}</h2>@if (rules().length) {<button type="button" class="btn btn--sm" [disabled]="running() !== null" (click)="run(null)"><app-icon name="filter"></app-icon>{{ 'APP.RULES.RUN_ALL' | translate }}</button>}<button type="button" class="btn btn--primary btn--sm" (click)="create()"><app-icon name="plus"></app-icon>{{ 'APP.RULES.NEW' | translate }}</button></div>
 <p class="hint intro">{{ 'APP.RULES.INTRO' | translate }}</p>
 @if (draft(); as d) {

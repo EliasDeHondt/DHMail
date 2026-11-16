@@ -1,7 +1,7 @@
 /**
     * @author Group DH Team
     * @see https://group-dh.com
-    * @since 29/10/2026
+    * @since 16/11/2026
 **/
 
 import { Component, ElementRef, HostListener, Input, OnDestroy, OnInit, forwardRef, inject } from '@angular/core';

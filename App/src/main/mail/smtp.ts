@@ -1,3 +1,9 @@
+/**
+    * @author Group DH Team
+    * @see https://group-dh.com
+    * @since 16/11/2026
+**/
+
 import nodemailer from 'nodemailer';
 import MailComposer from 'nodemailer/lib/mail-composer';
 import { readFile } from 'node:fs/promises';
